@@ -1,0 +1,77 @@
+
+
+Tribunal administratif d'Amiens : Aisne, Oise, Somme
+
+Tribunal administratif de Bastia : Corse-du-Sud, Haute-Corse
+
+Tribunal administratif de Besançon : Doubs, Jura, Haute-Saône, Territoire de Belfort
+
+Tribunal administratif de Bordeaux : Dordogne, Gironde, Lot-et-Garonne
+
+Tribunal administratif de Caen : Calvados, Manche, Orne
+
+Tribunal administratif de Cergy-Pontoise : Hauts-de-Seine, Val-d'Oise
+
+Tribunal administratif de Châlons-en-Champagne : Ardennes, Aube, Marne, Haute-Marne
+
+Tribunal administratif de Clermont-Ferrand : Allier, Cantal, Haute-Loire, Puy-de-Dôme
+
+Tribunal administratif de Dijon : Côte-d'Or, Nièvre, Saône-et-Loire, Yonne
+
+Tribunal administratif de Grenoble : Drôme, Isère, Savoie, Haute-Savoie
+
+Tribunal administratif de Lille : Nord, Pas-de-Calais
+
+Tribunal administratif de Limoges : Corrèze, Creuse, Indre, Haute-Vienne
+
+Tribunal administratif de Lyon : Ain, Ardèche, Loire, Rhône
+
+Tribunal administratif de Marseille : Alpes-de-Haute-Provence, Hautes-Alpes, Bouches-du-Rhône
+
+Tribunal administratif de Melun : Seine-et-Marne, Val-de-Marne
+
+Tribunal administratif de Montpellier : Aude, Hérault, Pyrénées-Orientales
+
+Tribunal administratif de Montreuil : Seine-Saint-Denis
+
+Tribunal administratif de Nancy : Meurthe-et-Moselle, Meuse, Vosges
+
+Tribunal administratif de Nantes : Loire-Atlantique, Maine-et-Loire, Mayenne, Sarthe, Vendée
+
+Tribunal administratif de Nice : Alpes-Maritimes
+
+Tribunal administratif de Nîmes : Gard, Lozère, Vaucluse
+
+Tribunal administratif d'Orléans : Cher, Eure-et-Loir, Indre-et-Loire, Loir-et-Cher, Loiret
+
+Tribunal administratif de Paris : Paris
+
+Tribunal administratif de Pau : Gers, Landes, Pyrénées-Atlantiques, Hautes-Pyrénées
+
+Tribunal administratif de Poitiers : Charente, Charente-Maritime, Deux-Sèvres, Vienne
+
+Tribunal administratif de Rennes : Côtes-d'Armor, Finistère, Ille-et-Vilaine, Morbihan
+
+Tribunal administratif de Rouen : Eure, Seine-Maritime
+
+Tribunal administratif de Strasbourg : Moselle, Bas-Rhin, Haut-Rhin
+
+Tribunal administratif de Toulon : Var
+
+Tribunal administratif de Toulouse : Ariège, Aveyron, Haute-Garonne, Lot, Tarn, Tarn-et-Garonne
+
+Tribunal administratif de Versailles : Essonne, Yvelines
+
+Tribunal administratif de la Guadeloupe : Guadeloupe
+
+Tribunal administratif de la Martinique : Martinique
+
+Tribunal administratif de la Guyane : Guyane
+
+Tribunal administratif de La Réunion*  : La Réunion
+
+Tribunal administratif de Mayotte : Mayotte
+
+Tribunal administratif de Saint-Barthélemy : Guadeloupe
+
+Tribunal administratif de Saint-Martin : Guadeloupe
