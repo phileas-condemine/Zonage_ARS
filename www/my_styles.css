@@ -22,14 +22,46 @@ body {
   box-shadow: 0 0 0 4px rgba(255, 0, 0, .7);
 }
 
-/* 
-.saved_choice {
-    -ms-transform: scale(1.5);
-    -webkit-transform: scale(1.5); 
-    transform: scale(1.5);
-  
+
+
+
+/*
+input[type="radio"][title]:hover:after {
+    font-style: italic;
+    color:gray;
+    border-radius: 6px;
+    text-align: center;
+    width: 250px;
+    height:50px;
 }
 */
+
+
+
+/* input avec ? à l'intérieur car temporaire */
+input[type="radio"].temp_minoritaire{
+    -webkit-appearance: initial;
+    appearance: initial;
+    background: white;
+    width: 12px;
+    height: 12px;
+    border: none;
+    position: relative;
+    outline: 1px solid #1e5180
+
+}
+
+input[type="radio"].temp_minoritaire:checked:after {
+    content: "\003F";
+    color: #000;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
 
 .saved_choice {
   -webkit-appearance: checkbox; /* Chrome, Safari, Opera */

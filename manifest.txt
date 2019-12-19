@@ -29,3 +29,12 @@ data/Seuils_arretes.xlsx
 data/sf/cadre_nat_sf.sas7bdat
 data/inf/cadre_nat_inf.sas7bdat
 www/slackr_config2.txt
+utils/get_zonage_en_vigueur.R
+utils/persistance.R
+utils/navigation.R
+utils/distribution_zonages_pop.R
+utils/import_file.R
+utils/tableau_agr.R
+utils/carte_agr.R
+utils/boutons_export.R
+utils/jauges.R

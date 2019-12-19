@@ -15,10 +15,11 @@ $(document).on('mouseover', 'tr.shiny-input-radiogroup', function () {
         Shiny.setInputValue('last_row_hovered',this.id);
                          });
                          
+/*
 $(document).on('click', '#communes_map .legend.info i', function () {
         Shiny.setInputValue('legend_click',$(this).attr("style"));
                          });
-                         
+*/                         
 
                                           
 /*$(window).on('scroll',function() {
@@ -47,8 +48,11 @@ function checkifrunning() {
       var is_running = $("html").attr("class").includes("shiny-busy");
       if (is_running){
         $("#loading").show()
+        $("#save_latest").hide()
       } else {
         $("#loading").hide()
+        $("#save_latest").show()
+
       }
     }; 
 setInterval(checkifrunning, 500)

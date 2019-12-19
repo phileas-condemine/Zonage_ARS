@@ -32,12 +32,15 @@ library(htmlwidgets)
 library(lubridate)
 library(openxlsx)
 library(knitr)
+#devtools::install_github('oswaldosantos/ggsn')
 library(ggsn)
 library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
 library(slackr)
 library(shinyjs)
+
+
 
 # token <- drop_auth()
 # saveRDS(token, "droptoken.rds")
@@ -73,7 +76,7 @@ vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                 "VUD","UD","Int","VD","OD",
                                 "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
                                 "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
-                                "Zone d'échange"="degre_liberte"),
+                                "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"),
                          inf = c("Code BCVC"="agr","Nom BVCV"="libagr",
                                  "Liste des départements"="departements",
                                  "Liste communes"="communes",
@@ -83,10 +86,10 @@ vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                  "VUD","UD","Int","VD","OD",
                                  "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
                                  "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
-                                 "Zone d'échange"="degre_liberte"))
-vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP","CN","population","degre_liberte"),
-                    sf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","degre_liberte"),
-                    inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","degre_liberte"))
+                                 "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"))
+vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP","CN","population"),
+                    sf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"),
+                    inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
 
 
 
@@ -154,13 +157,6 @@ regions=merge(regions,
 
 
 
-# my_google_files <- gs_ls()
-
-my_google_files <- drive_find(type = "spreadsheet")
-relevant_sheets=sapply(as.character(regions$reg),stringr::str_which,string = my_google_files$name)
-relevant_sheets=unique(unname(unlist(relevant_sheets)))
-my_google_files <- my_google_files[relevant_sheets,]
-my_google_files$name
 
 regions_derogatoires = c("84","11","93","32")
 

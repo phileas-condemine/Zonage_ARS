@@ -30,7 +30,6 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
   tvs=data.table(communes_TVS)
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
   setorder(tvs,-pop_tvs_per_reg)
-  
   tvs=tvs[,list(departements=paste(unique(dep),collapse=", "),
                 regions=paste(unique(reg),collapse=", "),
                 communes=paste(unique(libcom),collapse=", "),
@@ -43,10 +42,6 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
                 reg_majoritaire=reg[1]),
           by=c("agr","libagr")]
   tvs[,is_majoritaire:=reg_majoritaire==my_reg]
-  
-  # tvs$agr = gsub(" ","", tvs$agr)
-  # tvs$agr = sprintf("%05s", tvs$agr)#sous windows le padding de string se fait par des " " et non des "0"
-  # tvs$agr = gsub(" ","0", tvs$agr)
   
   tvs=merge(tvs,cadre_national,
             by.x=c("agr"),by.y=c("tvs"),all.x=T)    
@@ -120,9 +115,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
     zonage_saved = zonage_saved%>%
       mutate_all(as.character)%>%
       mutate(agr=stringi::stri_pad_left(agr,5,"0"))
-    # zonage_saved$agr = gsub(" ","", zonage_saved$agr)
-    # zonage_saved$agr = sprintf("%05s", zonage_saved$agr)
-    # zonage_saved$agr = gsub(" ","0", zonage_saved$agr)
+
     assign("vals",zonage_saved,env)
     
     zonage_saved$value_set=T

@@ -1,7 +1,7 @@
 # input = list(choix_ps="sf",choix_reg=24)
 # input = list(choix_ps="inf",choix_reg=24)
+# load(sprintf("data/%s_preprocessed_BVCV.RData",input$choix_reg))
 # my_reg = input$choix_reg
-
 zonage_historique=sas7bdat::read.sas7bdat(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
 zonage_historique$zonage_nat=factor(zonage_historique$zonage_nat)
 
@@ -23,14 +23,21 @@ if (input$choix_ps=="inf"){
 
 setnames(zonage_historique,"apl_2017_bvcv","apl")
 zonage_historique[,apl:=round(apl,1)]
-zonage_historique_reg=zonage_historique[reg==my_reg,c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
-setnames(zonage_historique_reg,"zonage_nat","CN")
-zonage_historique_reg=unique(zonage_historique_reg)
-zonage_historique_reg$bvcv = stringi::stri_pad_right(zonage_historique_reg$bvcv,5,"_")
 
+zonage_historique=zonage_historique[,c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
+setnames(zonage_historique,"zonage_nat","CN")
+zonage_historique=unique(zonage_historique)
+zonage_historique$bvcv = stringi::stri_pad_right(zonage_historique$bvcv,5,"_")
+CN = zonage_historique[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
+VZN = zonage_historique[,c("bvcv","CN")]
 
-CN = zonage_historique_reg[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
-VZN = zonage_historique_reg[,c("bvcv","CN")]
+# zonage_historique_reg=zonage_historique[reg==my_reg,
+#                                         c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
+# setnames(zonage_historique_reg,"zonage_nat","CN")
+# zonage_historique_reg=unique(zonage_historique_reg)
+# zonage_historique_reg$bvcv = stringi::stri_pad_right(zonage_historique_reg$bvcv,5,"_")
+# CN = zonage_historique_reg[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
+# VZN = zonage_historique_reg[,c("bvcv","CN")]
 
 
 prep_zonage <- function(cadre_national=CN,
@@ -52,25 +59,23 @@ prep_zonage <- function(cadre_national=CN,
                   regions=paste(unique(reg),collapse=", "),
                   communes=paste(unique(libcom),collapse=", "),
                   communes_codes=paste(unique(depcom), collapse=", "),
-                  # population_in_reg=sum(population[my_reg_BVCV]),
                   proportion_pop=round(100*sum(population[my_reg_BVCV])/sum(population),1),
-                  population=sum(population),
+                  population=sum(population),#toutes les communes du BVCV yc celles des régions voisines
                   nombre_regions=uniqueN(reg),
                   reg_majoritaire=reg[1]),
             by=c("agr","libagr")]
   
   bvcv[,is_majoritaire:=reg_majoritaire==my_reg]
-  # bvcv$agr = gsub(" ","", bvcv$agr)
-  # bvcv$agr = sprintf("%05s", bvcv$agr)
-  # bvcv$agr = gsub(" ","0", bvcv$agr)
+  
   bvcv=merge(bvcv,cadre_national,
              by.x=c("agr"),by.y=c("bvcv"),all.x=T)    
   
   radio_buttons=expand.grid(agr=bvcv$agr,
                             statut=c("VUD","UD","Int","VD","OD"),stringsAsFactors = F)%>%data.table
   radio_buttons=merge(radio_buttons,
-                      bvcv[,c("agr","is_majoritaire","CN","ZE_UD","ZE_OD")],
+                      bvcv[,c("agr","is_majoritaire","CN","ZE_UD","ZE_OD","reg_majoritaire")],
                       by="agr")
+  
   
   vals_zonage_historique$check_historique=T
   radio_buttons=merge(radio_buttons,vals_zonage_historique,
@@ -95,26 +100,8 @@ prep_zonage <- function(cadre_national=CN,
   print(my_google_files$name)
   if(!choix_mil%in%my_google_files$name){
     print("from default values")
-    # if(input$choix_ps=='sf'){
-      radio_buttons[,html:=sprintf(
-        "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s'%s/>",
-        agr,
-        statut,
-        ifelse(is_majoritaire,""," disabled='disabled'"),
-        ifelse(check_historique," historical_choice' checked='checked",""),
-        ifelse((ZE_OD==1&statut%in%c("OD","VD"))|(ZE_UD==1&statut%in%c("Int","UD")),""," disabled='disabled'")
-        
-      )]
-    # }else{
-    #   radio_buttons[,html:=sprintf(
-    #     "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s'%s%s/>",
-    #     agr,
-    #     statut,
-    #     ifelse(is_majoritaire,""," disabled='disabled'"),
-    #     ifelse(check_historique," historical_choice' checked='checked",""),
-    #     ifelse((ZE_OD==1&statut%in%c("Int","OD"))|(ZE_UD==1&statut%in%c("Int","UD")),""," disabled='disabled'")
-    #   )]
-    # }
+    radio_buttons$value_set = F
+
     vals=data.table(vals_zonage_historique[,c("bvcv","CN")])
     setnames(vals,c("bvcv","CN"),c("agr","picked_zonage"))
     
@@ -128,7 +115,6 @@ prep_zonage <- function(cadre_national=CN,
       
     }
     fwrite(vals,file=gs_file_nm)
-    # gs_upload(gs_file_nm,sheet_title=sheet_name,overwrite = T)
     drive_upload(media = gs_file_nm,path = sheet_name,overwrite = T,  type = "csv")
     
     assign("vals",vals,env)
@@ -137,7 +123,6 @@ prep_zonage <- function(cadre_national=CN,
     
   } else {
     print("using historical data")
-    # req(choix_mil%in%my_google_files$sheet_title)
     print("choix_mil2") ; print(choix_mil)
     zonage_saved <- NULL
     attempt <- 1
@@ -149,66 +134,60 @@ prep_zonage <- function(cadre_national=CN,
         drive_download(file = choix_mil,path=paste0("data/",choix_mil,".csv"),overwrite = T,type="csv")
         print(list.files("data/"))
         zonage_saved <- fread(paste0("data/",choix_mil,".csv"),colClasses = "character")%>%as_tibble()
-        
-        
-        # zonage_saved <- gs_read(gs_title(choix_mil))
         }
       )
     } 
     
-    # print("zonage saved") ; print(head(zonage_saved))
     zonage_saved = zonage_saved%>%mutate_all(as.character)%>%
     mutate(agr=stringi::stri_pad_right(agr,5,"_"))
-    # radio_buttons$agr=gsub("^0","",radio_buttons$agr)
-    # zonage_saved$agr = gsub(" ","", zonage_saved$agr)
-    # zonage_saved$agr = sprintf("%05s", zonage_saved$agr)
-    # zonage_saved$agr = gsub(" ","0", zonage_saved$agr)
     assign("vals",zonage_saved,env)
     
     zonage_saved$value_set=T
-    # print("radio_buttons1") ; print(head(radio_buttons))
-    
+
     radio_buttons=merge(radio_buttons,zonage_saved,
                         by.x=c("agr","statut"),
                         by.y=c("agr","picked_zonage"),all.x=T)
     radio_buttons=data.table(radio_buttons)
     radio_buttons[is.na(value_set),value_set:=F]
     
-    #Pour différencier le cas où la valeur a déjà été remplie (ancienne valeur) ou non.
-    radio_buttons[,value_is_set:=sum(value_set)>0,by="agr"]
+
+  }
+  zonages_en_vigueur$value_set_en_vigueur = T
+  radio_buttons = merge(radio_buttons, zonages_en_vigueur,
+                        by.x=c("agr","reg_majoritaire","statut"),by.y=c("agr","reg","en_vigueur_autre_reg"),all.x=T)
+  # désactiver la valeur historique pour aller directement appliquer celle du zonage "en vigueur"
+  radio_buttons[!(is_majoritaire),zonage_en_vigueur:=sum(!is.na(value_set_en_vigueur))>0,by="agr"]
+  radio_buttons[(zonage_en_vigueur),value_set:=F]
+  # si aucun zonage en vigueur et zone d'échange, on n'utilise pas le cadre nationale mais la recommandation de la FAQ : Int temporaire
+  radio_buttons[!(zonage_en_vigueur)&(ZE_OD==1|ZE_UD==1),`:=`(value_set=F,check_historique=F)]
+  radio_buttons[!(zonage_en_vigueur)&!(is_majoritaire)&(statut=="Int")&(ZE_OD==1|ZE_UD==1),value_provisoire_mino:=T]
+  
+  #Pour différencier le cas où la valeur a déjà été remplie (ancienne valeur) ou non.
+  radio_buttons[,value_is_set:=sum(value_set)>0,by="agr"]
     
-    # print("radio_buttons2") ; print(head(radio_buttons))
-    
-    if (input$choix_ps == "sf"){
-      ps_ZE_UD = c("Int","UD")
-      ps_ZE_OD = c("OD","VD")
-    } else if (input$choix_ps == "inf"){
-      ps_ZE_UD = c("VUD","UD")
-      ps_ZE_OD = c("OD","VD")
-    }
-    # if(input$choix_ps=='sf'){
-      radio_buttons[,html:=sprintf(
-        "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s'%s/>",
-        agr,
-        statut,
-        ifelse(is_majoritaire,"","disabled='disabled'"),
-        ifelse(check_historique,ifelse(value_is_set," historical_choice",
-                                       " historical_choice' checked='checked"),""),
-        ifelse(value_set," saved_choice' checked='checked",""),
-        ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
-        
-      )]
-    # }else{
-    #   radio_buttons[,html:=sprintf(
-    #     "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s'%s%s%s/>",
-    #     agr,
-    #     statut,
-    #     ifelse(ZE_OD==0&ZE_UD==0,"disabled='disabled'",""),
-    #     ifelse(value_set," checked='checked'","")
-    #   )]
-    # }
+  if (input$choix_ps == "sf"){
+    ps_ZE_UD = c("Int","UD")
+    ps_ZE_OD = c("OD","VD")
+  } else if (input$choix_ps == "inf"){
+    ps_ZE_UD = c("VUD","UD")
+    ps_ZE_OD = c("OD","VD")
   }
   
+
+  radio_buttons[,html:=sprintf(
+    "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s'%s/>",
+    agr,
+    statut,
+    ifelse(!is_majoritaire,"disabled='disabled'",""),
+    ifelse(check_historique,ifelse(value_is_set," historical_choice",
+                                   " historical_choice' checked='checked"),""),
+    ifelse(value_set," saved_choice' checked='checked",""),
+    ifelse(value_provisoire_mino," temp_minoritaire' title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage' checked='checked",""),
+    ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
+    
+  )]
+  
+
   # print("radio_buttons3") ; print(head(radio_buttons))
   
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")

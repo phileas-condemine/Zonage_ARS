@@ -135,7 +135,7 @@ dashboardPage(
                                                               conditionalPanel("!(input.choix_ps !== null)",
                                                                                tags$h3("Vous devez d'abord sélectionner une profession de santé"))
                                )),
-                               conditionalPanel("input.choix_ps !== null",
+                               conditionalPanel("input.choix_millesime !== null",
                                                 box(width = 12, 
                                                     actionBttn(
                                                       inputId = "go_zonage",
@@ -165,7 +165,15 @@ dashboardPage(
                                      fluidRow(
                                        column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
                                        column(6,textOutput("nb_modif_unsaved")),
-                                       column(4,tags$div(id="loading"))))),
+                                       column(4,tags$div(id="loading"))),
+                                     actionBttn(
+                                       inputId = "save_latest",
+                                       label = "Valider ce zonage",
+                                       color = "success",size = "lg",
+                                       style = "material-flat",
+                                       icon = icon("check"),
+                                       block = TRUE
+                                     ))),
                                  div(id="box_carte_jauges",box(width = 4,
                                      conditionalPanel("input.choix_reg !== null",
                                                       fluidRow(
