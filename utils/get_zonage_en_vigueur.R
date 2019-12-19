@@ -1,5 +1,5 @@
 my_google_files <- drive_find(type = "csv",pattern = "en_vigueur")
-my_google_files <- my_google_files[grepl(paste0("^",input$choix_ps),my_google_files$name)]
+my_google_files <- my_google_files[grepl(paste0("^",input$choix_ps),my_google_files$name),]
 files = lapply(my_google_files$name,function(en_vigueur){
   print(en_vigueur)
   my_path = paste0("data/",en_vigueur,".csv")

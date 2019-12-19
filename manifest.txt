@@ -17,14 +17,9 @@ www/my_styles.css
 www/sketch_mg.html    
 www/sketch_inf.html          
 www/sketch_sf.html          
-utils/create_arrete.Rmd
-utils/ARS.png
 data/liste_tribunaux_administratifs.RData
 data/pop_femme2016.RData
-utils/prep_liste_TribunauxAdministratifs.R
-utils/handle_geo_data.R
-utils/prep_zonage_mg.R
-utils/prep_zonage_hors_mg.R
+www/ARS.png
 data/Seuils_arretes.xlsx
 data/sf/cadre_nat_sf.sas7bdat
 data/inf/cadre_nat_inf.sas7bdat
@@ -38,3 +33,8 @@ utils/tableau_agr.R
 utils/carte_agr.R
 utils/boutons_export.R
 utils/jauges.R
+utils/create_arrete.Rmd
+utils/prep_liste_TribunauxAdministratifs.R
+utils/handle_geo_data.R
+utils/prep_zonage_mg.R
+utils/prep_zonage_hors_mg.R

@@ -5,7 +5,10 @@ server_ip=readLines("current_ip.txt")
 if(server_ip %in% c("54.204.34.9","164.131.131.193","54.204.36.75","54.204.37.78",
                     "34.203.76.245","3.217.214.132","34.197.152.155")){
   options(encoding = 'UTF-8')
+} else {
+  options(shiny.error = browser)
 }
+
 library(shiny)
 library(data.table)
 library(DT)
@@ -32,7 +35,8 @@ library(htmlwidgets)
 library(lubridate)
 library(openxlsx)
 library(knitr)
-#devtools::install_github('oswaldosantos/ggsn')
+#library(remotes)
+#install_github('oswaldosantos/ggsn')
 library(ggsn)
 library(shinydashboard)
 library(shinyWidgets)

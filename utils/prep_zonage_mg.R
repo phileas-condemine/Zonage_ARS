@@ -106,7 +106,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
         {
           drive_download(file = choix_mil,path=paste0("data/",choix_mil,".csv"),overwrite = T,type="csv")
           print(list.files("data/"))
-          zonage_saved <- fread(paste0("data/",choix_mil,".csv"),colClasses = "character")%>%as_tibble()
+          zonage_saved <- fread(paste0("data/",choix_mil,".csv"),colClasses = "character")%>%as.data.frame()
           # zonage_saved <- gs_read(gs_title(choix_mil))
         }
       )
