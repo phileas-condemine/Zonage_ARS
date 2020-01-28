@@ -183,7 +183,8 @@ shiny_running = function () {
 # get_TA()
 load("data/liste_tribunaux_administratifs.RData")
 
-mois_noms = c("Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre")
+mois_noms = c("janvier","février","mars","avril","mai","juin",
+              "juillet","août","septembre","octobre","novembre","décembre")
 
 list_PS = c("Médecins"="mg","Sages-femmes"="sf",
             # "Masseurs-kinésithérapeutes"="mk",
