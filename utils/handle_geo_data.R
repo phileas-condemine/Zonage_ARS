@@ -136,6 +136,23 @@ prep_geo_data_from_scratch <- function(my_reg){
     # Génère des problèmes avec les multipolygones au moment de l'affichage. Exemple Agde, Gigean en Occitanie.
     carte=communes_dissolved[,c("agr","libagr","geometry")]
     
+    #ajout des arrondissements et grands quartiers pour la Réunion
+    load("data/Shape_files/arr.RData")
+    carte <- rbind(carte,
+                   arr[["paris"]] %>% sf::st_as_sf() %>% 
+                   select(agr=depcom,libagr=libcom,geometry),
+                   arr[["lyon"]] %>% sf::st_as_sf() %>% 
+                   select(agr=depcom,libagr=libcom,geometry),
+                   arr[["marseille"]] %>% sf::st_as_sf() %>% 
+                   select(agr=depcom,libagr=libcom,geometry)) 
+    if(a=="TVS"){
+      load("data/Shape_files/grdquart_reu.RData")
+      carte <- rbind(carte[-which(substr(carte$agr,1,3)=="974"),],
+                     grdquart_reu %>% sf::st_as_sf() %>% 
+                       select(agr=depcom,libagr=libcom,geometry))
+    }
+                   
+    
     names(st_geometry(carte)) = NULL #https://github.com/rstudio/leaflet/issues/595
   
     assign(paste("communes",a,sep="_"),communes)

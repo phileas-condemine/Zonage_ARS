@@ -132,8 +132,9 @@ output$download_arrete <- downloadHandler(
     # case we don't have write permissions to the current working dir (which
     # can happen when deployed).
     temp_dir=tempdir()
-    tempReport <- file.path(temp_dir, "create_arrete.Rmd")
-    file.copy("utils/create_arrete.Rmd", tempReport, overwrite = TRUE)
+    print(paste0("create_arrete_",input$choix_ps,".Rmd"))
+    tempReport <- file.path(temp_dir, paste0("create_arrete_",input$choix_ps,".Rmd"))
+    file.copy(paste0("create_arrete_",input$choix_ps,".Rmd"), tempReport, overwrite = TRUE)
     tempimg <- file.path(temp_dir, "ARS.png")
     file.copy("utils/ARS.png", tempimg, overwrite = TRUE)
     jour_nommois_annee=function(d){
@@ -248,6 +249,7 @@ output$download_arrete <- downloadHandler(
                    DATE_NOMINATION_DG_ARS=input$DATE_DG_ELECTION%>%jour_nommois_annee,
                    DATE_DEBUT_DG_ARS=input$DATE_DG_EFFET%>%jour_nommois_annee,
                    NOM_DG_ARS = input$NOM_DG_ARS,
+                   GENRE_DG_ARS = input$GENRE_DG_ARS,
                    DATE_PRECEDENT_ARRETE=input$DATE_LAST_ARRETE%>%jour_nommois_annee,
                    DATE_DECISION_ARS_ZONAGE=input$DATE_NOUVEL_ARRETE%>%jour_nommois_annee,
                    # LIEN_VERS_SITE_ARS,
@@ -282,6 +284,7 @@ observeEvent(input$generate_arrete,{
                         fluidRow(
                           column(6,
                                  textInput("NOM_DG_ARS","Directeur.rice Général.e",placeholder = "Mme/M. X"),
+                                 textInput("GENRE_DG_ARS","H / F",placeholder = "F"),
                                  dateInput("DATE_DG_ELECTION","Date du décret de nomination du DG",startview = "decade", language = "fr",value = Sys.Date()-100,format = "dd-mm-yyyy"),
                                  dateInput("DATE_DG_EFFET","Date de prise de fonction du DG",startview = "decade", language = "fr",value = Sys.Date()-30,format = "dd-mm-yyyy"),
                                  dateInput("DATE_LAST_ARRETE","Date du précédent arrêté",startview = "decade", language = "fr",value = Sys.Date()-400,format = "dd-mm-yyyy"),
@@ -289,8 +292,6 @@ observeEvent(input$generate_arrete,{
                                  selectInput("VILLE_TRIBUNAL_ADMINISTRATIF","Ville du Tribunal Administratif de région",choices=my_TAs,selected=my_TAs[1]),
                                  downloadButton(outputId="download_arrete",label="Arrêté")),
                           column(6,div(style="display: table-cell;vertical-align: middle",
-                                       HTML("<p> Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pour être édité.</p>
-                                  <p> Dans l'article 3, des exemples de justification des choix de mise en ZIP/ZAC sont proposés mais devront être ajustés.</p>
-                                  <p> En particulier si la méthodologie applicable à la détermination des zones est revue, l'article 3 devra être modifié sensiblement.</p>"))
+                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pouvoir être relu et complété."))
                           ))))
 })
