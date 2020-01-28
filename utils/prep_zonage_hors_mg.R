@@ -44,6 +44,8 @@ prep_zonage <- function(cadre_national=CN,
                         vals_zonage_historique=VZN,
                         my_google_files,choix_mil,env){
   bvcv=data.table(communes_BVCV)
+  # fix à insérer dans le handle geo data parce que TVS : reg is numeric vs BVCV : reg is character de taille 2.
+  bvcv[,reg:=as.numeric(reg)]
   if(input$choix_ps == "sf"){
     print("hack pop sf")
     bvcv[,population:=NULL]
@@ -153,6 +155,7 @@ prep_zonage <- function(cadre_national=CN,
 
   }
   zonages_en_vigueur$value_set_en_vigueur = T
+  # browser()
   radio_buttons = merge(radio_buttons, zonages_en_vigueur,
                         by.x=c("agr","reg_majoritaire","statut"),by.y=c("agr","reg","en_vigueur_autre_reg"),all.x=T)
   # désactiver la valeur historique pour aller directement appliquer celle du zonage "en vigueur"

@@ -4,7 +4,6 @@ zonage_pop_reac=reactive({
   if(input$choix_ps == "mg"){# A vérifier, je compte toute la pop de la région y compris minoritaire mais à partir de population_reg (cf prep_zonage_mg)
     infos=merge(tableau_reg()[,c("agr","population")],
                 vals_reac(),by="agr",all.x=T)
-    
     zonage_pop=data.table(infos)[
       ,list(pop=sum(population,na.rm=T)),
       by="picked_zonage"]
@@ -15,7 +14,7 @@ zonage_pop_reac=reactive({
   } else if(input$choix_ps %in% c("sf","inf")){#on s'intéresse uniquement aux BVCV pr lesquels la région est majoritaire, pour ceux-là on compte toutes les communes du BVCV y compris régions voisines.
     infos=merge(tableau_reg()[,c("agr","population","is_majoritaire")],
                 vals_reac(),by="agr",all.x=T)
-    
+    # browser()
     zonage_pop=data.table(infos)[(is_majoritaire)
                                  ,list(pop=sum(population,na.rm=T)),
                                  by="picked_zonage"]
@@ -55,6 +54,7 @@ output$threshold_ZIP=flexdashboard::renderGauge({
   max_val=info_reg$maxZIP
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="ZIP"]$pop,1)
+  if (length(val)==0)val<-0
   if (val > max_val)
     shinyalert(title = "Dépassement de la population en ZIP",closeOnClickOutside = T)
   flexdashboard::gauge(label = "ZIP",symbol = '%',
@@ -75,6 +75,7 @@ output$threshold_ZAC=flexdashboard::renderGauge({
   max_val=info_reg$maxZAC
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="ZAC"]$pop,1)
+  if (length(val)==0)val<-0
   if (val > max_val)
     shinyalert(title = "Dépassement de la population en ZAC",closeOnClickOutside = T)
   flexdashboard::gauge(label = "ZAC",symbol = '%',
@@ -98,6 +99,7 @@ output$threshold_MD=flexdashboard::renderGauge({ #changer pour que ça soit en %
                           zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors vivier"]$pop,0)+
                      ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors vivier"]$pop)!=0,
                             zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors vivier"]$pop,0)),1)
+  if (length(val)==0)val<-0
   print(val)
   if (val > max_val)
     shinyalert(title = "Dépassement de la population en marge dérogatoire",closeOnClickOutside = T)
@@ -120,6 +122,8 @@ output$threshold_UD=flexdashboard::renderGauge({ #spécifier les zones d'échang
   print(max_val)
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="UD"]$pop,1)
+  if (length(val)==0)val<-0
+  # browser()
   if (val > max_val)
     shinyalert(title = "Dépassement de la population en zone sous-dotée",closeOnClickOutside = T)
   
@@ -141,6 +145,7 @@ output$threshold_OD=flexdashboard::renderGauge({ #spécifier les zones d'échang
   print(max_val)
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="OD"]$pop,1)
+  if (length(val)==0)val<-0
   if (val > max_val)
     shinyalert(title = "Dépassement de la population en zone sur-dotée",closeOnClickOutside = T)
   flexdashboard::gauge(label = "Zones sur-dotées",symbol = '%',

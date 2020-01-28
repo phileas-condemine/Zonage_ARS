@@ -96,7 +96,6 @@ vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP",
                     inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
 
 
-
 # com to agr
 # drop_delete(dtoken = token,path = "zonage/bvcv2019.sas7bdat")
 # drop_upload(dtoken=token,file = "data/tvs2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
