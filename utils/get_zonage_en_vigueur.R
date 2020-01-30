@@ -17,6 +17,7 @@ if (length(my_google_files$name)>0){
   print("fichier de zonages en vigueur");print(head(zonages_en_vigueur))
   if (nrow(zonages_en_vigueur)>0){
     zonages_en_vigueur = zonages_en_vigueur[reg!=input$choix_reg]
+    zonages_en_vigueur[,reg:=as.numeric(reg)]
     setnames(zonages_en_vigueur,"picked_zonage","en_vigueur_autre_reg")
   } else {
     zonages_en_vigueur =data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric())

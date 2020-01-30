@@ -33,8 +33,14 @@ utils/tableau_agr.R
 utils/carte_agr.R
 utils/boutons_export.R
 utils/jauges.R
-utils/create_arrete.Rmd
+utils/create_arrete_inf.Rmd
+utils/create_arrete_mg.Rmd
+utils/create_arrete_sf.Rmd
 utils/prep_liste_TribunauxAdministratifs.R
 utils/handle_geo_data.R
 utils/prep_zonage_mg.R
 utils/prep_zonage_hors_mg.R
+data/Shape_files/arr.RData
+data/Shape_files/grdquart_reu.RData
+utils/modele_word_arrete.docx
+data/contours_dep.RData

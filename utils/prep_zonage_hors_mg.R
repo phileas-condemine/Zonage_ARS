@@ -95,6 +95,7 @@ prep_zonage <- function(cadre_national=CN,
   # --> mettre alerte quand échange, pour dire qu'il faut faire un échange réciproque 
   # Finalement, bloquer toutes les zones pour lesquelles ZE_UD = 0 ET ZE_OD = 0 (mais ne suffit pas)
   # ... à la réflexion, ne pas mettre d'alerte sinon ça va être trop chiant pour les ARS
+  # Peut-être qu'un "showNotification" serait un bon compromis.
   print("millesime existant ?")
   print(choix_mil)
   print(choix_mil%in%my_google_files$name)
@@ -162,9 +163,10 @@ prep_zonage <- function(cadre_national=CN,
   radio_buttons[!(is_majoritaire),zonage_en_vigueur:=sum(!is.na(value_set_en_vigueur))>0,by="agr"]
   radio_buttons[(zonage_en_vigueur),value_set:=F]
   # si aucun zonage en vigueur et zone d'échange, on n'utilise pas le cadre nationale mais la recommandation de la FAQ : Int temporaire
-  radio_buttons[!(zonage_en_vigueur)&(ZE_OD==1|ZE_UD==1),`:=`(value_set=F,check_historique=F)]
-  radio_buttons[!(zonage_en_vigueur)&!(is_majoritaire)&(statut=="Int")&(ZE_OD==1|ZE_UD==1),value_provisoire_mino:=T]
-  
+  # radio_buttons[!(zonage_en_vigueur)&(ZE_OD==1|ZE_UD==1),`:=`(value_set=F,check_historique=F,value_provisoire_mino=T)]
+  radio_buttons[!(zonage_en_vigueur)&(ZE_OD==1|ZE_UD==1)&!(is_majoritaire),`:=`(value_set=F,check_historique=F,value_provisoire_mino=T)]
+  # radio_buttons[!(zonage_en_vigueur)&!(is_majoritaire)&(statut=="Int")&(ZE_OD==1|ZE_UD==1),value_provisoire_mino:=T]
+  radio_buttons[(zonage_en_vigueur),check_historique:=F]
   #Pour différencier le cas où la valeur a déjà été remplie (ancienne valeur) ou non.
   radio_buttons[,value_is_set:=sum(value_set)>0,by="agr"]
     
@@ -175,17 +177,18 @@ prep_zonage <- function(cadre_national=CN,
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
-  
+  browser()
 
   radio_buttons[,html:=sprintf(
-    "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s'%s/>",
+    "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s%s'%s/>",
     agr,
     statut,
     ifelse(!is_majoritaire,"disabled='disabled'",""),
-    ifelse(check_historique,ifelse(value_is_set," historical_choice",
+    ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
                                    " historical_choice' checked='checked"),""),
     ifelse(value_set," saved_choice' checked='checked",""),
-    ifelse(value_provisoire_mino," temp_minoritaire' title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage' checked='checked",""),
+    ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino," temp_minoritaire' title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage' checked='checked","")),
+    ifelse(is.na(value_set_en_vigueur),"",ifelse(value_set_en_vigueur," en_vigueur_choice' checked='checked","")),
     ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
     
   )]
@@ -196,6 +199,7 @@ prep_zonage <- function(cadre_national=CN,
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")
   radio_buttons = radio_buttons[,c("agr","VUD","UD","Int","VD","OD"),with=F]
   bvcv=merge(bvcv,radio_buttons,by="agr")
+  
   bvcv[,libCN:=case_when(
     CN=="VUD"~"Très sous-doté",
     CN=="UD"~"Sous-doté",

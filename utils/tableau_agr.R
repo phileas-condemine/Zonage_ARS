@@ -80,10 +80,21 @@ tableau_reg = reactive({
   } else{
     fond_de_carte(carte_BVCV)
   }
+  # browser()
+  # On remplace les valeurs en s'appuyant sur les zonages en vigueur des autres régions.
+  vals = data.table(vals)[zonages_en_vigueur,picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
+  vals = data.frame(vals)
+  
   default_vals(vals)
   current_mapped_data(vals)
   
-  if(input$choix_ps=="mg"){tvs}else{bvcv}
+  if(input$choix_ps=="mg"){
+    tvs = merge(tvs,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
+    tvs
+  }else{
+    bvcv = merge(bvcv,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
+    bvcv
+  }
 })
 
 output$zonage_dt=DT::renderDataTable(server=F,{
@@ -142,7 +153,7 @@ output$zonage_dt=DT::renderDataTable(server=F,{
                              # ,autoWidth = TRUE
                              # ,list(width = '200px', targets = 4)
                            ),
-                           search = list(regex = TRUE, caseInsensitive = FALSE),
+                           search = list(regex = TRUE, caseInsensitive = TRUE),
                            language = list(
                              info = 'Résultats _START_ à _END_ sur une liste de _TOTAL_.',
                              paginate = list(previous = 'Précédent', `next` = 'Suivant'),
@@ -191,20 +202,21 @@ observeEvent(input$zonage_dt_cell_clicked,{
     # print(my_row$is_majoritaire)
     new_modifs(new_modifs()+1)
     if(!my_row$is_majoritaire){
-      shinyalert("Attention!", "Vous avez sélectionné un territoire de vie-santé minoritaire en termes de population dans votre région.",
+      shinyalert("Attention!", paste("Vous avez sélectionné un",ifelse(input$choix_ps=="mg","Territoire de Vie-Santé","Bassin de Vie - Canton-Ville"),"minoritaire en termes de population dans votre région."),
                  cancelButtonText = "Annuler",
                  confirmButtonText = "Forcer l'édition",
                  type = "error",showCancelButton = T,
                  callbackJS = sprintf("
-                   function(x) { 
+                   function(x) {
                      if (x == true) {
                       $('#%s .zonage_radio_button').prop('disabled',false);
                      }
                    }"
                                       ,my_row$agr))
     }
-    if (!is.na(my_row$CN)&my_row$CN=="01_Sélection nationale"){
-      shinyalert("Attention!", "Ce territoire de vie-santé faire partie de la sélection nationale",
+    # browser()
+    if (!is.na(my_row$CN)&(my_row$CN=="01_Sélection nationale"|my_row$degre_liberte==0)){
+      shinyalert("Attention!", paste("Ce",ifelse(input$choix_ps=="mg","Territoire de Vie-Santé fait partie de la sélection nationale","Bassin de Vie - Canton-Ville n'est pas en zone d'échange.")),
                  cancelButtonText = "Annuler",
                  confirmButtonText = "Forcer l'édition",
                  type = "error",showCancelButton = T,

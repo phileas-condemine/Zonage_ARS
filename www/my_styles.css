@@ -22,7 +22,16 @@ body {
   box-shadow: 0 0 0 4px rgba(255, 0, 0, .7);
 }
 
+.en_vigueur_choice {
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(0, 0, 255, .7);
+}
 
+.saved_choice {
+  -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
+  -moz-appearance: checkbox;    /* Firefox */
+  -ms-appearance: checkbox;     /* not currently supported */
+}
 
 
 /*
@@ -63,11 +72,7 @@ input[type="radio"].temp_minoritaire:checked:after {
     transform: translate(-50%,-50%);
 }
 
-.saved_choice {
-  -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
-  -moz-appearance: checkbox;    /* Firefox */
-  -ms-appearance: checkbox;     /* not currently supported */
-}
+
 
 #gauge_and_map {
   position:fixed;

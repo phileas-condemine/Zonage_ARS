@@ -139,6 +139,7 @@ load("data/pop_femme2016.RData")
 dep = unique(TVS[,c("dep","reg","libdep")])
 
 # geo reg
+load("data/contours_dep.RData")
 load("data/reg_cont.RData")
 names(reg_cont)[which(names(reg_cont)=='code_insee')]<-'reg'
 names(reg_cont)[which(names(reg_cont)=='nom')]<-'libreg'

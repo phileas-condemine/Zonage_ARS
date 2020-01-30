@@ -1,5 +1,6 @@
 output$communes_map=renderLeaflet({
   print("Carto")
+  # browser()
   infos=merge(tableau_reg()[,c("agr","population","CN","communes_codes")],
               default_vals(),by="agr",all.x=T)
   infos <- infos%>%mutate_if(is.factor,as.character)
@@ -155,14 +156,14 @@ observeEvent(input$last_btn,{
                   stroke = FALSE,
                   layerId=~agr,
                   label = ~iconv(paste(libagr,"Zonage:",picked_zonage),to="UTF-8"),
-                  highlightOptions = highlightOptions(fillOpacity=1,bringToFront = TRUE))%>%
-      removeControl("legend") %>% 
-      addLegend(pal = factpal, data=legend_data,
-                values = ~picked_zonage, 
-                opacity = .7,
-                layerId = "legend",
-                title="Zonage",
-                group = "Légende")
+                  highlightOptions = highlightOptions(fillOpacity=1,bringToFront = TRUE))#%>%
+      # removeControl("legend") %>% 
+      # addLegend(pal = factpal, data=legend_data,
+      #           values = ~picked_zonage, 
+      #           opacity = .7,
+      #           layerId = "legend",
+      #           title="Zonage",
+      #           group = "Légende")
 
   } else {
     print("PROBLEME AVEC CE TVS, MAL REFERENCE !")

@@ -12,3 +12,4 @@ rsconnect::deployApp(appFileManifest = "manifest.txt",
 
 rsconnect::showLogs(streaming=T)
 
+

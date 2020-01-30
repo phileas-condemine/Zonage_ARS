@@ -11,12 +11,22 @@ output$download_table = downloadHandler(
     infos <- vals_reac()
     if(input$choix_ps=="mg"){
       load(paste0("data/",input$choix_reg,"_preprocessed_TVS.RData"))
-      infos <- merge(infos,communes_TVS[,c("agr","libagr","libcom","depcom","population")],by="agr")
+      infos <- merge(infos,communes_TVS[,c("agr","libagr","libcom","depcom","my_reg_TVS","population")],by="agr")
+      setnames(infos,"my_reg_TVS","dansMaRegion")
     } else if (input$choix_ps %in% c("sf","inf")){
       load(paste0("data/",input$choix_reg,"_preprocessed_BVCV.RData"))
-      infos <- merge(infos,communes_BVCV[,c("agr","libagr","libcom","depcom","population")],by="agr")
+      infos <- merge(infos,communes_BVCV[,c("agr","libagr","libcom","depcom","my_reg_BVCV","population")],by="agr")
+      infos <- merge(infos, unique(tableau_reg()[,.(agr,is_majoritaire,ZE_UD,ZE_OD,en_vigueur_autre_reg)]),by="agr")
+      infos$echangeable = infos$ZE_UD + infos$ZE_OD
+      infos$enVigueurAutreReg = !is.na(infos$en_vigueur_autre_reg)
+      setnames(infos,c("my_reg_BVCV","is_majoritaire"),c("dansMaRegion","estMajoritaire"))
     }
-    infos <- infos[,c("libagr","agr","libcom","depcom","population","picked_zonage")]
+    infos <- infos[,c("libagr","agr","libcom","depcom","dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg","population","picked_zonage")]
+    infos$dansMaRegion = ifelse(infos$dansMaRegion,"oui","non")
+    infos$estMajoritaire = ifelse(infos$estMajoritaire,"oui","non")
+    infos$echangeable = ifelse(infos$echangeable>0,"oui","non")
+    infos$enVigueurAutreReg = ifelse(infos$enVigueurAutreReg,"oui","non")
+    
     infos <- infos%>%mutate_if(is.factor,as.character)
     if(input$choix_ps%in%c("sf","inf")){
       print(table(infos$picked_zonage))
@@ -29,13 +39,18 @@ output$download_table = downloadHandler(
     }
     
     
-    
     infos <- infos%>%data.table
+    if(input$choix_ps%in%c("sf","inf")){
+      infos[dansMaRegion=="oui"&estMajoritaire=="non"&echangeable=="oui"&enVigueurAutreReg=="non", picked_zonage:="*Intermédiaire*"]
+    }
+    
+    
     if(input$choix_ps=="mg"){
       names(infos) <- c("Nom du territoire de vie-santé",
                         "Code du territoire de vie-santé",
                         "Nom de la commune",
                         "Code de la commune",
+                        "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Population",
                         "Zonage")
     } else if(input$choix_ps=="inf"){
@@ -43,6 +58,7 @@ output$download_table = downloadHandler(
                         "Code du bassin de vie ou pseudo-canton",
                         "Nom de la commune",
                         "Code de la commune",
+                        "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Population",
                         "Zonage")
     } else if(input$choix_ps=="sf"){
@@ -51,7 +67,7 @@ output$download_table = downloadHandler(
       names(infos) <- c("Nom du bassin de vie ou pseudo-canton",
                         "Code du bassin de vie ou pseudo-canton",
                         "Nom de la commune",
-                        "Code de la commune",
+                        "Code de la commune","dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Zonage","Population_femmes")
     }
     # USE OFFICER PACKAGE TO EXPORT EXCEL
@@ -97,20 +113,27 @@ output$download_plot <- downloadHandler(
     }
     names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
     }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
-    g <- ggplot(data=contours_reg)+geom_sf(aes(fill=picked_zonage),alpha=.5)+theme(legend.title = element_blank())+
+    # browser()
+    
+    g <- ggplot(data=contours_reg)+ ggspatial::annotation_map_tile(zoomin = 0)+ 
+      geom_sf(aes(fill=picked_zonage),alpha=.5)+theme(legend.title = element_blank())+
       labs(caption=paste0("Source : COG ",year(Sys.Date()),", date : ",format.Date(Sys.Date(),"%d/%m/%Y")))+
+      geom_sf(data=dep_contours[dep_contours$reg==input$choix_reg,],aes(fill=NA),color="black",show.legend = F,lwd=1.5)+
       ggrepel::geom_label_repel(
-        data = head(contours_reg,10),
-        aes(label = nom_zonage, geometry = geometry),
+        data = head(contours_reg,20),
+        # data = contours_reg,
+        # aes(label = nom_zonage, geometry = geometry),
+        aes(label = libagr, geometry = geometry),
         stat = "sf_coordinates",
         min.segment.length = 0
-      ) +
+      )+ 
       theme(axis.title.x = element_blank(),axis.title = element_blank())+
       scale_fill_manual(aesthetics = "fill",values=my_colors)+
       blank() +
       north(contours_reg,location = "bottomleft") +
       scalebar(contours_reg, dist = 20, dist_unit = "km",
-               transform = TRUE, model = "WGS84")     
+               transform = TRUE, model = "WGS84")    
+    
     if(input$choix_ps=="mg"){g <- g + ggtitle("Zonage médecin")
     }else if(input$choix_ps=="sf"){g <- g + ggtitle("Zonage sage-femme")
     }else if(input$choix_ps=="inf"){g <- g + ggtitle("Zonage infirmier")}
@@ -149,12 +172,22 @@ output$download_arrete <- downloadHandler(
     my_table <- vals_reac()
     if(input$choix_ps=="mg"){
       load(paste0("data/",input$choix_reg,"_preprocessed_TVS.RData"))
-      my_table <- merge(my_table,communes_TVS[,c("agr","libagr","libcom","depcom","population")],by="agr")
+      my_table <- merge(my_table,communes_TVS[,c("agr","libagr","libcom","depcom","my_reg_TVS","population")],by="agr")
+      setnames(my_table,"my_reg_TVS","dansMaRegion")
     } else if (input$choix_ps %in% c("sf","inf")){
       load(paste0("data/",input$choix_reg,"_preprocessed_BVCV.RData"))
-      my_table <- merge(my_table,communes_BVCV[,c("agr","libagr","libcom","depcom","population")],by="agr")
+      my_table <- merge(my_table,communes_BVCV[,c("agr","libagr","libcom","depcom","my_reg_BVCV","population")],by="agr")
+      my_table <- merge(my_table, unique(tableau_reg()[,.(agr,is_majoritaire,ZE_UD,ZE_OD,en_vigueur_autre_reg)]),by="agr")
+      my_table$echangeable = my_table$ZE_UD + my_table$ZE_OD
+      my_table$enVigueurAutreReg = !is.na(my_table$en_vigueur_autre_reg)
+      setnames(my_table,c("my_reg_BVCV","is_majoritaire"),c("dansMaRegion","estMajoritaire"))
     }
-    my_table <- my_table[,c("libagr","agr","libcom","depcom","population","picked_zonage")]
+    my_table <- my_table[,c("libagr","agr","libcom","depcom","dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg","population","picked_zonage")]
+    my_table$dansMaRegion = ifelse(my_table$dansMaRegion,"oui","non")
+    my_table$estMajoritaire = ifelse(my_table$estMajoritaire,"oui","non")
+    my_table$echangeable = ifelse(my_table$echangeable>0,"oui","non")
+    my_table$enVigueurAutreReg = ifelse(my_table$enVigueurAutreReg,"oui","non")
+    
     my_table <- my_table%>%mutate_if(is.factor,as.character)
     if(input$choix_ps%in%c("sf","inf")){
       print(table(my_table$picked_zonage))
@@ -166,29 +199,37 @@ output$download_arrete <- downloadHandler(
         picked_zonage=="OD"~"Sur-doté"))
     }
     
+    
+    
     my_table <- my_table%>%data.table
+    if(input$choix_ps%in%c("sf","inf")){
+      my_table[dansMaRegion=="oui"&estMajoritaire=="non"&echangeable=="oui"&enVigueurAutreReg=="non", picked_zonage:="*Intermédiaire*"]
+    }
+    
     if(input$choix_ps=="mg"){
       names(my_table) <- c("Nom du territoire de vie-santé",
-                           "Code du territoire de vie-santé",
-                           "Nom de la commune",
-                           "Code de la commune",
-                           "Population",
-                           "Zonage")
+                        "Code du territoire de vie-santé",
+                        "Nom de la commune",
+                        "Code de la commune",
+                        "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
+                        "Population",
+                        "Zonage")
     } else if(input$choix_ps=="inf"){
       names(my_table) <- c("Nom du bassin de vie ou pseudo-canton",
-                           "Code du bassin de vie ou pseudo-canton",
-                           "Nom de la commune",
-                           "Code de la commune",
-                           "Population",
-                           "Zonage")
+                        "Code du bassin de vie ou pseudo-canton",
+                        "Nom de la commune",
+                        "Code de la commune",
+                        "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
+                        "Population",
+                        "Zonage")
     } else if(input$choix_ps=="sf"){
       my_table[,population:=NULL]
       my_table = merge(my_table,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
       names(my_table) <- c("Nom du bassin de vie ou pseudo-canton",
-                           "Code du bassin de vie ou pseudo-canton",
-                           "Nom de la commune",
-                           "Code de la commune",
-                           "Zonage","Population_femmes")
+                        "Code du bassin de vie ou pseudo-canton",
+                        "Nom de la commune",
+                        "Code de la commune","dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
+                        "Zonage","Population_femmes")
     }
     print("la table")
     print(head(my_table))
@@ -226,20 +267,25 @@ output$download_arrete <- downloadHandler(
     }
     names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
     }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
-    g <- ggplot(data=contours_reg)+geom_sf(aes(fill=picked_zonage),alpha=.5)+theme(legend.title = element_blank())+
+
+    g <- ggplot(data=contours_reg)+ ggspatial::annotation_map_tile(zoomin = 0)+ 
+      geom_sf(aes(fill=picked_zonage),alpha=.5)+theme(legend.title = element_blank())+
       labs(caption=paste0("Source : COG ",year(Sys.Date()),", date : ",format.Date(Sys.Date(),"%d/%m/%Y")))+
+      # geom_sf(data=reg_cont[reg_cont$reg==input$choix_reg,],aes(fill=NA),color="black",show.legend = F,lwd=2)+
       ggrepel::geom_label_repel(
-        data = head(contours_reg,10),
-        aes(label = nom_zonage, geometry = geometry),
+        data = head(contours_reg,20),
+        # data = contours_reg,
+        # aes(label = nom_zonage, geometry = geometry),
+        aes(label = libagr, geometry = geometry),
         stat = "sf_coordinates",
         min.segment.length = 0
-      ) +
+      )+ 
       theme(axis.title.x = element_blank(),axis.title = element_blank())+
       scale_fill_manual(aesthetics = "fill",values=my_colors)+
       blank() +
       north(contours_reg,location = "bottomleft") +
       scalebar(contours_reg, dist = 20, dist_unit = "km",
-               transform = TRUE, model = "WGS84")     
+               transform = TRUE, model = "WGS84")        
     if(input$choix_ps=="mg"){g <- g + ggtitle("Zonage médecin")
     }else if(input$choix_ps=="sf"){g <- g + ggtitle("Zonage sage-femme")
     }else if(input$choix_ps=="inf"){g <- g + ggtitle("Zonage infirmier")}

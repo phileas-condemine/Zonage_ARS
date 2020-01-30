@@ -30,3 +30,4 @@ data/
 googledrive_token.rds
 www/slackr_config.txt
 .idea/
+rosm.cache/
