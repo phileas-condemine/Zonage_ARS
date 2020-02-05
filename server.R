@@ -30,12 +30,12 @@ function(input, output,session) {
   
   #### EXPORTS ####
   source("utils/boutons_export.R",local=T,encoding = "UTF-8")
-
+  
   # #### Persistance ####
-
+  
   source("utils/persistance.R",local=T,encoding = "UTF-8")
   
-
+  
   #### Jauges ####
   
   source("utils/jauges.R",local=T,encoding = "UTF-8")
@@ -43,6 +43,35 @@ function(input, output,session) {
   ##### Dist zonage #####
   
   source("utils/distribution_zonages_pop.R",local=T,encoding = "UTF-8")
+  
+  ##### Recap modif #####
+  
+  output$recap_dt = renderDataTable({
+    # browser()
+    infos <- vals_reac()
+    if(input$choix_ps=="mg"){
+      load(paste0("data/",input$choix_reg,"_preprocessed_TVS.RData"))
+      infos <- merge(infos,communes_TVS[,c("agr","libagr","libcom","depcom","my_reg_TVS","population")],by="agr")
+      setnames(infos,"my_reg_TVS","dansMaRegion")
+    } else if (input$choix_ps %in% c("sf","inf")){
+      load(paste0("data/",input$choix_reg,"_preprocessed_BVCV.RData"))
+      infos <- merge(infos,communes_BVCV[,c("agr","libagr","libcom","depcom","my_reg_BVCV","population")],by="agr")
+      infos <- merge(infos, unique(tableau_reg()[,.(agr,is_majoritaire,ZE_UD,ZE_OD,en_vigueur_autre_reg,CN)]),by="agr")
+      # infos$echangeable = infos$ZE_UD + infos$ZE_OD
+      # infos$enVigueurAutreReg = !is.na(infos$en_vigueur_autre_reg)
+      # setnames(infos,c("my_reg_BVCV","is_majoritaire"),c("dansMaRegion","estMajoritaire"))
+    }
+    infos = data.table(infos)
+    infos = infos[(CN!=picked_zonage)&(is_majoritaire),.(population=sum(population)),by=c("libagr","agr","picked_zonage","CN")]
+    setnames(infos,c("libagr","agr","picked_zonage","CN","population"),c("Libelle","Code","Zonage","Cadre National","Population"))
+    if(nrow(infos)>0){
+      datatable(infos,
+                rownames=F,
+                options=list(
+                  dom = "t"
+                ))
+    } else NULL
+  })
   
   vals_reac=reactive({
     print("get vals_reac")
@@ -59,7 +88,7 @@ function(input, output,session) {
     print("get vals_reac OK")
     vals
   })
-
+  
   source("utils/navigation.R",local=T,encoding = "UTF-8")
   
   output$nb_modif_unsaved = renderText({
@@ -87,6 +116,6 @@ function(input, output,session) {
     } else NULL
     
   })  
-
-
+  
+  
 }

@@ -117,7 +117,7 @@ dashboardPage(
                                                                                conditionalPanel("(typeof input.import_data_model !== 'undefined' && input.import_data_model.length > 0)",
                                                                                                 fileInput("from_file","",buttonLabel = "Parcourir...",
                                                                                                           placeholder = "Fichier de zonage déjà rempli",accept = c(".xls",".xlsx",".csv"))),
-                                                                                                tags$div(HTML('
+                                                                               tags$div(HTML('
                                                                                               <div id="import_data_model" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline">
                                                                                                 <label class="control-label" for="import_data_model">Format des données</label>
                                                                                                 <div class="shiny-options-group">
@@ -131,7 +131,7 @@ dashboardPage(
                                                                                                   </label>
                                                                                                 </div>
                                                                                               </div> '))
-                                                                               ),
+                                                              ),
                                                               conditionalPanel("!(input.choix_ps !== null)",
                                                                                tags$h3("Vous devez d'abord sélectionner une profession de santé"))
                                )),
@@ -160,54 +160,57 @@ dashboardPage(
                                  # uiOutput("box_tableau"),
                                  # uiOutput("box_carte_jauges")
                                  div(id="box_tableau",box(width = 8,
-                                     DTOutput("zonage_dt"),
-                                     tags$br(),
-                                     fluidRow(
-                                       column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
-                                       column(6,textOutput("nb_modif_unsaved")),
-                                       column(4,tags$div(id="loading"))),
-                                     actionBttn(
-                                       inputId = "save_latest",
-                                       label = "Valider ce zonage",
-                                       color = "success",size = "lg",
-                                       style = "material-flat",
-                                       icon = icon("check"),
-                                       block = TRUE
-                                     ))),
+                                                          DTOutput("zonage_dt"),
+                                                          tags$br(),
+                                                          fluidRow(
+                                                            column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
+                                                            column(6,textOutput("nb_modif_unsaved")),
+                                                            column(4,tags$div(id="loading"))),
+                                                          actionBttn(
+                                                            inputId = "save_latest",
+                                                            label = "Valider ce zonage",
+                                                            color = "success",size = "lg",
+                                                            style = "material-flat",
+                                                            icon = icon("check"),
+                                                            block = TRUE
+                                                          ),
+                                                          tags$br(),
+                                                          DTOutput("recap_dt")
+                                                          )),
                                  div(id="box_carte_jauges",box(width = 4,
-                                     conditionalPanel("input.choix_reg !== null",
-                                                      fluidRow(
-                                                        column(4,div(style="text-align: center;margin-bottom: 10px;",
-                                                                     downloadButton(outputId="download_plot",label="Carte"))),
-                                                        column(4,div(style="text-align: center;margin-bottom: 10px;",
-                                                                     downloadButton(outputId="download_table",label="Tableau"))),
-                                                        column(4,div(style="text-align: center;margin-bottom: 10px;",
-                                                                     actionButton("generate_arrete","Arrêté",icon=icon("edit"))
-                                                        ))
-                                                      ),
-                                                      
-                                                      fluidRow(
-                                                        column(12,
-                                                               leafletOutput("communes_map",width = "auto"))
-                                                      ),
-                                                      uiOutput("gauges"),
-                                                      
-                                                      tags$br(),
-                                                      fluidRow(
-                                                        column(8,textOutput("date_contours_update")),
-                                                        column(4,actionButton("update_contours","Mettre à jour",icon=icon("cogs")))
-                                                      ),
-                                                      tags$br(),
-                                                      fluidRow(
-                                                        column(12,plotlyOutput("dist_zonages",width="auto"))
-                                                      ),
-                                                      tags$br()
-                                                      
-                                     )
+                                                               conditionalPanel("input.choix_reg !== null",
+                                                                                fluidRow(
+                                                                                  column(4,div(style="text-align: center;margin-bottom: 10px;",
+                                                                                               downloadButton(outputId="download_plot",label="Carte"))),
+                                                                                  column(4,div(style="text-align: center;margin-bottom: 10px;",
+                                                                                               downloadButton(outputId="download_table",label="Tableau"))),
+                                                                                  column(4,div(style="text-align: center;margin-bottom: 10px;",
+                                                                                               actionButton("generate_arrete","Arrêté",icon=icon("edit"))
+                                                                                  ))
+                                                                                ),
+                                                                                
+                                                                                fluidRow(
+                                                                                  column(12,
+                                                                                         leafletOutput("communes_map",width = "auto"))
+                                                                                ),
+                                                                                uiOutput("gauges"),
+                                                                                
+                                                                                tags$br(),
+                                                                                fluidRow(
+                                                                                  column(8,textOutput("date_contours_update")),
+                                                                                  column(4,actionButton("update_contours","Mettre à jour",icon=icon("cogs")))
+                                                                                ),
+                                                                                tags$br(),
+                                                                                fluidRow(
+                                                                                  column(12,plotlyOutput("dist_zonages",width="auto"))
+                                                                                ),
+                                                                                tags$br()
+                                                                                
+                                                               )
                                  )
                                  )
-                                 
                                )
+                               
               ),             
               includeHTML("www/footer_catalogue.html"))
     )
