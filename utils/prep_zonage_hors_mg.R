@@ -177,21 +177,50 @@ prep_zonage <- function(cadre_national=CN,
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
-  browser()
-
+  # browser()
+  radio_buttons[,class:=paste0(
+    ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
+                                                " historical_choice"),""),
+    ifelse(value_set," saved_choice",""),
+    ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," temp_minoritaire","")),
+    ifelse(is.na(value_set_en_vigueur),"",ifelse(value_set_en_vigueur," en_vigueur_choice",""))
+  )]
+  
+  radio_buttons[,checked:=
+    ifelse(check_historique|(CN==statut),ifelse(value_is_set,F,T),F)+
+    ifelse(value_set,T,F)+
+    ifelse(is.na(value_provisoire_mino),F,ifelse(value_provisoire_mino&statut=="Int",T,F))+
+    ifelse(is.na(value_set_en_vigueur),F,ifelse(value_set_en_vigueur,T,F))
+  ]
+  
+  radio_buttons[,extra:=paste0(
+    ifelse(!is_majoritaire," disabled='disabled'",""),
+    ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage'","")),
+    ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
+  )]
+    
+  
   radio_buttons[,html:=sprintf(
-    "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s%s'%s/>",
+    "<input type='radio' name='%s' value='%s' class='zonage_radio_button%s'%s%s/>",
     agr,
     statut,
-    ifelse(!is_majoritaire,"disabled='disabled'",""),
-    ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
-                                   " historical_choice' checked='checked"),""),
-    ifelse(value_set," saved_choice' checked='checked",""),
-    ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino," temp_minoritaire' title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage' checked='checked","")),
-    ifelse(is.na(value_set_en_vigueur),"",ifelse(value_set_en_vigueur," en_vigueur_choice' checked='checked","")),
-    ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
-    
-  )]
+    class,
+    ifelse(checked>0," checked='checked'",""),
+    extra)]
+  
+  # radio_buttons[,html:=sprintf(
+  #   "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s%s'%s/>",
+  #   agr,
+  #   statut,
+  #   ifelse(!is_majoritaire,"disabled='disabled'",""),
+  #   ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
+  #                                  " historical_choice' checked='checked"),""),
+  #   ifelse(value_set," saved_choice' checked='checked",""),
+  #   ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," temp_minoritaire' title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage' checked='checked","")),
+  #   ifelse(is.na(value_set_en_vigueur),"",ifelse(value_set_en_vigueur," en_vigueur_choice' checked='checked","")),
+  #   ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
+  #   
+  # )]
   
 
   # print("radio_buttons3") ; print(head(radio_buttons))
