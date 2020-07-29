@@ -132,4 +132,13 @@ function(input, output,session) {
     )
   })
   
+  
+  output$dl_faq_hors_mg <- downloadHandler(
+    filename = 'FAQ_hors_mg.pdf',
+    content = function(file) {
+        file.copy("www/FAQ_hors_mg.pdf", file, overwrite = T)
+
+    }
+  )
+  
 }

@@ -60,7 +60,7 @@ options(gargle_oauth_cache = ".secrets")
 
 drive_auth(email = "drees-zonage-ars@sante.gouv.fr",
            token=".secrets/a924da283165ded31d5fb98542b0974f_drees-zonage-ars@sante.gouv.fr")
-drive_find(type = "csv")
+# drive_find(type = "csv",q="name contains '^sf_' or name contains '^inf_' or name contains '^mg_' or name contains '^mk_'")
 
 vars_to_toggle = c("agr","libagr","communes","population","is_majoritaire","CN","libCN")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",

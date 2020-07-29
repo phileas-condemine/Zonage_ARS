@@ -6,6 +6,8 @@ dashboardPage(
                          role = "button", span(class = "sr-only", "Toggle navigation")),
                        div(class = "navbar-custom-menu",
                            tags$ul(class = "nav navbar-nav",
+                                   tags$li(downloadLink("dl_faq_hors_mg",HTML("<span><i class=\"fa fa-download\"></i> FAQ IDE-SF-MK-Ortho</span>"),style="color:#fff;"),
+                                            class= 'dropdown'),
                                    tags$li(id="logo_ministere",
                                            a(tags$i(class="fa icon_ministere text-success vert_center"),"Solidarités Santé",href="http://solidarites-sante.gouv.fr/",
                                              target="_blank",  rel="noopener noreferrer")),

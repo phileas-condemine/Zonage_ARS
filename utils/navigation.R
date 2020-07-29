@@ -68,7 +68,7 @@ output$choix_reg_map=renderLeaflet({
 google_files = function(){
   req(input$choix_reg)
   req(input$choix_ps)
-  reg_google_files <- drive_find(type = "csv",pattern = paste0(input$choix_ps,'_',input$choix_reg))
+  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0(input$choix_ps,'_',input$choix_reg)))
   
   if(nrow(reg_google_files)>0){
     print("found google files !")
@@ -83,7 +83,7 @@ output$ui_millesime=renderUI({
   my_reg=input$choix_reg
   reg_name=regions[reg==my_reg]$libreg
   
-  reg_google_files <- drive_find(type = "csv",pattern = paste0(input$choix_ps,'_',input$choix_reg))
+  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0(input$choix_ps,'_',input$choix_reg)))
   reg_google_files <- reg_google_files[!grepl("en_vigueur",reg_google_files$name),]
   print(head(reg_google_files))
   if (!is.null(reg_google_files)){

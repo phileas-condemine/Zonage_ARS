@@ -16,7 +16,8 @@ www/Marianne.png
 www/my_styles.css        
 www/sketch_mg.html    
 www/sketch_inf.html          
-www/sketch_sf.html          
+www/sketch_sf.html
+www/FAQ_hors_mg.pdf
 data/liste_tribunaux_administratifs.RData
 data/pop_femme2016.RData
 utils/ARS.png
