@@ -200,8 +200,8 @@ dashboardPage(
                                                                                 
                                                                                 tags$br(),
                                                                                 fluidRow(
-                                                                                  column(8,textOutput("date_contours_update")),
-                                                                                  column(4,actionButton("update_contours","Mettre à jour",icon=icon("cogs")))
+                                                                                  column(6,textOutput("date_contours_update")),
+                                                                                  column(6,actionButton("update_contours","Mettre à jour",icon=icon("cogs")))
                                                                                 ),
                                                                                 tags$br(),
                                                                                 fluidRow(

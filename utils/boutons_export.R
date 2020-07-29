@@ -148,16 +148,17 @@ output$download_arrete <- downloadHandler(
   filename = function() {
     my_reg=input$choix_reg
     reg_name=regions[reg%in%my_reg]$libreg
-    paste0(reg_name,"_model.docx")
+    paste0(input$choix_ps,"_",reg_name,"_model.docx")
   },
   content = function(file) {
+    showNotification("Merci de patienter pendant que nous générons l'arrêté contenant la carte et le(s) tableau(x).",type = "message",duration = NULL)
     # Copy the report file to a temporary directory before processing it, in
     # case we don't have write permissions to the current working dir (which
     # can happen when deployed).
     temp_dir=tempdir()
     print(paste0("create_arrete_",input$choix_ps,".Rmd"))
     tempReport <- file.path(temp_dir, paste0("create_arrete_",input$choix_ps,".Rmd"))
-    file.copy(paste0("create_arrete_",input$choix_ps,".Rmd"), tempReport, overwrite = TRUE)
+    file.copy(paste0("utils/create_arrete_",input$choix_ps,".Rmd"), tempReport, overwrite = TRUE)
     tempimg <- file.path(temp_dir, "ARS.png")
     file.copy("utils/ARS.png", tempimg, overwrite = TRUE)
     jour_nommois_annee=function(d){
@@ -222,6 +223,11 @@ output$download_arrete <- downloadHandler(
                         "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Population",
                         "Zonage")
+      my_table2 = my_table[dansMaRegion=="oui"&estMajoritaire=="non"]
+      my_table3 = my_table[dansMaRegion=="non"&estMajoritaire=="oui"]
+      # my_table4 = my_table[dansMaRegion=="non"&estMajoritaire=="non"]
+      my_table = my_table[dansMaRegion=="oui"&estMajoritaire=="oui"]
+      
     } else if(input$choix_ps=="sf"){
       my_table[,population:=NULL]
       my_table = merge(my_table,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
@@ -268,7 +274,8 @@ output$download_arrete <- downloadHandler(
     names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
     }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
 
-    g <- ggplot(data=contours_reg)+ ggspatial::annotation_map_tile(zoomin = 0)+ 
+    g <- ggplot(data=contours_reg)+ 
+      ggspatial::annotation_map_tile(zoomin = 0)+
       geom_sf(aes(fill=picked_zonage),alpha=.5)+theme(legend.title = element_blank())+
       labs(caption=paste0("Source : COG ",year(Sys.Date()),", date : ",format.Date(Sys.Date(),"%d/%m/%Y")))+
       # geom_sf(data=reg_cont[reg_cont$reg==input$choix_reg,],aes(fill=NA),color="black",show.legend = F,lwd=2)+
@@ -298,6 +305,9 @@ output$download_arrete <- downloadHandler(
                    GENRE_DG_ARS = input$GENRE_DG_ARS,
                    DATE_PRECEDENT_ARRETE=input$DATE_LAST_ARRETE%>%jour_nommois_annee,
                    DATE_DECISION_ARS_ZONAGE=input$DATE_NOUVEL_ARRETE%>%jour_nommois_annee,
+                   OBJ_LAST_ARRETE=input$OBJ_LAST_ARRETE,
+                   DATE_DECISION_CONF_SANTE_AUTO=input$DATE_CONF_SANTE_AUTO%>%jour_nommois_annee,
+                   DATE_DECISION_UNION_REG_PS=input$DATE_UNION_REG_PS%>%jour_nommois_annee,
                    # LIEN_VERS_SITE_ARS,
                    # ANNEE_CALCUL_APL,
                    # PROP_5pct_VIVIER,
@@ -309,6 +319,8 @@ output$download_arrete <- downloadHandler(
                    # LIST_ZAC_INSULAIRES,
                    # LIST_ZAC_AUTRES,
                    TABLE = my_table,
+                   TABLE2 = ifelse(input$choix_ps%in%c("sf","inf"),my_table2,NULL),
+                   TABLE3 = ifelse(input$choix_ps%in%c("sf","inf"),my_table3,NULL),
                    CARTE=g,
                    VILLE_REDACTION=input$VILLE_TRIBUNAL_ADMINISTRATIF,
                    TODAY=Sys.Date()%>%jour_nommois_annee,
@@ -325,7 +337,7 @@ output$download_arrete <- downloadHandler(
 
 observeEvent(input$generate_arrete,{
   my_TAs=TA[reg%in%input$choix_reg]$TA
-  if(input$choix_ps=="mg"){
+  if(input$choix_ps%in%c("mg","inf")){
   showModal(modalDialog(title="Informations relatives à l'arrêté",
                         size="l",easyClose = T,footer=NULL,
                         fluidRow(
@@ -335,11 +347,18 @@ observeEvent(input$generate_arrete,{
                                  dateInput("DATE_DG_ELECTION","Date du décret de nomination du DG",startview = "decade", language = "fr",value = Sys.Date()-100,format = "dd-mm-yyyy"),
                                  dateInput("DATE_DG_EFFET","Date de prise de fonction du DG",startview = "decade", language = "fr",value = Sys.Date()-30,format = "dd-mm-yyyy"),
                                  dateInput("DATE_LAST_ARRETE","Date du précédent arrêté",startview = "decade", language = "fr",value = Sys.Date()-400,format = "dd-mm-yyyy"),
-                                 dateInput("DATE_NOUVEL_ARRETE","Date du nouvel arrêté",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
-                                 selectInput("VILLE_TRIBUNAL_ADMINISTRATIF","Ville du Tribunal Administratif de région",choices=my_TAs,selected=my_TAs[1]),
-                                 downloadButton(outputId="download_arrete",label="Arrêté")),
+                                 textInput("OBJ_LAST_ARRETE","Objet du précédent arrêté",placeholder = "(relatif à) ...")
+                                 ),
                           column(6,div(style="display: table-cell;vertical-align: middle",
-                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pouvoir être relu et complété."))
+                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pouvoir être relu et complété.")),
+                                 dateInput("DATE_NOUVEL_ARRETE","Date du nouvel arrêté",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
+                                 dateInput("DATE_CONF_SANTE_AUTO","Date avis de la conférence régionale de la santé et de l’autonomie ",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
+                                 dateInput("DATE_UNION_REG_PS","Date avis de l’union régionale des professionnels de santé",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
+                                 selectInput("VILLE_TRIBUNAL_ADMINISTRATIF","Ville du Tribunal Administratif de région",choices=my_TAs,selected=my_TAs[1]),
+                                 # column(6,tags$div(id="loading")),
+                                 # column(6,
+                                        downloadButton(outputId="download_arrete",label="Arrêté")
+                                 # )
                           ))))
   } else {
       showNotification(duration = NULL,type = "warning",ui = HTML("<b>Attention</b> la génération de l'arrêté n'est pas encore disponible pour cette profession, n'hésitez pas à nous solliciter (Blandine Legendre, Clémence Lamoril et Philéas Condemine) pour en savoir plus sur l'avancement du projet."))
