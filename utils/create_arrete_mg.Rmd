@@ -1,7 +1,7 @@
 ---
 output: 
   word_document:
-    reference_docx: utils/modele_word_arrete.docx
+    reference_docx: modele_word_arrete.docx
 params: 
   REGION_NAME: REGION_NAME
   DATE_NOMINATION_DG_ARS: DATE_NOMINATION_DG_ARS

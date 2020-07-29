@@ -158,7 +158,9 @@ output$download_arrete <- downloadHandler(
     temp_dir=tempdir()
     print(paste0("create_arrete_",input$choix_ps,".Rmd"))
     tempReport <- file.path(temp_dir, paste0("create_arrete_",input$choix_ps,".Rmd"))
+    tempModele <- file.path(temp_dir, "modele_word_arrete.docx")
     file.copy(paste0("utils/create_arrete_",input$choix_ps,".Rmd"), tempReport, overwrite = TRUE)
+    file.copy(paste0("utils/modele_word_arrete.docx"), tempModele, overwrite = TRUE)
     tempimg <- file.path(temp_dir, "ARS.png")
     file.copy("utils/ARS.png", tempimg, overwrite = TRUE)
     jour_nommois_annee=function(d){
