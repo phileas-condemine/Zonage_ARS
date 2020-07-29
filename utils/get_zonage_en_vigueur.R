@@ -11,7 +11,7 @@ if (length(my_google_files$name)>0){
     infos = gsub("_en_vigueur","",en_vigueur)
     ps = strsplit(infos,split = "_")[[1]][1]
     reg = strsplit(infos,split = "_")[[1]][2]
-    cbind(fread(my_path),reg=reg)
+    cbind(fread(my_path,colClasses = c("agr"="character")),reg=reg)
   })
   zonages_en_vigueur = rbindlist(files)
   print("fichier de zonages en vigueur");print(head(zonages_en_vigueur))

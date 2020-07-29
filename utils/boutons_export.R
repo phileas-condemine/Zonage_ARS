@@ -325,6 +325,7 @@ output$download_arrete <- downloadHandler(
 
 observeEvent(input$generate_arrete,{
   my_TAs=TA[reg%in%input$choix_reg]$TA
+  if(input$choix_ps=="mg"){
   showModal(modalDialog(title="Informations relatives à l'arrêté",
                         size="l",easyClose = T,footer=NULL,
                         fluidRow(
@@ -340,4 +341,7 @@ observeEvent(input$generate_arrete,{
                           column(6,div(style="display: table-cell;vertical-align: middle",
                                        HTML("Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pouvoir être relu et complété."))
                           ))))
+  } else {
+      showNotification(duration = NULL,type = "warning",ui = HTML("<b>Attention</b> la génération de l'arrêté n'est pas encore disponible pour cette profession, n'hésitez pas à nous solliciter (Blandine Legendre, Clémence Lamoril et Philéas Condemine) pour en savoir plus sur l'avancement du projet."))
+    }
 })

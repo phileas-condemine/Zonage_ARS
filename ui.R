@@ -135,17 +135,18 @@ dashboardPage(
                                                               conditionalPanel("!(input.choix_ps !== null)",
                                                                                tags$h3("Vous devez d'abord sélectionner une profession de santé"))
                                )),
-                               conditionalPanel("input.choix_millesime !== null",
-                                                box(width = 12, 
-                                                    actionBttn(
-                                                      inputId = "go_zonage",
-                                                      label = "Accéder au formulaire de zonage",
-                                                      color = "success",size = "lg",
-                                                      style = "material-flat",
-                                                      icon = icon("door-open"),
-                                                      block = TRUE
-                                                    )
-                                                ))
+                               uiOutput("ui_go_zonage")
+                               # conditionalPanel("input.choix_millesime !== null",
+                               #                  box(width = 12, 
+                               #                      actionBttn(
+                               #                        inputId = "go_zonage",
+                               #                        label = "Accéder au formulaire de zonage",
+                               #                        color = "success",size = "lg",
+                               #                        style = "material-flat",
+                               #                        icon = icon("door-open"),
+                               #                        block = TRUE
+                               #                      ))
+                               #                  )
                                # actionButton("go_zonage","Accéder au formulaire de zonage",icon=shiny::icon("door-open")))
                                
                                

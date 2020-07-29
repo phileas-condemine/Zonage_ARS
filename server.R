@@ -117,5 +117,19 @@ function(input, output,session) {
     
   })  
   
+  output$ui_go_zonage = renderUI({
+    req(input$choix_millesime)
+    
+    box(width = 12, 
+        actionBttn(
+          inputId = "go_zonage",
+          label = "Accéder au formulaire de zonage",
+          color = "success",size = "lg",
+          style = "material-flat",
+          icon = icon("door-open"),
+          block = TRUE
+        )
+    )
+  })
   
 }
