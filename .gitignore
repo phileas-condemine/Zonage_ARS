@@ -32,3 +32,4 @@ www/slackr_config.txt
 .idea/
 rosm.cache/
 utils/deploy_dev.R
+utils/test_arrete*

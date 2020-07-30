@@ -208,7 +208,8 @@ output$download_arrete <- downloadHandler(
     if(input$choix_ps%in%c("sf","inf")){
       my_table[dansMaRegion=="oui"&estMajoritaire=="non"&echangeable=="oui"&enVigueurAutreReg=="non", picked_zonage:="*Intermédiaire*"]
     }
-    
+    my_table2 = data.table()
+    my_table3 = data.table()
     if(input$choix_ps=="mg"){
       names(my_table) <- c("Nom du territoire de vie-santé",
                         "Code du territoire de vie-santé",
@@ -225,10 +226,14 @@ output$download_arrete <- downloadHandler(
                         "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Population",
                         "Zonage")
-      my_table2 = my_table[dansMaRegion=="oui"&estMajoritaire=="non"]
-      my_table3 = my_table[dansMaRegion=="non"&estMajoritaire=="oui"]
+      # browser()
+      my_table2 = my_table[dansMaRegion=="oui"&estMajoritaire=="non",c(1,2,3,4,10),with=F]
+      my_table3 = my_table[dansMaRegion=="non"&estMajoritaire=="oui",c(1,2,3,4,10),with=F]
       # my_table4 = my_table[dansMaRegion=="non"&estMajoritaire=="non"]
-      my_table = my_table[dansMaRegion=="oui"&estMajoritaire=="oui"]
+      my_table = my_table[dansMaRegion=="oui"&estMajoritaire=="oui",c(1,2,3,4,10),with=F]
+      fwrite(my_table,"data/test_arrete_kable_data.csv")
+      fwrite(my_table3,"data/test2_arrete_kable_data.csv")
+      
       
     } else if(input$choix_ps=="sf"){
       my_table[,population:=NULL]
@@ -321,8 +326,8 @@ output$download_arrete <- downloadHandler(
                    # LIST_ZAC_INSULAIRES,
                    # LIST_ZAC_AUTRES,
                    TABLE = my_table,
-                   TABLE2 = ifelse(input$choix_ps%in%c("sf","inf"),my_table2,NULL),
-                   TABLE3 = ifelse(input$choix_ps%in%c("sf","inf"),my_table3,NULL),
+                   TABLE2 = my_table2,
+                   TABLE3 = my_table3,
                    CARTE=g,
                    VILLE_REDACTION=input$VILLE_TRIBUNAL_ADMINISTRATIF,
                    TODAY=Sys.Date()%>%jour_nommois_annee,
@@ -352,7 +357,7 @@ observeEvent(input$generate_arrete,{
                                  textInput("OBJ_LAST_ARRETE","Objet du précédent arrêté",placeholder = "(relatif à) ...")
                                  ),
                           column(6,div(style="display: table-cell;vertical-align: middle",
-                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsft Word afin de pouvoir être relu et complété.")),
+                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsoft Word afin de pouvoir être relu et complété.")),
                                  dateInput("DATE_NOUVEL_ARRETE","Date du nouvel arrêté",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                  dateInput("DATE_CONF_SANTE_AUTO","Date avis de la conférence régionale de la santé et de l’autonomie ",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                  dateInput("DATE_UNION_REG_PS","Date avis de l’union régionale des professionnels de santé",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),

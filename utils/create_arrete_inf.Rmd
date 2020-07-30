@@ -33,6 +33,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
+    # reference_docx: modele_word_arrete.docx
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -120,7 +121,7 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 # ANNEXE 1 : liste des communes et des bassins de vie ou cantons-ou-ville de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-kable(params$TABLE)
+flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
 ```
 
 ******
@@ -128,7 +129,7 @@ kable(params$TABLE)
 # ANNEXE 2 : liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève d’une autre ARS
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-kable(params$TABLE2)
+flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
 ```
 
 ******
@@ -136,7 +137,8 @@ kable(params$TABLE2)
 # ANNEXE 3 : liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-kable(params$TABLE3)
+flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+
 ```
 
 
@@ -144,7 +146,7 @@ kable(params$TABLE3)
 
 # ANNEXE 4
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=10.4}
+```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide',fig.keep='all', fig.width=16, fig.height=10.4}
 params$CARTE
 ```
 
