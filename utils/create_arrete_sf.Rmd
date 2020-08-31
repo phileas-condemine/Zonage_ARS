@@ -9,7 +9,9 @@ params:
   NOM_DG_ARS: NOM_DG_ARS
   GENRE_DG_ARS: 'H'
   DATE_PRECEDENT_ARRETE: DATE_PRECEDENT_ARRETE
-  DATE_DECISION_ARS_ZONAGE: DATE_DECISION_ARS_ZONAGE
+  OBJ_LAST_ARRETE: OBJ_LAST_ARRETE
+  DATE_DECISION_CONF_SANTE_AUTO: DATE_DECISION_CONF_SANTE_AUTO
+  DATE_DECISION_UNION_REG_PS: DATE_DECISION_UNION_REG_PS
   LIEN_VERS_SITE_ARS: LIEN_VERS_SITE_ARS
   ANNEE_CALCUL_APL: ANNEE_CALCUL_APL
   PROP_5pct_VIVIER: PROP_5pct_VIVIER
@@ -22,6 +24,8 @@ params:
   LIST_ZAC_INSULAIRES: LIST_ZAC_INSULAIRES
   LIST_ZAC_AUTRES: LIST_ZAC_AUTRES
   TABLE: TABLE
+  TABLE2: TABLE2
+  TABLE3: TABLE3
   CARTE: CARTE
   VILLE_REDACTION: VILLE_REDACTION
   TODAY: TODAY
@@ -38,35 +42,36 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- https://shiny.rstudio.com/articles/generating-reports.html -->
 
-## relatif à la définition des zones de mise en œuvre des mesures destinées à favoriser une meilleure répartition géographique des sages-femmes libérales
+## relatif à la détermination des zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé pour la profession de sage-femme
 
-## `r paste(ifelse(params$GENRE_DG_ARS=='F',"La directrice générale","Le directeur général"))` de l'Agence régionale de santé `r params$REGION_NAME`,
+## Le directeur général de l’Agence régionale de santé `r params$REGION_NAME`,
 
-Vu le code de la santé publique et notamment son article L. 1434-4 ;
+Vu le code de la santé publique, notamment son article L. 1434-4 ;
 
-Vu la loi n° 2016-41 du 26 janvier 2016 de modernisation de notre système de santé, notamment son article 158;
+Vu la loi n° 2016-41 du 26 janvier 2016 de modernisation de notre système de santé, notamment son article 158 ;
 
-Vu le décret n° 2010-336 du 31 mars 2010 portant création des Agences régionales de santé;
 
-Vu le décret du `r params$DATE_NOMINATION_DG_ARS` portant nomination de `r params$NOM_DG_ARS` en qualité de `r paste(ifelse(params$GENRE_DG_ARS=='F',"directrice générale","directeur général"))` de l'Agence régionale de santé `r params$REGION_NAME` à compter `r params$DATE_DEBUT_DG_ARS`; 
+Vu le décret du `r params$DATE_NOMINATION_DG_ARS` portant nomination de `r params$NOM_DG_ARS` en qualité de `r paste(ifelse(params$GENRE_DG_ARS=='F',"directrice générale","directeur général"))` de l'Agence régionale de santé `r params$REGION_NAME` à compter du `r params$DATE_DEBUT_DG_ARS`; 
 
-Vu le décret n° 2017-632 du 25 avril 2017 relatif aux conditions de détermination des zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l'accès aux soins ou dans lesquelles le niveau de l'offre est particulièrement élevé ;
+Vu le décret n° 2017-632 du 25 avril 2017 relatif aux conditions de détermination des zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé ;
 
-Vu l'arrêté du 17 octobre 2019 relatif à la méthodologie applicable à la profession de sage-femme pour la détermination des zones prévues au 1° de l’article L. 1434-4 du code de la santé publique.
+Vu l’arrêté du 17 octobre 2019 relatif à la méthodologie applicable à la profession de sage-femme pour la détermination des zones prévues au 1° de l’article L. 1434-4 du code de la santé publique ;
 
-Vu l'avis de la conférence régionale de santé et de l’autonomie réunion en sa séance plénière le `r params$DATE_DECISION_ARS_ZONAGE` pris conformément aux dispositions de l'article R. 1434-42 du code de la santé publique ;
+Vu l’avis des ministres chargés de la santé et de la sécurité sociale du 10 août 2018 relatif à l’avenant n°4 à la convention nationale des sages-femmes, signée le 11 octobre 2007 et tacitement renouvelée ;
 
-Considérant les résultats de la concertation organisée au niveau régional ;
+Vu l’avis de la conférence régionale de la santé et de l’autonomie en date du `r params$DATE_DECISION_CONF_SANTE_AUTO` ;
+
+Vu l’avis de l’union régionale des professionnels de santé sages-femmes `r params$REGION_NAME` en date du `r params$DATE_DECISION_UNION_REG_PS` ;
 
 
 ## Arrête
 
-**Article 1^er^** : Le présent arrête abroge celui en date du `r params$DATE_PRECEDENT_ARRETE`, portant adoption de la révision du projet régional de santé de `r params$REGION_NAME`, dans sa partie relative à la détermination des zones prévues à l'article L. 1434-4 du code de la santé publique.
+**Article 1^er^** : L’arrêté du `r params$DATE_PRECEDENT_ARRETE` relatif à `r params$OBJ_LAST_ARRETE` est abrogé.
 
 
-**Article 2** : Les zones de mise en œuvre des mesures destinées à favoriser une meilleure répartition des sages-femmes libérales sont arrêtées ainsi qu'il suit en région `r params$REGION_NAME`.
+**Article 2** : Les zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé pour la profession de sage-femme sont arrêtées ainsi qu’il suit en région `r params$REGION_NAME`.
 
-Ces zones sont réparties en trois catégories :
+Ces zones sont réparties en cinq catégories :
 
 - les zones très sous dotées ;
 - les zones sous dotées ;
@@ -74,21 +79,23 @@ Ces zones sont réparties en trois catégories :
 - les zones très dotées ;
 - les zones surdotées. 
 
-La liste des communes, leur rattachement à un bassin de vie ou canton-ou-ville et leur qualification est jointe en annexe 1 de cet arrêté.
+**Article 3** :  Les communes classées selon les catégories susvisées sont réparties ainsi qu’il suit : 
 
-La cartographie de ce zonage figure en annexe 2 du même arrête.
+-	la liste des communes et  des bassins de vie ou cantons-ou-villes de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME` figure en annexe 1 du présent arrêté ; 
+-	la liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou cantons-ou-ville dont la qualification relève d’une autre ARS figure en annexe 2 du présent arrêté ; 
+-	la liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou cantons-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME` figure en annexe 3 du présent arrêté.
 
-**Article 3** : Le présent arrêté peut faire l'objet, dans un délai de deux mois à compter de la notification ou de la publication, soit :
+La cartographie de ce zonage figure en annexe 4 du  présent arrêté.
 
-- d'un recours grâcieux auprès `r paste(ifelse(params$GENRE_DG_ARS=='F',"de la directrice générale","du directeur général"))` de l'Agence régionale de santé ;
+**Article 4** : Le présent arrêté peut faire l'objet, dans un délai de deux mois à compter de la notification ou de la publication, soit :
 
-- d'un recours hiérarchique auprès du ministère des Solidarités et de la Santé ;
-
+- d’un recours gracieux auprès du directeur général de l’Agence régionale de santé ;
+-	d’un recours hiérarchique auprès du ministère des Solidarités et de la Santé ;
 - d'un recours contentieux devant le tribunal administratif de `r params$VILLE_REGION_TRIBUNAL` ;
 
 Le recours grâcieux ne conserve pas le délai des autres recours.
 
-**Article 4** : `r paste(ifelse(params$GENRE_DG_ARS=='F',"La directrice générale","Le directeur général"))` de l'Agence régionale de santé `r params$REGION_NAME` est en charge de l’exécution du présent arrêté qui sera publié au recueil des actes administratifs de la préfecture de la région `r params$REGION_NAME`.
+**Article 5** : Le directeur général de l’Agence régionale de santé `r params$REGION_NAME` est chargé de l’exécution du présent arrêté qui sera publié au recueil des actes administratifs de la préfecture de la région `r params$REGION_NAME`.
 
   
   
@@ -103,20 +110,37 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 
 
 
-******
 
-# ANNEXE 1
+
+##### ANNEXE 1 : liste des communes et des bassins de vie ou cantons-ou-ville de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-#kable(params$TABLE)
+flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
 ```
 
 
-******
 
-# ANNEXE 2
+##### ANNEXE 2 : liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève d’une autre ARS
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=10.4}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+```
+
+
+
+##### ANNEXE 3 : liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME`
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+
+```
+
+
+
+
+##### ANNEXE 4 : cartographie du zonage de la profession d'infirmier
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide',fig.keep='all', fig.width=16, fig.height=10.4}
 params$CARTE
 ```
 

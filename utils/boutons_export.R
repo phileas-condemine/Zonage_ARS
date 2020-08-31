@@ -218,6 +218,9 @@ output$download_arrete <- downloadHandler(
                         "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Population",
                         "Zonage")
+      my_table$dep = substr(my_table$`Code de la commune`,1,2)
+      setorder(my_table,"dep","Nom de la commune")
+      my_table$dep=NULL
     } else if(input$choix_ps=="inf"){
       names(my_table) <- c("Nom du bassin de vie ou pseudo-canton",
                         "Code du bassin de vie ou pseudo-canton",
@@ -227,22 +230,29 @@ output$download_arrete <- downloadHandler(
                         "Population",
                         "Zonage")
       # browser()
+      my_table$dep = substr(my_table$`Code de la commune`,1,2)
+      setorder(my_table,"dep","Nom de la commune")
       my_table2 = my_table[dansMaRegion=="oui"&estMajoritaire=="non",c(1,2,3,4,10),with=F]
       my_table3 = my_table[dansMaRegion=="non"&estMajoritaire=="oui",c(1,2,3,4,10),with=F]
       # my_table4 = my_table[dansMaRegion=="non"&estMajoritaire=="non"]
       my_table = my_table[dansMaRegion=="oui"&estMajoritaire=="oui",c(1,2,3,4,10),with=F]
-      fwrite(my_table,"data/test_arrete_kable_data.csv")
-      fwrite(my_table3,"data/test2_arrete_kable_data.csv")
+      # fwrite(my_table,"data/test_arrete_kable_data.csv")
+      # fwrite(my_table3,"data/test2_arrete_kable_data.csv")
       
       
     } else if(input$choix_ps=="sf"){
       my_table[,population:=NULL]
       my_table = merge(my_table,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
-      names(my_table) <- c("Nom du bassin de vie ou pseudo-canton",
+      names(my_table) <- c("Code de la commune","Nom du bassin de vie ou pseudo-canton",
                         "Code du bassin de vie ou pseudo-canton",
                         "Nom de la commune",
-                        "Code de la commune","dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
+                        "dansMaRegion","estMajoritaire","echangeable","enVigueurAutreReg",
                         "Zonage","Population_femmes")
+      my_table$dep = substr(my_table$`Code de la commune`,1,2)
+      setorder(my_table,"dep","Nom de la commune")
+      my_table2 = my_table[dansMaRegion=="oui"&estMajoritaire=="non",c(2,3,1,4,9),with=F]
+      my_table3 = my_table[dansMaRegion=="non"&estMajoritaire=="oui",c(2,3,1,4,9),with=F]
+      my_table = my_table[dansMaRegion=="oui"&estMajoritaire=="oui",c(2,3,1,4,9),with=F]
     }
     print("la table")
     print(head(my_table))
@@ -311,7 +321,7 @@ output$download_arrete <- downloadHandler(
                    NOM_DG_ARS = input$NOM_DG_ARS,
                    GENRE_DG_ARS = input$GENRE_DG_ARS,
                    DATE_PRECEDENT_ARRETE=input$DATE_LAST_ARRETE%>%jour_nommois_annee,
-                   DATE_DECISION_ARS_ZONAGE=input$DATE_NOUVEL_ARRETE%>%jour_nommois_annee,
+                   # DATE_DECISION_ARS_ZONAGE=input$DATE_NOUVEL_ARRETE%>%jour_nommois_annee,
                    OBJ_LAST_ARRETE=input$OBJ_LAST_ARRETE,
                    DATE_DECISION_CONF_SANTE_AUTO=input$DATE_CONF_SANTE_AUTO%>%jour_nommois_annee,
                    DATE_DECISION_UNION_REG_PS=input$DATE_UNION_REG_PS%>%jour_nommois_annee,
@@ -344,7 +354,7 @@ output$download_arrete <- downloadHandler(
 
 observeEvent(input$generate_arrete,{
   my_TAs=TA[reg%in%input$choix_reg]$TA
-  if(input$choix_ps%in%c("mg","inf")){
+  if(input$choix_ps%in%c("mg","inf","sf")){
   showModal(modalDialog(title="Informations relatives à l'arrêté",
                         size="l",easyClose = T,footer=NULL,
                         fluidRow(
@@ -356,15 +366,16 @@ observeEvent(input$generate_arrete,{
                                  dateInput("DATE_LAST_ARRETE","Date du précédent arrêté",startview = "decade", language = "fr",value = Sys.Date()-400,format = "dd-mm-yyyy"),
                                  textInput("OBJ_LAST_ARRETE","Objet du précédent arrêté",placeholder = "(relatif à) ...")
                                  ),
-                          column(6,div(style="display: table-cell;vertical-align: middle",
-                                       HTML("Le rapport proposé en téléchargement est au format .docx Microsoft Word afin de pouvoir être relu et complété.")),
-                                 dateInput("DATE_NOUVEL_ARRETE","Date du nouvel arrêté",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
+                          column(6,
+                                 # dateInput("DATE_NOUVEL_ARRETE","Date du nouvel arrêté",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                  dateInput("DATE_CONF_SANTE_AUTO","Date avis de la conférence régionale de la santé et de l’autonomie ",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                  dateInput("DATE_UNION_REG_PS","Date avis de l’union régionale des professionnels de santé",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                  selectInput("VILLE_TRIBUNAL_ADMINISTRATIF","Ville du Tribunal Administratif de région",choices=my_TAs,selected=my_TAs[1]),
                                  # column(6,tags$div(id="loading")),
                                  # column(6,
-                                        downloadButton(outputId="download_arrete",label="Arrêté")
+                                 downloadButton(outputId="download_arrete",label="Arrêté"),
+                                 div(style="display: table-cell;vertical-align: middle",HTML("Le rapport proposé en téléchargement est au format .docx Microsoft Word afin de pouvoir être relu et complété."))
+                                 
                                  # )
                           ))))
   } else {

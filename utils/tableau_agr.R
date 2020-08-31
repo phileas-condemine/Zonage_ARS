@@ -1,9 +1,7 @@
 tableau_reg = reactive({
-  
   print("tableau")
   
   req(input$choix_reg)
-  
   # print("Variables à afficher") ; print(input$vars_to_show)
   # print("Largeur boxes") ; print(input$table_width)
   
@@ -48,7 +46,6 @@ tableau_reg = reactive({
   print("my_mil1") ; print(my_mil)
   my_mil = my_mil
   # }
-  
   progress$inc(2/9, detail = "Chargement des fichiers historiques")
   source(paste0("utils/get_zonage_en_vigueur.R"),local=T,encoding = "UTF-8")
   if(input$choix_ps=='mg'){
@@ -80,7 +77,6 @@ tableau_reg = reactive({
   } else{
     fond_de_carte(carte_BVCV)
   }
-  # browser()
   # On remplace les valeurs en s'appuyant sur les zonages en vigueur des autres régions.
   vals = data.table(vals)[zonages_en_vigueur,picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
   vals = data.frame(vals)
@@ -90,9 +86,17 @@ tableau_reg = reactive({
   
   if(input$choix_ps=="mg"){
     tvs = merge(tvs,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
+    tvs[,degre_liberte := (CN=="02_Vivier")*is_majoritaire]
+    
+    tvs = rbind(tvs[degre_liberte==1],tvs[degre_liberte==0],tvs[is.na(degre_liberte)])
+    
     tvs
   }else{
     bvcv = merge(bvcv,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
+    bvcv[,degre_liberte := (ZE_UD+ZE_OD)*is_majoritaire]
+    
+    bvcv = rbind(bvcv[degre_liberte==1],bvcv[degre_liberte==0],bvcv[is.na(degre_liberte)])
+    
     bvcv
   }
 })
@@ -102,14 +106,14 @@ output$zonage_dt=DT::renderDataTable(server=F,{
   print("DT")
   my_data=tableau_reg()
   
-  if(input$choix_ps %in% c("sf","inf")){
-    my_data[,degre_liberte := (ZE_UD+ZE_OD)*is_majoritaire]
-    # setorder(my_data,-degre_liberte)
-  } else if(input$choix_ps =="mg"){
-    my_data[,degre_liberte := (CN=="02_Vivier")*is_majoritaire]
-  }
+  # if(input$choix_ps %in% c("sf","inf")){
+  #   my_data[,degre_liberte := (ZE_UD+ZE_OD)*is_majoritaire]
+  #   # setorder(my_data,-degre_liberte)
+  # } else if(input$choix_ps =="mg"){
+  #   my_data[,degre_liberte := (CN=="02_Vivier")*is_majoritaire]
+  # }
   nb_rows = nrow(my_data)
-  my_data = rbind(my_data[degre_liberte==1],my_data[degre_liberte==0],my_data[is.na(degre_liberte)])
+  # my_data = rbind(my_data[degre_liberte==1],my_data[degre_liberte==0],my_data[is.na(degre_liberte)])
   print(paste0("Conservation des lignes: ",round(100*nrow(my_data)/nb_rows),"%"))
   my_data[,degre_liberte:=ifelse(degre_liberte==1,"modifiable","hors-champs")]
   # req(input$vars_to_show)
@@ -214,7 +218,6 @@ observeEvent(input$zonage_dt_cell_clicked,{
                    }"
                                       ,my_row$agr))
     }
-    # browser()
     if (!is.na(my_row$CN)&(my_row$CN=="01_Sélection nationale"|my_row$degre_liberte==0)){
       shinyalert("Attention!", paste("Ce",ifelse(input$choix_ps=="mg","Territoire de Vie-Santé fait partie de la sélection nationale","Bassin de Vie - Canton-Ville n'est pas en zone d'échange.")),
                  cancelButtonText = "Annuler",

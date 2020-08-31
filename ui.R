@@ -197,7 +197,6 @@ dashboardPage(
                                                                                          leafletOutput("communes_map",width = "auto"))
                                                                                 ),
                                                                                 uiOutput("gauges"),
-                                                                                
                                                                                 tags$br(),
                                                                                 fluidRow(
                                                                                   column(6,textOutput("date_contours_update")),
@@ -208,12 +207,10 @@ dashboardPage(
                                                                                   column(12,plotlyOutput("dist_zonages",width="auto"))
                                                                                 ),
                                                                                 tags$br()
-                                                                                
                                                                )
                                  )
                                  )
                                )
-                               
               ),             
               includeHTML("www/footer_catalogue.html"))
     )

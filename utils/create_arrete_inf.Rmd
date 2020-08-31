@@ -12,7 +12,6 @@ params:
   OBJ_LAST_ARRETE: OBJ_LAST_ARRETE
   DATE_DECISION_CONF_SANTE_AUTO: DATE_DECISION_CONF_SANTE_AUTO
   DATE_DECISION_UNION_REG_PS: DATE_DECISION_UNION_REG_PS
-  DATE_DECISION_ARS_ZONAGE: DATE_DECISION_ARS_ZONAGE
   LIEN_VERS_SITE_ARS: LIEN_VERS_SITE_ARS
   ANNEE_CALCUL_APL: ANNEE_CALCUL_APL
   PROP_5pct_VIVIER: PROP_5pct_VIVIER
@@ -44,7 +43,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- https://shiny.rstudio.com/articles/generating-reports.html -->
 
-## relatif à la détermination des zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé pour la profession de d’infirmier
+## relatif à la détermination des zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé pour la profession d’infirmier
 
 ## Le directeur général de l’Agence régionale de santé `r params$REGION_NAME`,
 
@@ -60,7 +59,7 @@ Vu l’arrêté du 10 janvier 2020 relatif à la méthodologie applicable à la 
 
 Vu l’avis des ministres chargés de la santé et de la sécurité sociale du 13 juin 2019 relatif à l’avenant n°6 à la convention nationale des infirmiers libéraux, signée le 22 juin 2007 ; 
 
-Vu l’avis de la conférence régionale de la santé et de l’autonomie en date du `params$DATE_DECISION_CONF_SANTE_AUTO` ;
+Vu l’avis de la conférence régionale de la santé et de l’autonomie en date du `r params$DATE_DECISION_CONF_SANTE_AUTO` ;
 
 Vu l’avis de l’union régionale des professionnels de santé infirmiers en date du `r params$DATE_DECISION_UNION_REG_PS` ;
 
@@ -72,7 +71,7 @@ Vu l’avis de l’union régionale des professionnels de santé infirmiers en d
 
 **Article 2** : Les zones caractérisées par une offre de soins insuffisante ou par des difficultés dans l’accès aux soins ou dans lesquelles le niveau de l’offre est particulièrement élevé pour la profession d’infirmier sont arrêtées ainsi qu’il suit en région `r params$REGION_NAME`.
 
-Ces zones sont réparties en trois catégories :
+Ces zones sont réparties en cinq catégories :
 
 - les zones très sous dotées ;
 - les zones sous dotées ;
@@ -84,7 +83,7 @@ Ces zones sont réparties en trois catégories :
 
 **Article 3** :  Les communes classées selon les catégories susvisées sont réparties ainsi qu’il suit : 
 
--	la liste des communes et  des bassins de vie/cantons-ou-villes de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME` figure en annexe 1 du présent arrêté ; 
+-	la liste des communes et  des bassins de vie ou cantons-ou-villes de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME` figure en annexe 1 du présent arrêté ; 
 -	la liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou cantons-ou-ville dont la qualification relève d’une autre ARS figure en annexe 2 du présent arrêté ; 
 -	la liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou cantons-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME` figure en annexe 3 du présent arrêté.
 
@@ -94,9 +93,7 @@ La cartographie de ce zonage figure en annexe 4 du  présent arrêté.
 **Article 4** : Le présent arrêté peut faire l'objet, dans un délai de deux mois à compter de la notification ou de la publication, soit :
 
 - d’un recours gracieux auprès du directeur général de l’Agence régionale de santé ;
-
 -	d’un recours hiérarchique auprès du ministère des Solidarités et de la Santé ;
-
 - d'un recours contentieux devant le tribunal administratif de `r params$VILLE_REGION_TRIBUNAL` ;
 
 Le recours grâcieux ne conserve pas le délai des autres recours.
@@ -116,25 +113,25 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 
 
 
-******
 
-# ANNEXE 1 : liste des communes et des bassins de vie ou cantons-ou-ville de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME`
+
+##### ANNEXE 1 : liste des communes et des bassins de vie ou cantons-ou-ville de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
 ```
 
-******
 
-# ANNEXE 2 : liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève d’une autre ARS
+
+##### ANNEXE 2 : liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève d’une autre ARS
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
 ```
 
-******
 
-# ANNEXE 3 : liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME`
+
+##### ANNEXE 3 : liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
@@ -142,9 +139,9 @@ flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter
 ```
 
 
-******
 
-# ANNEXE 4
+
+##### ANNEXE 4 : cartographie du zonage de la profession d'infirmier
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide',fig.keep='all', fig.width=16, fig.height=10.4}
 params$CARTE
