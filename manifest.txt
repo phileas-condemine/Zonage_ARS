@@ -4,7 +4,6 @@ ui.R
 server.R
 global.R
 droptoken.rds
-data/Seuils_ZIP_ZAC.xlsx
 www/accueil.html         
 www/custom_scripts.js    
 www/dt_callback.js       
@@ -16,12 +15,13 @@ www/sketch_mg.html
 www/sketch_inf.html          
 www/sketch_sf.html
 www/FAQ_hors_mg.pdf
-data/liste_tribunaux_administratifs.RData
-utils/ARS.png
-data/Seuils_arretes.xlsx
+www/slackr_config.txt
 data/sf/cadre_nat_sf.sas7bdat
 data/inf/cadre_nat_inf.sas7bdat
-www/slackr_config.txt
+data/Shape_files/arr.RData
+data/Shape_files/grdquart_reu.RData
+data/geojson/init_geojson.txt
+utils/ARS.png
 utils/get_zonage_en_vigueur.R
 utils/get_qpv_zonage_en_vigueur.R
 utils/qpv.R
@@ -40,7 +40,4 @@ utils/prep_liste_TribunauxAdministratifs.R
 utils/handle_geo_data.R
 utils/prep_zonage_mg.R
 utils/prep_zonage_hors_mg.R
-data/Shape_files/arr.RData
-data/Shape_files/grdquart_reu.RData
 utils/modele_word_arrete.docx
-data/geojson/init_geojson.txt

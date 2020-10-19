@@ -70,7 +70,9 @@ function(input, output,session) {
   ##### Recap modif #####
   
   output$recap_dt = renderDataTable({
+    # browser()
     infos <- vals_reac()
+    req(!is.null(infos))
     if(input$choix_ps=="mg"){
       #### TVS
       load(paste0("data/",input$choix_reg,"_preprocessed_TVS.RData"))
@@ -129,12 +131,13 @@ function(input, output,session) {
       
       
       vals=vals[sapply(vals,length)>0]
-      req(length(vals)>0)
-      vals=stack(vals)
-      names(vals) <- c("picked_zonage","agr")
-      vals <- vals %>% mutate_if(is.factor,as.character)
-      print("get vals_reac OK")
-      vals
+      if(length(vals)>0){
+        vals=stack(vals)
+        names(vals) <- c("picked_zonage","agr")
+        vals <- vals %>% mutate_if(is.factor,as.character)
+        print("get vals_reac OK")
+        vals
+      } else NULL
     } else NULL
   })
   
