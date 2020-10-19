@@ -18,7 +18,6 @@ www/sketch_inf.html
 www/sketch_sf.html
 www/FAQ_hors_mg.pdf
 data/liste_tribunaux_administratifs.RData
-data/pop_femme2016.RData
 utils/ARS.png
 data/Seuils_arretes.xlsx
 data/sf/cadre_nat_sf.sas7bdat
