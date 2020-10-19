@@ -157,16 +157,19 @@ hist_qpv=hist_qpv%>%mutate_if(is.factor,as.character)%>%data.table%>%unique
 hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
 
 # source("utils/handle_insee_pop.R")
-drop_download("zonage/pop_femme2016.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+if(!"pop_femme2016.RData"%in%list.files("data"))
+  drop_download("zonage/pop_femme2016.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
 load("data/pop_femme2016.RData")
 
 dep = unique(TVS[,c("dep","reg","libdep")])
 
 # geo reg
-drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+if(!"contours_dep.RData"%in%list.files("data"))
+  drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
 
 # rdrop2::drop_upload(file="data/reg_cont.RData",dtoken=token,path="zonage/",autorename = F)
-drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+if(!"reg_cont.RData"%in%list.files("data"))
+  drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
 
 load("data/contours_dep.RData")
 load("data/reg_cont.RData")
@@ -175,6 +178,9 @@ names(reg_cont)[which(names(reg_cont)=='nom')]<-'libreg'
 # nm reg
 regions = unique(TVS[,c("reg","libreg")])
 
+# rdrop2::drop_upload(file="data/Seuils_arretes.xlsx",dtoken=token,path="zonage/",autorename = F)
+if(!"Seuils_arretes.xlsx"%in%list.files("data"))
+  drop_download("zonage/Seuils_arretes.xlsx",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
 seuils_reg_mg=read_xlsx("data/Seuils_arretes.xlsx",sheet="mg")
 seuils_reg_sf=read_xlsx("data/Seuils_arretes.xlsx",sheet="sf")%>%rename(check_sf=check)
 seuils_reg_inf=read_xlsx("data/Seuils_arretes.xlsx",sheet="inf")%>%rename(check_inf=check)
