@@ -35,7 +35,7 @@ library(htmlwidgets)
 library(lubridate)
 library(openxlsx)
 library(knitr)
-# library(kableExtra)
+library(kableExtra)
 library(flextable)
 #library(remotes)
 #install_github('oswaldosantos/ggsn')
@@ -66,36 +66,36 @@ drive_auth(email = "drees-zonage-ars@sante.gouv.fr",
 
 vars_to_toggle = c("agr","libagr","communes","population","is_majoritaire","CN","libCN")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
-                                "Liste des départements"="departements",
-                                "Liste communes"="communes",
-                                "Population (communes de la région)"="population",
-                                # "APL 2017"="apl",
-                                "Ma région est majoritaire"="is_majoritaire",
-                                "Hors Vivier (HV)"="HV","Zone de Vigilance (ZV)"="ZV","ZAC","ZIP","Cadre National (CN)"="CN",
-                                "Zone d'échange"="degre_liberte"),
-                         sf = c("Code BCVC"="agr","Nom BVCV"="libagr",
-                                "Liste des départements"="departements",
-                                "Liste communes"="communes",
-                                "Population (BVCV total)"="population",
-                                "APL 2017"="apl",
-                                "Ma région est majoritaire"="is_majoritaire",
-                                "VUD","UD","Int","VD","OD",
-                                "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
-                                "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
-                                "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"),
-                         inf = c("Code BCVC"="agr","Nom BVCV"="libagr",
-                                 "Liste des départements"="departements",
-                                 "Liste communes"="communes",
-                                 "Population (BVCV total)"="population",
-                                 "APL 2017"="apl",
-                                 "Ma région est majoritaire"="is_majoritaire",
-                                 "VUD","UD","Int","VD","OD",
-                                 "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
-                                 "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
-                                 "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"))
+                                  "Liste des départements"="departements",
+                                  "Liste communes"="communes",
+                                  "Population (communes de la région)"="population",
+                                  # "APL 2017"="apl",
+                                  "Ma région est majoritaire"="is_majoritaire",
+                                  "Hors Vivier (HV)"="HV","Zone de Vigilance (ZV)"="ZV","ZAC","ZIP","Cadre National (CN)"="CN",
+                                  "Zone d'échange"="degre_liberte"),
+                           sf = c("Code BCVC"="agr","Nom BVCV"="libagr",
+                                  "Liste des départements"="departements",
+                                  "Liste communes"="communes",
+                                  "Population (BVCV total)"="population",
+                                  "APL 2017"="apl",
+                                  "Ma région est majoritaire"="is_majoritaire",
+                                  "VUD","UD","Int","VD","OD",
+                                  "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
+                                  "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
+                                  "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"),
+                           inf = c("Code BCVC"="agr","Nom BVCV"="libagr",
+                                   "Liste des départements"="departements",
+                                   "Liste communes"="communes",
+                                   "Population (BVCV total)"="population",
+                                   "APL 2017"="apl",
+                                   "Ma région est majoritaire"="is_majoritaire",
+                                   "VUD","UD","Int","VD","OD",
+                                   "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
+                                   "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
+                                   "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"))
 vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP","CN","population"),
-                    sf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"),
-                    inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
+                         sf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"),
+                         inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
 
 
 # com to agr
@@ -109,14 +109,29 @@ if(!"tvs2019.sas7bdat"%in%list.files("data")){
 TVS = haven::read_sas("data/tvs2019.sas7bdat")
 names(TVS) <- c("depcom","libcom","agr","libagr","reg","dep","libdep","libreg")
 TVS=data.table(TVS)
-TVS$agr = stringi::stri_pad_left(TVS$agr,5,"0")
+# TVS$agr = stringi::stri_pad_left(TVS$agr,5,"0")
+TVS$agr = stringi::stri_pad_right(TVS$agr,5,"_")
 table(nchar(TVS$agr))
+
+# QPV
+if(!"qpv_markers_pop.RData"%in%list.files("data")){
+  rdrop2::drop_download(path = "zonage/qpv_markers_pop.RData",overwrite = T,
+                        dtoken = token,verbose = T,
+                        local_path = "data")
+}
+load("data/qpv_markers_pop.RData")
+
+
+
+
 # drop_upload(dtoken=token,file = "data/bvcv2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
 if(!"bvcv2019.sas7bdat"%in%list.files("data")){
   rdrop2::drop_download(path = "zonage/bvcv2019.sas7bdat",overwrite = T,
                         dtoken = token,verbose = T,
                         local_path = "data")
 }
+
+
 BVCV = haven::read_sas("data/bvcv2019.sas7bdat") %>% 
   select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
 BVCV=data.table(BVCV)
@@ -133,7 +148,13 @@ if(!"Zonage_medecin_20190703.xlsx"%in%list.files("data")){
                         local_path = "data")
 }
 
-
+hist_qpv <- readxl::read_excel("data/Zonage_medecin_20190703.xlsx",sheet = "Zonage_QPV")[,c(1,3,5,6,10,12)]
+hist_qpv = data.table(hist_qpv)
+names(hist_qpv) <- c("reg","agr","cod","libqpv","zonage_ars","pop")
+hist_qpv[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
+hist_qpv[zonage_ars=="Hors vivier",zonage_ars:="HV"]
+hist_qpv=hist_qpv%>%mutate_if(is.factor,as.character)%>%data.table%>%unique
+hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
 
 # source("utils/handle_insee_pop.R")
 load("data/pop_femme2016.RData")
@@ -192,3 +213,12 @@ mois_noms = c("janvier","février","mars","avril","mai","juin",
 list_PS = c("Médecins"="mg","Sages-femmes"="sf",
             # "Masseurs-kinésithérapeutes"="mk",
             "Infirmiers"="inf")
+
+
+vswitch_zonage_mg = function(v){
+  sapply(v,function(x)switch(x,
+                             ZIP = 4,
+                             ZAC = 3,
+                             ZV = 2,
+                             HV = 1))
+}

@@ -28,10 +28,10 @@ my_deps=dep[reg==my_reg]$dep
 token <- readRDS("droptoken.rds")
 drop_acc(dtoken = token)
 
-prep_geo_data_from_scratch <- function(my_reg){
+prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
   nb_deps=length(my_deps)
   communes=lapply(my_deps,function(my_dep){
-    if (!paste0(my_dep,".json")%in%list.files("data/geojson/")){
+    if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
       download.file(paste0("https://geo.api.gouv.fr/departements/",my_dep,"/communes?fields=nom,code,population,contour&format=geojson&geometry=contour"),
                     destfile = paste0("data/geojson/",my_dep,".json"))
       
@@ -43,14 +43,47 @@ prep_geo_data_from_scratch <- function(my_reg){
   })
   communes=do.call("rbind",communes)
   communes=unique(communes)
+
+  
   names(communes)[which(names(communes)=="nom")]<-"libcom"
   names(communes)[which(names(communes)=="code")]<-"depcom"
+  
+  if(my_reg %in% c(11,84,93)){
+    load("data/Shape_files/arr.RData")
+    z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+                                                sheet="Zonage_communes")[,c(4,6,10)]
+    names(z_pop) <- c("tvs","depcom","population")
+    
+    arr = lapply(arr,function(x){
+      x@data$depcom = as.character(x@data$depcom)
+      x@data = merge(x@data,z_pop,by="depcom")
+      x
+    })
+  
+  }
+  
+  
+  if(my_reg == 11){
+    communes <- rbind(communes,
+                      arr[["paris"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+  }
+  if(my_reg == 84){
+    communes <- rbind(communes,
+                      arr[["lyon"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+  }
+  if(my_reg == 93){
+    communes <- rbind(communes,
+                      arr[["marseille"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+  }
+  
+  
+  
   communes$my_reg_TVS=T
   communes$my_reg_BVCV=T
   
   # Pour savoir si la région est "majoritaire" dans le TVS ou BVCV, 
   # on va récupérer les données des communes des régions adjacentes. 
-  
+
   for(a in c("TVS","BVCV")){
     AGR <- get(a)
     AGR_pertinents=AGR[agr%in%unique(AGR[depcom%in%communes$depcom]$agr)]
@@ -60,13 +93,13 @@ prep_geo_data_from_scratch <- function(my_reg){
   }
   other_deps <- unique(c(other_deps_BVCV,other_deps_TVS))
   remove(other_deps_BVCV,other_deps_TVS)
-  
+
   if (length(other_deps)>0){
     nb_deps=length(other_deps)
     
     other_communes=lapply(other_deps,function(my_dep){
       # info_com=jsonlite::fromJSON(sprintf("https://geo.api.gouv.fr/communes?codeDepartement=%s&fields=nom,code,population&format=json&geometry=centre",my_dep))
-      if (!paste0(my_dep,".json")%in%list.files("data/geojson/")){
+      if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
         download.file(sprintf(
           "https://geo.api.gouv.fr/departements/%s/communes?fields=nom,code,population,contour&format=geojson&geometry=contour"
           ,my_dep),paste0("data/geojson/",my_dep,".json"))            
@@ -106,79 +139,98 @@ prep_geo_data_from_scratch <- function(my_reg){
     
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
+    
+    if(my_reg == 4){
+      load("data/Shape_files/grdquart_reu.RData")
+      z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+                                sheet="Zonage_TVS")[,c(2,1,11)]
+      names(z_pop) <- c("reg","agr","population")
+      z_pop = z_pop[z_pop$reg==4,]
+      z_pop$reg=NULL
+      z_pop$agr = substr(z_pop$agr,7,13)
+      grdquart_reu$my_reg_TVS=T
+      grdquart_reu$my_reg_BVCV=T
+      names(grdquart_reu@data)
+      grdquart_reu@data = merge(grdquart_reu@data,z_pop,by.x="depcom",by.y="agr")
+      communes = grdquart_reu%>% sf::st_as_sf() %>% select(depcom,libcom,population,my_reg_TVS,my_reg_BVCV,agr=depcom,libagr=libcom,reg,dep,libdep,libreg,geometry)
+      
+      
+      # carte <- rbind(carte[-which(substr(carte$agr,1,3)=="974"),],
+      #                grdquart_reu %>% sf::st_as_sf() %>%
+      #                  select(agr=depcom,libagr=libcom,geometry))
+    }
+    
+
+    
+    
     # Nettoyage des polygones pour éviter les erreurs
     print("Fusion des polygones (regroupement des communes en AGR). Ca peut prendre 1 minute la première fois.")
     print(system.time(communes$geometry <-
-                        as(communes$geometry, 'Spatial')%>%
-                        sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
+                        communes$geometry %>% 
+                        st_transform(2154) %>%
+                        as('Spatial')%>%
+                        # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
                         rgeos::gBuffer(byid=TRUE, width=0)%>%
-                        sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
-                        st_as_sf()%>%.$geometry))
+                        # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
+                        # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
+                        st_as_sf()%>%
+                        st_transform(4326) %>%
+                        .$geometry))
     
+
     
     communes_dissolved=aggregate(x = communes,
                                  by = list("code_agr"=communes$agr),
                                  FUN = function(x)x[1])
+    
+    
+    
+    
     # leaflet()%>%
     #   addPolygons(data=communes_dissolved)
     print("polygons reduction")
     print(format(object.size(communes_dissolved), units = "Mb"))
-    print(system.time(communes_dissolved$geometry <-
-                        as(communes_dissolved$geometry, 'Spatial')%>%
-                        sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
+    print(system.time(communes_dissolved$geometry <-communes_dissolved$geometry %>%
+                        st_transform(2154) %>%
+                        as('Spatial')%>%
+                        # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
                         rgeos::gSimplify(topologyPreserve = T,tol=200) %>%
                         # rmapshaper::ms_simplify()%>%
                         rgeos::gBuffer(byid=TRUE, width=0)%>%
-                        sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
-                        st_as_sf()%>%.$geometry))
+                        # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
+                        # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
+                        st_as_sf()%>%
+                        st_transform(4326) %>%
+                        .$geometry))
     
     print(format(object.size(communes_dissolved), units = "Mb"))
     # Génère des problèmes avec les multipolygones au moment de l'affichage. Exemple Agde, Gigean en Occitanie.
     carte=communes_dissolved[,c("agr","libagr","geometry")]
-    
-    #ajout des arrondissements et grands quartiers pour la Réunion
-    load("data/Shape_files/arr.RData")
-    carte <- rbind(carte,
-                   arr[["paris"]] %>% sf::st_as_sf() %>% 
-                   select(agr=depcom,libagr=libcom,geometry),
-                   arr[["lyon"]] %>% sf::st_as_sf() %>% 
-                   select(agr=depcom,libagr=libcom,geometry),
-                   arr[["marseille"]] %>% sf::st_as_sf() %>% 
-                   select(agr=depcom,libagr=libcom,geometry)) 
-    if(a=="TVS"){
-      load("data/Shape_files/grdquart_reu.RData")
-      carte <- rbind(carte[-which(substr(carte$agr,1,3)=="974"),],
-                     grdquart_reu %>% sf::st_as_sf() %>% 
-                       select(agr=depcom,libagr=libcom,geometry))
-    }
-                   
     
     names(st_geometry(carte)) = NULL #https://github.com/rstudio/leaflet/issues/595
   
     assign(paste("communes",a,sep="_"),communes)
     assign(paste("carte",a,sep="_"),carte)
   }
-  # carte_TVS$agr = gsub(" ","", carte_TVS$agr)
-  # carte_TVS$agr = sprintf("%05s", carte_TVS$agr)
-  # carte_TVS$agr = gsub(" ","0", carte_TVS$agr)
-  # communes_TVS$agr = gsub(" ","", communes_TVS$agr)
-  # communes_TVS$agr = sprintf("%05s", communes_TVS$agr)
-  # communes_TVS$agr = gsub(" ","0", communes_TVS$agr)
   save(communes_TVS,carte_TVS,
-       file=paste0("data/",my_reg,"_preprocessed_TVS.RData")) 
-  # carte_BVCV$agr = gsub(" ","", carte_BVCV$agr)
-  # carte_BVCV$agr = sprintf("%05s", carte_BVCV$agr)
-  # carte_BVCV$agr = gsub(" ","0", carte_BVCV$agr)
-  # communes_BVCV$agr = gsub(" ","", communes_BVCV$agr)
-  # communes_BVCV$agr = sprintf("%05s", communes_BVCV$agr)
-  # communes_BVCV$agr = gsub(" ","0", communes_BVCV$agr)
+  file=paste0("data/",my_reg,"_preprocessed_TVS.RData")) 
+
   save(communes_BVCV,carte_BVCV,
        file=paste0("data/",my_reg,"_preprocessed_BVCV.RData"))
   print("upload to dropbox")
-  rdrop2::drop_upload(file = paste0("data/",my_reg,"_preprocessed_TVS.RData"),
-                      dtoken = token,path = "zonage/")
-  rdrop2::drop_upload(file = paste0("data/",my_reg,"_preprocessed_BVCV.RData"),
-                      dtoken = token,path = "zonage/")
+  file = paste0(my_reg,"_preprocessed_TVS.RData")
+
+  if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
+    rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+  }
+  rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
+  file = paste0(my_reg,"_preprocessed_BVCV.RData")
+  if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
+    print("rm bvcv")
+    rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+  }
+  rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
+
   }
 
 

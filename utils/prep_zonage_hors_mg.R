@@ -156,7 +156,6 @@ prep_zonage <- function(cadre_national=CN,
 
   }
   zonages_en_vigueur$value_set_en_vigueur = T
-  # browser()
   radio_buttons = merge(radio_buttons, zonages_en_vigueur,
                         by.x=c("agr","reg_majoritaire","statut"),by.y=c("agr","reg","en_vigueur_autre_reg"),all.x=T)
   # désactiver la valeur historique pour aller directement appliquer celle du zonage "en vigueur"
@@ -177,7 +176,6 @@ prep_zonage <- function(cadre_national=CN,
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
-  # browser()
   radio_buttons[,class:=paste0(
     ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
                                                 " historical_choice"),""),

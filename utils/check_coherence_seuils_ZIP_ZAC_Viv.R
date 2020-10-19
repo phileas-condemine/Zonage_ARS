@@ -11,7 +11,8 @@ levels(zonage_historique$zonage_ars) <- c("HV","ZAC","ZIP","ZV")
 zonage_historique=zonage_historique%>%
   mutate_if(is.factor,as.character)%>%
   select(reg,tvs,zonage_ars,zonage_nat,population)%>%
-  mutate(tvs=as.character(tvs),tvs=stringi::stri_pad_left(tvs,5,"0"))
+  # mutate(tvs=as.character(tvs),tvs=stringi::stri_pad_left(tvs,5,"0"))
+  mutate(tvs=as.character(tvs),tvs=stringi::stri_pad_right(tvs,5,"_"))
 zonage_historique=data.table(zonage_historique)
 zonage_historique=unique(zonage_historique)
 

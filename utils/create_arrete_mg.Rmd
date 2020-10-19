@@ -24,13 +24,18 @@ params:
   LIST_ZAC_INSULAIRES: LIST_ZAC_INSULAIRES
   LIST_ZAC_AUTRES: LIST_ZAC_AUTRES
   TABLE: TABLE
+  TABLE2: TABLE2
+  TABLE3: TABLE3
   CARTE: CARTE
   VILLE_REDACTION: VILLE_REDACTION
   TODAY: TODAY
+  ADD_ANNEXES: ADD_ANNEXES
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if (shiny::isRunning())
+  shiny::setProgress(0.1,"Préparation du corps de l'arrêté") 
 ```
 
 <center>![LOGO_ARS](ARS.png)</center>
@@ -99,15 +104,41 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 
 ##### ANNEXE 1
 
+Zonage des communes
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-kable(params$TABLE)
+if("Tableaux"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(0.2,"Création du tableau de l'annexe 1 (c'est long)") 
+  flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=10)
+}
+
+```
+
+Zonages des quartiers prioritaires de la Ville (QPV) qui diffèrent du zonage pris pour la commune d'appartenance.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if("Tableaux"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(0.6,"Tableau des QPV") 
+  flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+}
 ```
 
 
 
 ##### ANNEXE 2
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=16, fig.height=10.4}
-params$CARTE
+Cartographie du zonage par Territoire de Vie-Santé (TVS)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide',fig.keep='all', fig.width=16, fig.height=10.4}
+if("Cartes"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(0.7,"Ajout de la carte") 
+  params$CARTE
+}
+if (shiny::isRunning())
+    shiny::setProgress(0.9,"Export du fichier Word") 
+
 ```
 

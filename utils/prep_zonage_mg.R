@@ -1,32 +1,34 @@
-
+###### LOAD HIST TVS
 zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
                                     sheet="Zonage_communes")[,c(2,4,8,9)]
+zonage_historique=data.table(zonage_historique)
 names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars")
-zonage_historique$zonage_ars=factor(zonage_historique$zonage_ars)
-levels(zonage_historique$zonage_ars) <- c("HV","ZAC","ZIP","ZV")
-# zonage_historique$zonage_ars=relevel(zonage_historique$zonage_ars,ref = "ZIP")
+table(zonage_historique$zonage_ars)
+zonage_historique[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
+zonage_historique[zonage_ars=="Hors vivier",zonage_ars:="HV"]
 zonage_historique=zonage_historique%>%
   mutate_if(is.factor,as.character)%>%
-  select(reg,tvs,zonage_ars,zonage_nat)
-zonage_historique=data.table(zonage_historique)
-zonage_historique=unique(zonage_historique)
+  select(reg,tvs,zonage_ars,zonage_nat)%>% 
+  data.table %>% 
+  unique
 
 
 zonage_historique_reg=zonage_historique[reg==my_reg,c("tvs","zonage_ars","zonage_nat")]
 setnames(zonage_historique_reg,"zonage_nat","CN")
 zonage_historique_reg=unique(zonage_historique_reg)
-zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
+# zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
+zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
 
-# zonage_historique_reg$tvs = gsub(" ","", zonage_historique_reg$tvs)
-# zonage_historique_reg$tvs = sprintf("%05s", zonage_historique_reg$tvs)
-# zonage_historique_reg$tvs = gsub(" ","0", zonage_historique_reg$tvs)
 
 CN = zonage_historique_reg[,c("tvs","CN")]%>%unique
 VZN = zonage_historique_reg[,c("tvs","zonage_ars")]
 VZN$check_historique=T
+VZN <<- VZN
 
 
-prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_files,choix_mil,env){
+
+
+prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zonage_historique = qpv_VZN,my_google_files,choix_mil,env){
   tvs=data.table(communes_TVS)
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
   setorder(tvs,-pop_tvs_per_reg)
@@ -51,12 +53,8 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
   radio_buttons=merge(radio_buttons,
                       tvs[,c("agr","is_majoritaire","CN")],
                       by="agr")
-  
   radio_buttons=merge(radio_buttons,vals_zonage_historique,
                       by.x=c("agr","statut"),by.y=c("tvs","zonage_ars"),all.x=T)
-  
-  radio_buttons[(check_historique)]
-  
   radio_buttons=data.table(radio_buttons)
   radio_buttons[is.na(check_historique),check_historique:=F]
   
@@ -86,9 +84,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
       gs_file_nm=paste0("data/",choix_mil,".csv")
     }
     fwrite(vals,file=gs_file_nm)
-    # gs_upload(gs_file_nm,sheet_title=sheet_name,overwrite = T)
     drive_upload(media = gs_file_nm,path = sheet_name,overwrite = T,  type = "csv")
-    
     assign("vals",vals,env)
 
     
@@ -107,14 +103,14 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
           drive_download(file = choix_mil,path=paste0("data/",choix_mil,".csv"),overwrite = T,type="csv")
           print(list.files("data/"))
           zonage_saved <- fread(paste0("data/",choix_mil,".csv"),colClasses = "character")%>%as.data.frame()
-          # zonage_saved <- gs_read(gs_title(choix_mil))
         }
       )
     } 
     print("zonage_saved") ; print(head(zonage_saved))
     zonage_saved = zonage_saved%>%
       mutate_all(as.character)%>%
-      mutate(agr=stringi::stri_pad_left(agr,5,"0"))
+      # mutate(agr=stringi::stri_pad_left(agr,5,"0"))
+      mutate(agr=stringi::stri_pad_right(agr,5,"_"))
 
     assign("vals",zonage_saved,env)
     
@@ -135,7 +131,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
       ifelse(is_majoritaire,""," disabled='disabled'"),
       ifelse(check_historique,ifelse(value_is_set," historical_choice",
                                      " historical_choice' checked='checked"),""),
-      ifelse(value_set,"saved_choice' checked='checked",""),
+      ifelse(value_set," saved_choice' checked='checked",""),
       ifelse(CN=="01_Sélection nationale"&!value_set&!check_historique,
              ifelse(statut=="ZIP",
                     ifelse(my_reg%in%regions_derogatoires," checked='checked'"," checked='checked' disabled='disabled'"),
@@ -145,17 +141,17 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,my_google_f
     )]
   }
   
-  # print("radio_buttons3") ; print(head(radio_buttons))
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")
   tvs=merge(tvs,radio_buttons,by="agr")
 
-  # tvs$agr=factor(tvs$agr)
-  # tvs$libagr=factor(tvs$libagr)
-  
   setorder(tvs,-proportion_pop)
   print("names tvs")
   print(class(tvs))
   assign("tvs",tvs,env)
   assign("radio_buttons",radio_buttons,env)
-  
 }
+
+
+
+
+

@@ -1,3 +1,17 @@
+
+###### LOGOUT  #######
+observeEvent(input$logout,{
+  req(input$logout)
+  session$reload()
+})
+observeEvent(input$sidebarmenu,{
+  if(has_logged_in()&input$sidebarmenu%in%c("accueil","my_params")){
+    session$reload()
+  }
+})
+
+
+###### LOGIN TO ZONAGE #####
 observeEvent(input$go_zonage,{
   print("current mil selected")
   print(input$choix_millesime)
@@ -15,7 +29,7 @@ observeEvent(input$go_zonage,{
                         actionButton("send_pwd","Soumettre")))
 })
 
-observeEvent(input$choix_reg,{
+observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
   print("valeur par défaut import data model")
   print(input$import_data_model)
   output$auth=renderText({
@@ -29,12 +43,12 @@ observeEvent(input$send_pwd,{
   auth = fread("data/auth.txt")
   auth = auth[key==input$my_auth & reg == input$choix_reg]
   if(nrow(auth)>0){
-    print("OK")
+    # print("OK")
     output$auth=renderText({
       "OK"
     })
+    has_logged_in(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)
-    
     removeModal()
   }
   
@@ -69,6 +83,10 @@ google_files = function(){
   req(input$choix_reg)
   req(input$choix_ps)
   reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0(input$choix_ps,'_',input$choix_reg)))
+  if(input$choix_ps == "mg"){
+    qpv_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0("qpv_",input$choix_ps,'_',input$choix_reg)))
+    reg_google_files <- rbind(reg_google_files,qpv_google_files)
+  }
   
   if(nrow(reg_google_files)>0){
     print("found google files !")
@@ -104,19 +122,28 @@ output$ui_millesime=renderUI({
                                 plugins= list('remove_button')))
 })
 
-output$ui_vars_to_show = renderUI({
+output$ui_params = renderUI({
   req(input$choix_ps)
   tagList(
     # selectInput(inputId="vars_to_show",label="Variables à afficher",
     #           selected = vars_to_show_list[[input$choix_ps]],
     #           choices = vars_to_choose_from[[input$choix_ps]],
     #           multiple=T),
-    sliderInput("table_width","Ajuster la table",min=0,max=12,value=8))
+    sliderInput("table_width","Ajuster la table",min=0,max=12,value=8),
+    shinyWidgets::switchInput(inputId = "remove_alerte_jauge",
+                              label = "Alertes Jauges",
+                              value = F,
+                              onLabel = "Désactivée",offLabel = "Activées",
+                              labelWidth = "200",handleWidth = "100",
+                              # onStatus = "#0f0",offStatus = "#00f",
+                              size = "normal",inline = T
+    )
+  )
   
   
 })
 
-outputOptions(output, "ui_vars_to_show", suspendWhenHidden=FALSE)
+outputOptions(output, "ui_params", suspendWhenHidden=FALSE)
 
 observeEvent(input$table_width,{
   req(input$table_width)

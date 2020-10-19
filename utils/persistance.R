@@ -12,10 +12,19 @@ observeEvent(input$save_latest_check,{
               by="agr",all.x=T)
   my_dt[is.na(picked_zonage)]$picked_zonage <- ""
   setorder(my_dt,agr)
-  sheet_name=paste(input$choix_ps,input$choix_reg,"en_vigueur",sep="_")
+  sheet_name=paste("en_vigueur",input$choix_ps,input$choix_reg,sep="_")
   gs_file_nm=paste0("data/",sheet_name,".csv")
   fwrite(my_dt,file=gs_file_nm)
   drive_upload(media = gs_file_nm,path = sheet_name,overwrite = T,  type = "csv")
+  
+  if(input$choix_ps=="mg"){
+    save_qpv = sheet_name=paste("en_vigueur","qpv",input$choix_reg,sep="_")
+    file_qpv = paste0("data/",save_qpv,".csv")
+    drive_upload(media = file_qpv,path = save_qpv,overwrite = T,  type = "csv")
+    timer_qpv(Sys.time())
+    new_modifs_qpv(0)
+  }
+  
   removeModal()
 })
 
@@ -40,6 +49,15 @@ observeEvent(c(autorefresh(),input$force_save),{
     drive_upload(media = gs_file_nm,path = sheet_name,overwrite = T,  type = "csv")
     timer(Sys.time())
     new_modifs(0)
+  }
+  
+  
+  if((((difftime(Sys.time(),timer(),units = "sec") > 20))&new_modifs_qpv()>0)){
+    save_qpv = paste0("qpv_",input$choix_millesime)
+    file_qpv = paste0("data/",save_qpv,".csv")
+    drive_upload(media = file_qpv,path = save_qpv,overwrite = T,  type = "csv")
+    timer_qpv(Sys.time())
+    new_modifs_qpv(0)
   }
   # print("Persistance OK")
   

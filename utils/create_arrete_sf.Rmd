@@ -29,10 +29,14 @@ params:
   CARTE: CARTE
   VILLE_REDACTION: VILLE_REDACTION
   TODAY: TODAY
+  ADD_ANNEXES: ADD_ANNEXES
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+if (shiny::isRunning())
+  shiny::setProgress(0.1,"Préparation du corps de l'arrêté")
 ```
 
 <center>![LOGO_ARS](ARS.png)</center>
@@ -97,8 +101,8 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 
 **Article 5** : Le directeur général de l’Agence régionale de santé `r params$REGION_NAME` est chargé de l’exécution du présent arrêté qui sera publié au recueil des actes administratifs de la préfecture de la région `r params$REGION_NAME`.
 
-  
-  
+
+
 
 ### Fait à `r params$VILLE_REDACTION`, le `r params$TODAY`
 
@@ -115,7 +119,12 @@ Le recours grâcieux ne conserve pas le délai des autres recours.
 ##### ANNEXE 1 : liste des communes et des bassins de vie ou cantons-ou-ville de la région `r params$REGION_NAME` qualifiés par l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+if("Tableaux"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(.2,"Création du tableau en annexe 1 (c'est long)")  
+  
+  flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+}
 ```
 
 
@@ -123,7 +132,11 @@ flextable(params$TABLE)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=
 ##### ANNEXE 2 : liste des communes de la région `r params$REGION_NAME` rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève d’une autre ARS
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+if("Tableaux"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(.4,"Création du tableau de l'annexe 2")  
+  flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+}
 ```
 
 
@@ -131,8 +144,12 @@ flextable(params$TABLE2)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter
 ##### ANNEXE 3 : liste des communes appartenant à une autre région mais rattachées à un bassin de vie ou canton-ou-ville dont la qualification relève de l’ARS `r params$REGION_NAME`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
-
+if("Tableaux"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(.6,"Création du tableau de l'annexe 3") 
+  flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter=30)
+  
+}
 ```
 
 
@@ -141,6 +158,12 @@ flextable(params$TABLE3)%>%theme_vanilla()%>%autofit()%>%fit_to_width(8,max_iter
 ##### ANNEXE 4 : cartographie du zonage de la profession d'infirmier
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide',fig.keep='all', fig.width=16, fig.height=10.4}
-params$CARTE
+if("Cartes"%in%params$ADD_ANNEXES){
+  if (shiny::isRunning())
+    shiny::setProgress(.8,"Génération de la carte") 
+  params$CARTE
+}
+if (shiny::isRunning())
+  shiny::setProgress(.95,"Export du fichier Word") 
 ```
 

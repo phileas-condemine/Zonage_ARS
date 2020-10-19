@@ -1,5 +1,6 @@
-my_google_files <- drive_find(type = "csv",q = "name contains 'en_vigueur'")
-my_google_files <- my_google_files[grepl(paste0("^",input$choix_ps),my_google_files$name),]
+##### AGR ######
+my_google_files <- drive_find(type = "csv",q = "name contains 'en_vigueur_'")
+my_google_files <- my_google_files[grepl(paste0("^en_vigueur_",input$choix_ps),my_google_files$name),]
 print("récupération des fichiers de zonage en vigueur")
 if (length(my_google_files$name)>0){
   files = lapply(my_google_files$name,function(en_vigueur){
@@ -27,3 +28,4 @@ if (length(my_google_files$name)>0){
   
 }
 rm(files)
+
