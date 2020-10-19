@@ -217,6 +217,10 @@ shiny_running = function () {
 
 # source("utils/prep_liste_TribunauxAdministratifs.R",echo = T)
 # get_TA()
+# rdrop2::drop_upload(file="data/liste_tribunaux_administratifs.RData",dtoken=token,path="zonage/",autorename = F)
+if(!"liste_tribunaux_administratifs.RData"%in%list.files("data"))
+  drop_download("zonage/liste_tribunaux_administratifs.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+
 load("data/liste_tribunaux_administratifs.RData")
 
 mois_noms = c("janvier","février","mars","avril","mai","juin",
