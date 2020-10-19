@@ -163,6 +163,11 @@ load("data/pop_femme2016.RData")
 dep = unique(TVS[,c("dep","reg","libdep")])
 
 # geo reg
+drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+
+# rdrop2::drop_upload(file="data/reg_cont.RData",dtoken=token,path="zonage/",autorename = F)
+drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+
 load("data/contours_dep.RData")
 load("data/reg_cont.RData")
 names(reg_cont)[which(names(reg_cont)=='code_insee')]<-'reg'

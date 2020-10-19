@@ -4,7 +4,6 @@ ui.R
 server.R
 global.R
 droptoken.rds
-data/reg_cont.RData
 data/Seuils_ZIP_ZAC.xlsx
 www/accueil.html         
 www/custom_scripts.js    
@@ -44,5 +43,4 @@ utils/prep_zonage_hors_mg.R
 data/Shape_files/arr.RData
 data/Shape_files/grdquart_reu.RData
 utils/modele_word_arrete.docx
-data/contours_dep.RData
 data/geojson/init_geojson.txt
