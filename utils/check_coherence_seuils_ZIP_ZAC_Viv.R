@@ -2,8 +2,10 @@ library(data.table)
 library(dplyr)
 library(readxl)
 library(plotly)
+# zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+#                                     sheet="Zonage_communes")[,c(2,4,8,9,10)]
 zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
-                                    sheet="Zonage_communes")[,c(2,4,8,9,10)]
+                                    sheet="Zonage_TVS")[,c(2,5,7,8,11)]
 names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars","population")
 zonage_historique$zonage_ars=factor(zonage_historique$zonage_ars)
 levels(zonage_historique$zonage_ars) <- c("HV","ZAC","ZIP","ZV")

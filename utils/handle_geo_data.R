@@ -50,13 +50,21 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
   
   if(my_reg %in% c(11,84,93)){
     load("data/Shape_files/arr.RData")
+    # z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+    #                                             sheet="Zonage_communes")[,c(4,6,10)]
+    # names(z_pop) <- c("tvs","depcom","population")
     z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
-                                                sheet="Zonage_communes")[,c(4,6,10)]
+                                                sheet="Zonage_TVS")[,c(5,5,11)]
     names(z_pop) <- c("tvs","depcom","population")
     
     arr = lapply(arr,function(x){
       x@data$depcom = as.character(x@data$depcom)
-      x@data = merge(x@data,z_pop,by="depcom")
+      tmp = x@data
+      tmp$ordre = 1:nrow(tmp)
+      tmp = merge(tmp,z_pop,by="depcom")
+      setorder(tmp,"ordre")
+      tmp$ordre=NULL
+      x@data = tmp
       x
     })
   

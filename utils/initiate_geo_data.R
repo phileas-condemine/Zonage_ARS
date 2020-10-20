@@ -4,7 +4,7 @@ my_reg = 6
 my_reg = 28
 my_reg = 84 # ARA
 my_reg = 4 #La Réunion
-todo = c(11,84,93,4)#PLM - Réu
+todo = c(11,84,93)#PLM - Réu
 todo = setdiff(regions$reg,6)
 for (my_reg in todo){#Mayotte est exclue !
   print(my_reg)
