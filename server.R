@@ -12,6 +12,7 @@ function(input, output,session) {
   new_modifs <- reactiveVal(0)
   new_modifs_qpv <- reactiveVal(0)
   has_logged_in <- reactiveVal(F)
+  enable_dl_zonage_en_vigueur <- reactiveVal(F)
   edition_forced <- reactiveVal(c())
   last_arg_clicked <- reactiveVal("")
   modif_zonage_qpv <- reactiveVal(list(cod="",picked_zonage=""))
@@ -158,7 +159,9 @@ function(input, output,session) {
         tagList(
           downloadButton("dl_ref_zonage_med","Fichier réf. zonage médecin", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_tvs_com","Corres. TVS - Communes", style = "width:230px;color:#000"),br(),
-          downloadButton("dl_pop_tvs","Population jauges", style = "width:230px;color:#000")
+          downloadButton("dl_pop_tvs","Population jauges", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br()
+          ,tags$div(id="loading")
         )
       } else if(input$choix_ps=="sf"){
         
@@ -166,7 +169,9 @@ function(input, output,session) {
           downloadButton("dl_faq_hors_mg","FAQ", style = "width:230px;color:#000"),br(),
           downloadButton("dl_ref_zonage_sf","Fichier réf. zonage SF", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_bvcv_com","Corres. BVCV - Communes", style = "width:230px;color:#000"),br(),
-          downloadButton("dl_pop_bvcv_femmes","Population jauges (femmes)", style = "width:230px;color:#000")
+          downloadButton("dl_pop_bvcv_femmes","Population jauges (femmes)", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br()
+          ,tags$div(id="loading")
           
         )
       } else  if(input$choix_ps=="inf"){
@@ -174,12 +179,29 @@ function(input, output,session) {
           downloadButton("dl_faq_hors_mg","FAQ", style = "width:230px;color:#000"),br(),
           downloadButton("dl_ref_zonage_ide","Fichier réf. zonage IDE", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_bvcv_com","Corres. BVCV - Communes", style = "width:230px;color:#000"),br(),
-          downloadButton("dl_pop_bvcv_all","Population jauges", style = "width:230px;color:#000")
+          downloadButton("dl_pop_bvcv_all","Population jauges", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
+          ,tags$div(id="loading")
+          
           
         )
-      } else NULL
+      } else {
+        tagList(
+          downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
+          ,tags$div(id="loading")
+        )
+      }
       
-    } else NULL
+    } else {
+      tagList(
+        downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
+        downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
+        downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
+        ,tags$div(id="loading")
+      )
+    }
     
     
   })
@@ -253,6 +275,79 @@ function(input, output,session) {
       names(pop_bvcv) <- c("Région","Département","BVCV","Nom BVCV","Commune","Nom commune","Population")
       openxlsx::write.xlsx(pop_bvcv,file)
       
+    }
+  )
+  
+  
+  output$dl_zonage_en_vigueur_mg <- downloadHandler(
+    filename = 'zonages_en_vigueur_mg.xlsx',
+    content = function(file) {
+      if(enable_dl_zonage_en_vigueur()){
+        source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg","")
+        source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+        en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg","")
+        if(nrow(en_vigueur_agr)>0){
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr,"QPV"=en_vigueur_qpv),file = file)
+
+        } else {
+          showNotification("Aucune ARS n'a validé son zonage pour les médecins généralistes sur l'application pour l'instant",type = "message",duration = 10)
+        }
+      } else {
+        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
+                              actionButton("send_pwd2","Soumettre")))
+
+      }
+
+    }
+  )
+
+
+  output$dl_zonage_en_vigueur_sf <- downloadHandler(
+    filename = 'zonages_en_vigueur_sf.xlsx',
+    content = function(file) {
+      if(enable_dl_zonage_en_vigueur()){
+        source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf","")
+        if(nrow(en_vigueur_agr)>0){
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
+
+        } else {
+          showNotification("Aucune ARS n'a validé son zonage pour les sages-femmes sur l'application pour l'instant",type = "message",duration = 10)
+        }
+      } else {
+        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
+                              actionButton("send_pwd2","Soumettre")))
+
+      }
+
+    }
+  )
+
+  output$dl_zonage_en_vigueur_inf <- downloadHandler(
+    filename = 'zonages_en_vigueur_inf.xlsx',
+    content = function(file) {
+      if(enable_dl_zonage_en_vigueur()){
+        source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf","")
+        if(nrow(en_vigueur_agr)>0){
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
+
+        } else {
+          showNotification("Aucune ARS n'a validé son zonage pour les infirmiers sur l'application pour l'instant",type = "message",duration = 10)
+        }
+      } else {
+        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
+                              actionButton("send_pwd2","Soumettre")))
+
+      }
+
     }
   )
   

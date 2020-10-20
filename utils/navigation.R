@@ -48,8 +48,29 @@ observeEvent(input$send_pwd,{
       "OK"
     })
     has_logged_in(T)
+    enable_dl_zonage_en_vigueur(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)
     removeModal()
+  }
+  
+})
+
+
+observeEvent(input$send_pwd2,{
+  req(input$my_auth2)
+  
+  auth = fread("data/auth.txt")
+  auth = auth[key==input$my_auth2]
+  if(nrow(auth)>0){
+    # print("OK")
+    # output$auth2=renderText({
+    #   "OK"
+    # })
+    enable_dl_zonage_en_vigueur(T)
+    # outputOptions(output, "auth2", suspendWhenHidden=FALSE)
+    removeModal()
+    showNotification("Identification validée, merci de renouveler la demande de téléchargement.",type = "message")
+    
   }
   
 })

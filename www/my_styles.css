@@ -144,6 +144,9 @@ input[type="radio"].temp_minoritaire:checked:after {
 */
 
 #loading {
+      margin-left:100px;
+      margin-top: 10px;
+      margin-bottom: 10px;
       display: inline-block;
       border: 3px solid #f3f3f3; 
       border-top: 3px solid #3498db; 

@@ -79,6 +79,7 @@ observeEvent(c(input$save_zonage_qpv),{
 
 zonage_qpv_en_vigueur = reactive({
   source(paste0("utils/get_qpv_zonage_en_vigueur.R"),local=T,encoding = "UTF-8")
+  qpv_zonages_en_vigueur = dl_zonage_en_vigueur_qpv(input$choix_ps,input$choix_reg)
   qpv_zonages_en_vigueur
 })
 zonage_qpv = reactive({

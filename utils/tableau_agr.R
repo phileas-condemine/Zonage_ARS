@@ -45,7 +45,8 @@ tableau_reg = reactive({
     print("my_mil1") ; print(my_mil)
     my_mil = my_mil
     progress$inc(2/9, detail = "Chargement des fichiers historiques")
-    source(paste0("utils/get_zonage_en_vigueur.R"),local=T,encoding = "UTF-8")
+    source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+    zonages_en_vigueur = dl_zonage_en_vigueur_agr(input$choix_ps,input$choix_reg)
     if(input$choix_ps=='mg'){
       source(paste0("utils/prep_zonage_mg.R"),local=T,encoding = "UTF-8")
     }else{

@@ -83,7 +83,13 @@ tagList(
       tabItems(
         tabItem(tabName = "accueil",
                 includeHTML("www/accueil.html"),
-                fluidRow(div(style="margin-left:40px",actionButton("go_params","Choix de la région, de la profession de santé")))
+                fluidRow(div(style="margin-left:40px",actionButton("go_params","Choix de la région, de la profession de santé"))),
+                tags$br(),
+                tags$br(),
+                tags$br(),
+                tags$br(),
+                tags$br(),
+                tags$br()
                 # ,includeHTML("www/footer_accueil.html")
         ),
         tabItem(tabName = "my_params",
