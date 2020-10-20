@@ -140,7 +140,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
     
-    if(my_reg == 4){
+    if(my_reg == 4 & a =="TVS"){
       load("data/Shape_files/grdquart_reu.RData")
       z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
                                 sheet="Zonage_TVS")[,c(2,1,11)]
@@ -152,7 +152,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
       grdquart_reu$my_reg_BVCV=T
       names(grdquart_reu@data)
       grdquart_reu@data = merge(grdquart_reu@data,z_pop,by.x="depcom",by.y="agr")
-      communes = grdquart_reu%>% sf::st_as_sf() %>% select(depcom,libcom,population,my_reg_TVS,my_reg_BVCV,agr=depcom,libagr=libcom,reg,dep,libdep,libreg,geometry)
+      communes = grdquart_reu%>% sf::st_as_sf() %>% select(depcom = depcom,libcom = libcom,population,my_reg_TVS,my_reg_BVCV,agr=depcom,libagr=libcom,reg,dep,libdep,libreg,geometry)
       
       
       # carte <- rbind(carte[-which(substr(carte$agr,1,3)=="974"),],

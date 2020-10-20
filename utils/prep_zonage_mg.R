@@ -1,6 +1,13 @@
 ###### LOAD HIST TVS
-zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+# readxl::excel_sheets("data/Zonage_medecin_20190703.xlsx")
+
+if(my_reg!="4"){
+  zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
                                     sheet="Zonage_communes")[,c(2,4,8,9)]
+} else if (my_reg=="4"){
+  zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+                                      sheet="Zonage_TVS")[,c(2,1,7,8)]
+}
 zonage_historique=data.table(zonage_historique)
 names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars")
 table(zonage_historique$zonage_ars)
@@ -12,12 +19,17 @@ zonage_historique=zonage_historique%>%
   data.table %>% 
   unique
 
+if (my_reg=="4"){
+  zonage_historique[,tvs:=substr(tvs,7,13)]
+}
 
 zonage_historique_reg=zonage_historique[reg==my_reg,c("tvs","zonage_ars","zonage_nat")]
 setnames(zonage_historique_reg,"zonage_nat","CN")
 zonage_historique_reg=unique(zonage_historique_reg)
 # zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
-zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
+if (my_reg!="4"){
+  zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
+}
 
 
 CN = zonage_historique_reg[,c("tvs","CN")]%>%unique
@@ -31,7 +43,9 @@ VZN <<- VZN
 prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zonage_historique = qpv_VZN,my_google_files,choix_mil,env){
   tvs=data.table(communes_TVS)
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
+  tvs[,reg:=gsub("^0","",reg)]
   setorder(tvs,-pop_tvs_per_reg)
+  # browser()
   tvs=tvs[,list(departements=paste(unique(dep),collapse=", "),
                 regions=paste(unique(reg),collapse=", "),
                 communes=paste(unique(libcom),collapse=", "),

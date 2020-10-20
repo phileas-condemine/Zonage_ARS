@@ -1,6 +1,6 @@
 output$ui_toggle_qpv = renderUI({
   if(!is.null(input$choix_ps)){
-    if(input$choix_ps=="mg"){
+    if(input$choix_ps=="mg"&!input$choix_reg%in%c("4")){
       shinyWidgets::switchInput(inputId = "toggle_qpv",
                                 label = "Ajouter QPV",
                                 value = F,

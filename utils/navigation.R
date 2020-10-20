@@ -103,9 +103,14 @@ output$choix_reg_map=renderLeaflet({
 google_files = function(){
   req(input$choix_reg)
   req(input$choix_ps)
-  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0(input$choix_ps,'_',input$choix_reg)))
+  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
+  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
+  reg_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
   if(input$choix_ps == "mg"){
-    qpv_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0("qpv_",input$choix_ps,'_',input$choix_reg)))
+    regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
+    qpv_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
+    qpv_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
+    
     reg_google_files <- rbind(reg_google_files,qpv_google_files)
   }
   
@@ -121,17 +126,21 @@ output$ui_millesime=renderUI({
   input$refresh_millesime
   my_reg=input$choix_reg
   reg_name=regions[reg==my_reg]$libreg
-  
-  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", paste0(input$choix_ps,'_',input$choix_reg)))
+  # browser()
+  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
+  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
+  reg_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
   reg_google_files <- reg_google_files[!grepl("en_vigueur",reg_google_files$name),]
   print(head(reg_google_files))
   if (!is.null(reg_google_files)){
+    if(nrow(reg_google_files)>0){
     millesimes(setNames(reg_google_files$name,
                         reg_google_files$name%>%
-                          gsub(pattern = input$choix_reg,replacement = "")%>%
-                          gsub(pattern = input$choix_ps,replacement = "")%>%
+                          gsub(pattern = paste0(input$choix_reg,"_"),replacement = "")%>%
+                          gsub(pattern = paste0(input$choix_ps,"_"),replacement = "")%>%
                           gsub(pattern = "_+",replacement = "_")%>%
                           gsub(pattern = "(^_)|(_$)",replacement = "")))
+    } else  {millesimes("")}
   } else {millesimes("")}
   print("millesimes") ; print(millesimes())
   
