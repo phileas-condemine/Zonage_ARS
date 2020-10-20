@@ -15,18 +15,24 @@ observeEvent(input$sidebarmenu,{
 observeEvent(input$go_zonage,{
   print("current mil selected")
   print(input$choix_millesime)
-  if(is.null(input$choix_millesime)|input$choix_millesime==""){
-    new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_cadre_national')
-    updateSelectizeInput(session,'choix_millesime',
-                         choices=c(millesimes(),setNames(new_mil,"cadre_national")),
-                         selected=new_mil)
+  
+  if(input$choix_reg == 6 & input$choix_ps != "mg"){
+    showNotification("Pour l'instant seule la profession de médecin généraliste est traitée dans cette application pour Mayotte")
+  } else {
+    
+    if(is.null(input$choix_millesime)|input$choix_millesime==""){
+      new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_cadre_national')
+      updateSelectizeInput(session,'choix_millesime',
+                           choices=c(millesimes(),setNames(new_mil,"cadre_national")),
+                           selected=new_mil)
+    }
+    
+    updateTabsetPanel(session,"sidebarmenu","zonage")
+    
+    showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
+                          passwordInput("my_auth",label = "",placeholder = "Clef d'identification"),
+                          actionButton("send_pwd","Soumettre")))
   }
-  
-  updateTabsetPanel(session,"sidebarmenu","zonage")
-  
-  showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
-                        passwordInput("my_auth",label = "",placeholder = "Clef d'identification"),
-                        actionButton("send_pwd","Soumettre")))
 })
 
 observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
@@ -134,12 +140,12 @@ output$ui_millesime=renderUI({
   print(head(reg_google_files))
   if (!is.null(reg_google_files)){
     if(nrow(reg_google_files)>0){
-    millesimes(setNames(reg_google_files$name,
-                        reg_google_files$name%>%
-                          gsub(pattern = paste0(input$choix_reg,"_"),replacement = "")%>%
-                          gsub(pattern = paste0(input$choix_ps,"_"),replacement = "")%>%
-                          gsub(pattern = "_+",replacement = "_")%>%
-                          gsub(pattern = "(^_)|(_$)",replacement = "")))
+      millesimes(setNames(reg_google_files$name,
+                          reg_google_files$name%>%
+                            gsub(pattern = paste0(input$choix_reg,"_"),replacement = "")%>%
+                            gsub(pattern = paste0(input$choix_ps,"_"),replacement = "")%>%
+                            gsub(pattern = "_+",replacement = "_")%>%
+                            gsub(pattern = "(^_)|(_$)",replacement = "")))
     } else  {millesimes("")}
   } else {millesimes("")}
   print("millesimes") ; print(millesimes())

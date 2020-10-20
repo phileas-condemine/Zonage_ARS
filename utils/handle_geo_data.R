@@ -28,7 +28,7 @@ my_deps=dep[reg==my_reg]$dep
 token <- readRDS("droptoken.rds")
 drop_acc(dtoken = token)
 
-prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
+prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = c("TVS","BVCV")){
   nb_deps=length(my_deps)
   communes=lapply(my_deps,function(my_dep){
     if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
@@ -43,7 +43,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
   })
   communes=do.call("rbind",communes)
   communes=unique(communes)
-
+  
   
   names(communes)[which(names(communes)=="nom")]<-"libcom"
   names(communes)[which(names(communes)=="code")]<-"depcom"
@@ -54,7 +54,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     #                                             sheet="Zonage_communes")[,c(4,6,10)]
     # names(z_pop) <- c("tvs","depcom","population")
     z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
-                                                sheet="Zonage_TVS")[,c(5,5,11)]
+                              sheet="Zonage_TVS")[,c(5,5,11)]
     names(z_pop) <- c("tvs","depcom","population")
     
     arr = lapply(arr,function(x){
@@ -67,7 +67,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
       x@data = tmp
       x
     })
-  
+    
   }
   
   
@@ -91,17 +91,19 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
   
   # Pour savoir si la région est "majoritaire" dans le TVS ou BVCV, 
   # on va récupérer les données des communes des régions adjacentes. 
-
-  for(a in c("TVS","BVCV")){
+  other_deps <- c()
+  for(a in mailles_geo){
     AGR <- get(a)
     AGR_pertinents=AGR[agr%in%unique(AGR[depcom%in%communes$depcom]$agr)]
-    other_deps=unique(AGR_pertinents$dep)
-    other_deps=other_deps[!other_deps%in%my_deps]
-    assign(paste("other_deps",a,sep="_"),other_deps)
+    other_deps_one=unique(AGR_pertinents$dep)
+    other_deps_one=other_deps[!other_deps_one%in%my_deps]
+    other_deps <- c(other_deps,other_deps_one)
+    # assign(paste("other_deps",a,sep="_"),other_deps)
   }
-  other_deps <- unique(c(other_deps_BVCV,other_deps_TVS))
-  remove(other_deps_BVCV,other_deps_TVS)
-
+  # other_deps <- unique(c(other_deps_BVCV,other_deps_TVS))
+  # remove(other_deps_BVCV,other_deps_TVS)
+  other_deps = unique(other_deps)
+  
   if (length(other_deps)>0){
     nb_deps=length(other_deps)
     
@@ -124,7 +126,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     
     other_communes=do.call("rbind",other_communes)
     
-    for(a in c("TVS","BVCV")){
+    for(a in mailles_geo){
       AGR <- get(a)
       communes_pertinentes <- AGR_pertinents$depcom
       assign(paste("communes_pertinentes",a,sep="_"),communes_pertinentes)
@@ -141,8 +143,8 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     communes=rbind(communes,other_communes)
   }
   communes2 <- communes
-
-  for(a in c("TVS","BVCV")){
+  
+  for(a in mailles_geo){
     AGR <- get(a)
     
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
@@ -167,8 +169,18 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
       #                grdquart_reu %>% sf::st_as_sf() %>%
       #                  select(agr=depcom,libagr=libcom,geometry))
     }
+    if(my_reg == 6 & a == "TVS"){
+      #### LA POPULATION N'EST PAS FOURNIE PAR L'API GEO POUR MAYOTTE
+      z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+                                sheet="Zonage_TVS")[,c(2,5,11)]
+      names(z_pop) <- c("reg","agr","population")
+      z_pop = z_pop[z_pop$reg==6,]
+      z_pop$reg=NULL
+      communes = merge(communes,z_pop,by="agr",all.x=T)
+      
+    }
     
-
+    
     
     
     # Nettoyage des polygones pour éviter les erreurs
@@ -185,7 +197,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
                         st_transform(4326) %>%
                         .$geometry))
     
-
+    
     
     communes_dissolved=aggregate(x = communes,
                                  by = list("code_agr"=communes$agr),
@@ -216,30 +228,40 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     carte=communes_dissolved[,c("agr","libagr","geometry")]
     
     names(st_geometry(carte)) = NULL #https://github.com/rstudio/leaflet/issues/595
-  
+    
     assign(paste("communes",a,sep="_"),communes)
     assign(paste("carte",a,sep="_"),carte)
   }
-  save(communes_TVS,carte_TVS,
-  file=paste0("data/",my_reg,"_preprocessed_TVS.RData")) 
-
-  save(communes_BVCV,carte_BVCV,
-       file=paste0("data/",my_reg,"_preprocessed_BVCV.RData"))
+  if("TVS"%in%mailles_geo){
+    save(communes_TVS,carte_TVS,
+         file=paste0("data/",my_reg,"_preprocessed_TVS.RData")) 
+  }
+  if("BVCV"%in%mailles_geo){
+    save(communes_BVCV,carte_BVCV,
+         file=paste0("data/",my_reg,"_preprocessed_BVCV.RData"))
+  }
   print("upload to dropbox")
-  file = paste0(my_reg,"_preprocessed_TVS.RData")
-
-  if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
-    rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+  
+  if("TVS"%in%mailles_geo){
+    
+    file = paste0(my_reg,"_preprocessed_TVS.RData")
+    
+    if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
+      rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+    }
+    rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
   }
-  rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
-  file = paste0(my_reg,"_preprocessed_BVCV.RData")
-  if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
-    print("rm bvcv")
-    rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+  
+  if("BVCV"%in%mailles_geo){
+    
+    file = paste0(my_reg,"_preprocessed_BVCV.RData")
+    if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
+      print("rm bvcv")
+      rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+    }
+    rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
   }
-  rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
-
-  }
+}
 
 
 #SELON SI LES DONNEES SONT DEJA PRE-PROCESSED OU NON#
