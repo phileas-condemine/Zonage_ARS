@@ -50,10 +50,10 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
   
   if(my_reg %in% c(11,84,93)){
     load("data/Shape_files/arr.RData")
-    # z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+    # z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
     #                                             sheet="Zonage_communes")[,c(4,6,10)]
     # names(z_pop) <- c("tvs","depcom","population")
-    z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+    z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
                                                 sheet="Zonage_TVS")[,c(5,5,11)]
     names(z_pop) <- c("tvs","depcom","population")
     
@@ -150,7 +150,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F){
     
     if(my_reg == 4 & a =="TVS"){
       load("data/Shape_files/grdquart_reu.RData")
-      z_pop = readxl::read_xlsx("data/Zonage_medecin_20190703.xlsx",
+      z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
                                 sheet="Zonage_TVS")[,c(2,1,11)]
       names(z_pop) <- c("reg","agr","population")
       z_pop = z_pop[z_pop$reg==4,]

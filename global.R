@@ -139,16 +139,16 @@ setnames(BVCV,c('bvcv','libbvcv'),c('agr','libagr'))
 BVCV$agr = stringi::stri_pad_right(BVCV$agr,5,"_")
 table(nchar(BVCV$agr))
 
-# drop_upload(dtoken=token,file = "data/Zonage_medecin_20190703.xlsx",
+# drop_upload(dtoken=token,file = "data/Zonage_medecin_20191231.xlsx",
 # path = "zonage",mode = "overwrite",autorename = F)
 
-if(!"Zonage_medecin_20190703.xlsx"%in%list.files("data")){
-  rdrop2::drop_download(path = "zonage/Zonage_medecin_20190703.xlsx",overwrite = T,
+if(!"Zonage_medecin_20191231.xlsx"%in%list.files("data")){
+  rdrop2::drop_download(path = "zonage/Zonage_medecin_20191231.xlsx",overwrite = T,
                         dtoken = token,verbose = T,
                         local_path = "data")
 }
 
-hist_qpv <- readxl::read_excel("data/Zonage_medecin_20190703.xlsx",sheet = "Zonage_QPV")[,c(1,3,5,6,10,12)]
+hist_qpv <- readxl::read_excel("data/Zonage_medecin_20191231.xlsx",sheet = "Zonage_QPV")[,c(1,3,5,6,10,12)]
 hist_qpv = data.table(hist_qpv)
 names(hist_qpv) <- c("reg","agr","cod","libqpv","zonage_ars","pop")
 hist_qpv[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
