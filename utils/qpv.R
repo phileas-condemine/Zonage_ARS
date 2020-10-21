@@ -1,6 +1,6 @@
 output$ui_toggle_qpv = renderUI({
   if(!is.null(input$choix_ps)){
-    if(input$choix_ps=="mg"&!input$choix_reg%in%c("4")){
+    if(input$choix_ps=="mg"&!input$choix_reg%in%c("4","6")){
       shinyWidgets::switchInput(inputId = "toggle_qpv",
                                 label = "Ajouter QPV",
                                 value = F,
@@ -63,12 +63,11 @@ observeEvent(c(input$save_zonage_qpv),{
   if(!is.null(input$edit_one_qpv)&length(input$edit_one_qpv)>0&!is.null(input$zonage_one_qpv)){
     if(input$zonage_one_qpv!=zonage_qpv()[cod%in%input$edit_one_qpv]$picked_zonage){
       save_qpv = paste0("qpv_",input$choix_millesime)
-      file_qpv = paste0("data/",save_qpv,".csv")
+      local_name = paste0("data/",save_qpv)
       qpv = copy(zonage_qpv())
       qpv[cod%in%input$edit_one_qpv,picked_zonage:=input$zonage_one_qpv]
-      fwrite(qpv,file=file_qpv)
+      fwrite(unique(qpv),file=local_name)
       new_modifs_qpv(new_modifs_qpv()+1)
-      # drive_upload(media = file_qpv,path = save_qpv,overwrite = T,  type = "csv")
       modif_zonage_qpv(list(cod=input$edit_one_qpv,picked_zonage=input$zonage_one_qpv))
       removeNotification("save_qpv",session)
       showNotification(sprintf("Le choix du zonage %s pour le QPV %s est enregistré.",input$zonage_one_qpv,input$edit_one_qpv),
@@ -90,18 +89,21 @@ zonage_qpv = reactive({
       
       
       save_qpv = paste0("qpv_",input$choix_millesime)
-      file_qpv = paste0("data/",save_qpv,".csv")
-      if(!save_qpv%in%google_files()$name){
+      drop_name = paste0("zonage/mg/",save_qpv)
+      local_name = paste0("data/",save_qpv)
+      if(!save_qpv%in%dropbox_files()$name){
         # INIT from file zonage 2019
         qpv=data.table::copy(hist_qpv)[reg==input$choix_reg,c("cod","zonage_ars")]
         setnames(qpv,"zonage_ars","picked_zonage")
-        fwrite(qpv,file=file_qpv)
-        drive_upload(media = file_qpv,path = save_qpv,overwrite = T,  type = "csv")
+        fwrite(unique(qpv),file=local_name)
+        if(rdrop2::drop_exists(drop_name,dtoken = token))
+          drop_delete(dtoken = token,path = drop_name)
+        drop_upload(dtoken=token,file = local_name,path = paste0("zonage/mg/"),mode = "overwrite",autorename = F)
       } else {
         # FROM SAVED
-        if(!paste0(save_qpv,".csv")%in%list.files("data/"))
-          drive_download(file = save_qpv,path=file_qpv,overwrite = T,type="csv")
-        qpv <- fread(file_qpv,colClasses = "character")
+        if(!save_qpv%in%list.files("data/"))
+          drop_download(drop_name,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+          qpv <- fread(local_name,colClasses = "character")
       }
       
       # VERIFIER ZONAGE EN VIGUEUR AUTRES REG
@@ -158,8 +160,8 @@ observeEvent(c(vals_reac()),{
         #   cur_qpv[qpv_update_zonage_qpv,picked_zonage:=i.picked_zonage.new,on="cod"]
         #   
         #   save_qpv = paste0("qpv_",input$choix_millesime)
-        #   file_qpv = paste0("data/",save_qpv,".csv")
-        #   fwrite(cur_qpv,file=file_qpv)
+        #   local_name = paste0("data/",save_qpv,".csv")
+        #   fwrite(cur_qpv,file=local_name)
         #   new_modifs_qpv(new_modifs_qpv()+1)
         # }
         

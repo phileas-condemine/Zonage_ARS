@@ -132,16 +132,19 @@ observeEvent(input$parse_file,{
       my_data[,value:=NULL]
     }
   }
+  
+  
   filenm_no_extension = gsub('(.xls$)|(.xlsx$)|(.csv$)','',input$from_file$name)
   local_filenm = paste0("data/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
-  gs_filenm = paste0(input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension)
-  fwrite(my_data,local_filenm)
-  # gs_upload(local_filenm,gs_filenm,overwrite = T)
-  drive_upload(media = local_filenm,path = gs_filenm,overwrite = T,  type = "csv")
+  drop_filenm = paste0("data/",input$choix_ps,"/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
+  fwrite(unique(my_data),local_filenm)
+  if(rdrop2::drop_exists(drop_filenm,dtoken = token))
+    drop_delete(dtoken = token,path = drop_filenm)
+  drop_upload(dtoken=token,file = local_filenm,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
   
   updateSelectizeInput(session,'choix_millesime',
-                       choices=c(millesimes(),setNames(gs_filenm,filenm_no_extension)),
-                       selected=gs_filenm)
+                       choices=c(millesimes(),setNames(drop_filenm,filenm_no_extension)),
+                       selected=drop_filenm)
   importFile(my_data)
   shinyjs::runjs("$('#file_import_box button.btn-box-tool').trigger('click');")
   shinyjs::runjs("$('button#go_zonage').addClass('pulse');")

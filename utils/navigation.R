@@ -106,25 +106,27 @@ output$choix_reg_map=renderLeaflet({
     fitBounds(bbox_reg[1]-1,bbox_reg[2],bbox_reg[3],bbox_reg[4])
 })
 
-google_files = function(){
+dropbox_files = reactive({
   req(input$choix_reg)
   req(input$choix_ps)
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
-  reg_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
+  reg_files = drop_dir(paste0("zonage/",input$choix_ps),dtoken = token)
+  reg_files = data.table(reg_files)
+  reg_files = reg_files[grepl(regex,name)]
   if(input$choix_ps == "mg"){
     regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
-    qpv_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
-    qpv_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
+    qpv_files = drop_dir(paste0("zonage/",input$choix_ps),dtoken = token)
+    qpv_files = data.table(qpv_files)
+    qpv_files = qpv_files[grepl(regex,name)]
     
-    reg_google_files <- rbind(reg_google_files,qpv_google_files)
+    reg_files <- rbind(reg_files,qpv_files)
   }
   
-  if(nrow(reg_google_files)>0){
+  if(nrow(reg_files)>0){
     print("found google files !")
-    return(reg_google_files)
+    reg_files
   } else NULL
-}
+})
 
 output$ui_millesime=renderUI({
   req(input$choix_reg)
@@ -134,17 +136,20 @@ output$ui_millesime=renderUI({
   reg_name=regions[reg==my_reg]$libreg
   # browser()
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_google_files <- drive_find(type = "csv",q = sprintf("name contains '%s'", regex))
-  reg_google_files <- reg_google_files[grepl(regex,reg_google_files$name),]
-  reg_google_files <- reg_google_files[!grepl("en_vigueur",reg_google_files$name),]
-  print(head(reg_google_files))
-  if (!is.null(reg_google_files)){
-    if(nrow(reg_google_files)>0){
-      millesimes(setNames(reg_google_files$name,
-                          reg_google_files$name%>%
-                            gsub(pattern = paste0(input$choix_reg,"_"),replacement = "")%>%
-                            gsub(pattern = paste0(input$choix_ps,"_"),replacement = "")%>%
+  
+  reg_files = drop_dir(paste0("zonage/",input$choix_ps,"/"),dtoken = token)
+  reg_files = data.table(reg_files)
+  reg_files = reg_files[grepl(regex,name)]
+  reg_files = reg_files[!grepl("en_vigueur",name)]
+  
+  print(head(reg_files))
+  if (!is.null(reg_files)){
+    if(nrow(reg_files)>0){
+      millesimes(setNames(reg_files$name,
+                          reg_files$name%>%
+                            gsub(pattern = paste0(input$choix_ps,"_",input$choix_reg,"_"),replacement = "")%>%
                             gsub(pattern = "_+",replacement = "_")%>%
+                            gsub(pattern = ".csv$",replacement = "")%>%
                             gsub(pattern = "(^_)|(_$)",replacement = "")))
     } else  {millesimes("")}
   } else {millesimes("")}

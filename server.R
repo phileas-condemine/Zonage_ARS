@@ -118,7 +118,8 @@ function(input, output,session) {
       datatable(infos,
                 rownames=F,
                 options=list(
-                  dom = "t"
+                  dom = "t",
+                  pageLength = -1
                 ))
     } else NULL
   })

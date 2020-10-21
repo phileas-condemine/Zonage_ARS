@@ -76,3 +76,5 @@ naq = naq[reg==my_reg | !is.na(picked_zonage)]#ma région ou bien zonage pris
 naq = naq[zonage_nat!=picked_zonage]# modification par rapport au national
 table(naq$reg)
 naq
+
+openxlsx::write.xlsx(list(paca = paca,hdf=hdf,ara=ara,naq=naq),"data/zonages_pris_hors_app/sf/diff_zonage_nat_vs_picked_zonage.xlsx")

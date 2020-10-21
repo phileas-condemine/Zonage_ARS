@@ -1,24 +1,6 @@
 reg_name=regions[reg==my_reg]$libreg
 my_deps=dep[reg==my_reg]$dep
-# 
-# my_google_files <- gs_ls()
-# relevant_sheets=sapply(regions$libreg,stringr::str_which,string = my_google_files$sheet_title)
-# relevant_sheets=unname(unlist(relevant_sheets))
-# my_google_files <- my_google_files[relevant_sheets,]
-# # my_google_files$sheet_title
-# 
-# reg_google_files <- my_google_files%>%
-#   filter(grepl(reg_name,sheet_title))%>%
-#   arrange(desc(updated))
-# 
-# 
-# 
-# 
-# print("update choix millésimes")
-# millesimes <- setNames(reg_google_files$sheet_title,
-#                        gsub(reg_name,"",reg_google_files$sheet_title))
-# 
-# 
+
 
 #SI LES DONNEES NE SONT PAS DEJA PRE-PROCESSED#
 ###############################################

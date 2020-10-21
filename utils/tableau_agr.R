@@ -47,6 +47,8 @@ tableau_reg = reactive({
     progress$inc(2/9, detail = "Chargement des fichiers historiques")
     source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
     zonages_en_vigueur = dl_zonage_en_vigueur_agr(input$choix_ps,input$choix_reg)
+
+    
     if(input$choix_ps=='mg'){
       source(paste0("utils/prep_zonage_mg.R"),local=T,encoding = "UTF-8")
     }else{
@@ -67,7 +69,7 @@ tableau_reg = reactive({
     prep_zonage(env=environment(),
                 choix_mil = my_mil,
                 # no_archive=no_archive(),
-                my_google_files=google_files())
+                my_dropbox_files=dropbox_files())
     
     progress$inc(2/9, detail = "OK !")
     

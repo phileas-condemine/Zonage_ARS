@@ -23,9 +23,6 @@ library(readxl)
 library(flexdashboard)
 library(jsonlite)
 library(curl)
-# library(googlesheets)
-library(googledrive)
-# library(googlesheets4)
 library(colourvalues)
 library(bsplus)
 library(rdrop2)
@@ -37,8 +34,6 @@ library(openxlsx)
 library(knitr)
 library(kableExtra)
 library(flextable)
-#library(remotes)
-#install_github('oswaldosantos/ggsn')
 library(ggsn)
 library(shinydashboard)
 library(shinyWidgets)
@@ -58,11 +53,7 @@ slackr_setup(config_file = "www/slackr_config.txt",echo = F)
 rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,
                       dtoken = token,verbose = T,
                       local_path = "data")
-options(gargle_oauth_cache = ".secrets")
 
-drive_auth(email = "drees-zonage-ars@sante.gouv.fr",
-           token=".secrets/a924da283165ded31d5fb98542b0974f_drees-zonage-ars@sante.gouv.fr")
-# drive_find(type = "csv",q="name contains '^sf_' or name contains '^inf_' or name contains '^mg_' or name contains '^mk_'")
 
 vars_to_toggle = c("agr","libagr","communes","population","is_majoritaire","CN","libCN")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",

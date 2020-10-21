@@ -42,7 +42,7 @@ VZN <<- VZN
 
 
 
-prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zonage_historique = qpv_VZN,my_google_files,choix_mil,env){
+prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zonage_historique = qpv_VZN,my_dropbox_files,choix_mil,env){
   tvs=data.table(communes_TVS)
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
   tvs[,reg:=gsub("^0","",reg)]
@@ -74,7 +74,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
   radio_buttons=data.table(radio_buttons)
   radio_buttons[is.na(check_historique),check_historique:=F]
   
-  if(!choix_mil%in%my_google_files$name){
+  if(!choix_mil%in%my_dropbox_files$name){
     print("from default values")
     radio_buttons[,html:=sprintf(
       "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s'%s%s/>",
@@ -93,32 +93,32 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     
     setorder(vals,agr)
     if(choix_mil==""){
-      sheet_name=paste0("mg_",input$choix_reg,"_cadre_national")
-      gs_file_nm=paste0("data/mg_",input$choix_reg,"_cadre_national.csv")
-    } else {
-      sheet_name=choix_mil
-      gs_file_nm=paste0("data/",choix_mil,".csv")
+      choix_mil = paste0("mg_",input$choix_reg,"_cadre_national.csv")
     }
-    fwrite(vals,file=gs_file_nm)
-    drive_upload(media = gs_file_nm,path = sheet_name,overwrite = T,  type = "csv")
+    drop_name=paste0("zonage/mg/",choix_mil)
+    local_name=paste0("data/",choix_mil)
+    fwrite(unique(vals),file=local_name)
+    if(rdrop2::drop_exists(drop_name,dtoken = token))
+    drop_delete(dtoken = token,path = drop_name)
+    drop_upload(dtoken=token,file = local_name,path = "zonage/mg/",mode = "overwrite",autorename = F)
     assign("vals",vals,env)
 
     
     
   } else {
-    req(choix_mil%in%my_google_files$name)
+    req(choix_mil%in%my_dropbox_files$name)
     print("using historical data")
     print(choix_mil)
     zonage_saved <- NULL
     attempt <- 1
     while( is.null(zonage_saved) && attempt <= 5 ) {
-      print(paste("try read sheet in gs:",attempt))
+      print(paste("try read sheet in dropbox:",attempt))
       attempt <- attempt + 1
       try(
         {
-          drive_download(file = choix_mil,path=paste0("data/",choix_mil,".csv"),overwrite = T,type="csv")
+          drop_download(paste0("zonage/mg/",choix_mil),local_path = "data/",overwrite = T,dtoken = token,verbose = T)
           print(list.files("data/"))
-          zonage_saved <- fread(paste0("data/",choix_mil,".csv"),colClasses = "character")%>%as.data.frame()
+          zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }
       )
     } 
