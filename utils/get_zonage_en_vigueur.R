@@ -16,7 +16,7 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
       drop_download(drop_path,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
       infos = gsub("en_vigueur_","",en_vigueur)
       infos = gsub(".csv","",infos)
-
+      
       ps = strsplit(infos,split = "_")[[1]][1]
       reg = strsplit(infos,split = "_")[[1]][2]
       cbind(fread(local_path,colClasses = c("agr"="character")),reg=reg)
@@ -41,9 +41,11 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
     maj = bvcv_reg_majoritaire
   }
   message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
-  zonages_en_vigueur[maj,majoritaire:=1,by=c("agr","reg")]
-  zonages_en_vigueur[is.na(majoritaire),majoritaire:=0]
-  setorder(zonages_en_vigueur,-majoritaire)#majoritaire en priorité
-  zonages_en_vigueur = zonages_en_vigueur[,.SD[1],by="agr"]
+  if(nrow(zonages_en_vigueur)>0){
+    zonages_en_vigueur[maj,majoritaire:=1,by=c("agr","reg")]
+    zonages_en_vigueur[is.na(majoritaire),majoritaire:=0]
+    setorder(zonages_en_vigueur,-majoritaire)#majoritaire en priorité
+    zonages_en_vigueur = zonages_en_vigueur[,.SD[1],by="agr"]
+  }
   zonages_en_vigueur
 }
