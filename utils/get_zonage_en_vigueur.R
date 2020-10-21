@@ -42,7 +42,7 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
   }
   message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
   if(nrow(zonages_en_vigueur)>0){
-    zonages_en_vigueur[maj,majoritaire:=1,by=c("agr","reg")]
+    zonages_en_vigueur[maj,majoritaire:=1,on=c("agr","reg")]
     zonages_en_vigueur[is.na(majoritaire),majoritaire:=0]
     setorder(zonages_en_vigueur,-majoritaire)#majoritaire en priorité
     zonages_en_vigueur = zonages_en_vigueur[,.SD[1],by="agr"]
