@@ -22,14 +22,16 @@ output$dist_zonages = renderPlotly({
     if(input$choix_ps=="mg"){
       zonage_pop[,zonage_majoritaire:=factor(zonage_majoritaire,levels=c("NA - majoritaire","NA - minoritaire",
                                                                          "HV - majoritaire","HV - minoritaire",
+                                                                         "ZV - majoritaire", "ZV - minoritaire",
                                                                          "ZAC - majoritaire","ZAC - minoritaire",
-                                                                         "ZIP - majoritaire","ZIP - minoritaire",
-                                                                         "ZV - majoritaire", "ZV - minoritaire"))]
+                                                                         "ZIP - majoritaire","ZIP - minoritaire"
+                                                                         ))]
       my_colors = data.table(zonage_majoritaire = c("NA - majoritaire","NA - minoritaire",
                                                     "HV - majoritaire","HV - minoritaire",
+                                                    "ZV - majoritaire", "ZV - minoritaire",
                                                     "ZAC - majoritaire","ZAC - minoritaire",
-                                                    "ZIP - majoritaire","ZIP - minoritaire",
-                                                    "ZV - majoritaire", "ZV - minoritaire"),
+                                                    "ZIP - majoritaire","ZIP - minoritaire"
+                                                    ),
                              color = c('#A6CEE3','#95BDD2',
                                        '#1F78B4','#0E67A3',
                                        '#33A02C','#228F1B',
