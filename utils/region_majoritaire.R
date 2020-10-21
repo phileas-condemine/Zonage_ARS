@@ -2,7 +2,7 @@
 
 #### TVS
 
-source("global.R")
+# source("global.R")
 
 all_com_tvs = rbindlist(use.names = T,lapply(regions$reg,function(my_reg){
   file = paste0(my_reg,"_preprocessed_TVS.RData")

@@ -233,7 +233,7 @@ vswitch_zonage_mg = function(v){
 file = "agr_reg_majoritaire.RData"
 local_name = paste0("data/",file)
 drop_name = paste0("zonage/",file)
-if(drop_exists(file,dtoken = token)){
+if(drop_exists(drop_name,dtoken = token)){
   print("recup régions majoritaires par AGR")
   drop_download(drop_name,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
 } else {
