@@ -16,6 +16,7 @@ for (i in 1:nrow(regions)){
 
 library(rdrop2)
 token <- readRDS("droptoken.rds")
-rdrop2::drop_upload(file = paste0("data/auth.txt"),mode = "overwrite",
-                    dtoken = token,path = "zonage/")
+rdrop2::drop_upload(file = paste0("data/auth.txt"),mode = "overwrite"
+                    # ,dtoken = token
+                    ,path = "zonage/")
 

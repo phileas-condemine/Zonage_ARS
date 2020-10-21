@@ -98,9 +98,15 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     drop_name=paste0("zonage/mg/",choix_mil)
     local_name=paste0("data/",choix_mil)
     fwrite(unique(vals),file=local_name)
-    if(rdrop2::drop_exists(drop_name,dtoken = token))
-    drop_delete(dtoken = token,path = drop_name)
-    drop_upload(dtoken=token,file = local_name,path = "zonage/mg/",mode = "overwrite",autorename = F)
+    if(rdrop2::drop_exists(drop_name
+                           # ,dtoken = token
+                           ))
+    drop_delete(
+      # dtoken = token,
+                path = drop_name)
+    drop_upload(
+      # dtoken=token,
+                file = local_name,path = "zonage/mg/",mode = "overwrite",autorename = F)
     assign("vals",vals,env)
 
     
@@ -116,7 +122,9 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
       attempt <- attempt + 1
       try(
         {
-          drop_download(paste0("zonage/mg/",choix_mil),local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+          drop_download(paste0("zonage/mg/",choix_mil),local_path = "data/",overwrite = T
+                        # ,dtoken = token
+                        ,verbose = T)
           print(list.files("data/"))
           zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }

@@ -45,13 +45,16 @@ library(shinyjs)
 
 # token <- drop_auth()
 # saveRDS(token, "droptoken.rds")
-token <- readRDS("droptoken.rds")
+# token <- readRDS("droptoken.rds")
 # Then pass the token to each drop_ function
-drop_acc(dtoken = token)
+# drop_acc(dtoken = token)
+drop_auth(rdstoken = "droptoken.rds")
+# drop_acc()
+
 slackr_setup(config_file = "www/slackr_config.txt",echo = F)
 
 rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,
-                      dtoken = token,verbose = T,
+                      # dtoken = token,verbose = T,
                       local_path = "data")
 
 
@@ -94,7 +97,7 @@ vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP",
 # drop_upload(dtoken=token,file = "data/tvs2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
 if(!"tvs2019.sas7bdat"%in%list.files("data")){
   rdrop2::drop_download(path = "zonage/tvs2019.sas7bdat",overwrite = T,
-                        dtoken = token,verbose = T,
+                        # dtoken = token,verbose = T,
                         local_path = "data")
 }
 TVS = haven::read_sas("data/tvs2019.sas7bdat")
@@ -107,7 +110,7 @@ table(nchar(TVS$agr))
 # QPV
 if(!"qpv_markers_pop.RData"%in%list.files("data")){
   rdrop2::drop_download(path = "zonage/qpv_markers_pop.RData",overwrite = T,
-                        dtoken = token,verbose = T,
+                        # dtoken = token,verbose = T,
                         local_path = "data")
 }
 load("data/qpv_markers_pop.RData")
@@ -118,7 +121,7 @@ load("data/qpv_markers_pop.RData")
 # drop_upload(dtoken=token,file = "data/bvcv2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
 if(!"bvcv2019.sas7bdat"%in%list.files("data")){
   rdrop2::drop_download(path = "zonage/bvcv2019.sas7bdat",overwrite = T,
-                        dtoken = token,verbose = T,
+                        # dtoken = token,verbose = T,
                         local_path = "data")
 }
 
@@ -135,7 +138,7 @@ table(nchar(BVCV$agr))
 
 if(!"Zonage_medecin_20191231.xlsx"%in%list.files("data")){
   rdrop2::drop_download(path = "zonage/Zonage_medecin_20191231.xlsx",overwrite = T,
-                        dtoken = token,verbose = T,
+                        # dtoken = token,verbose = T,
                         local_path = "data")
 }
 
@@ -149,18 +152,24 @@ hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
 
 # source("utils/handle_insee_pop.R")
 if(!"pop_femme2016.RData"%in%list.files("data"))
-  drop_download("zonage/pop_femme2016.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download("zonage/pop_femme2016.RData",local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+                )
 load("data/pop_femme2016.RData")
 
 dep = unique(TVS[,c("dep","reg","libdep")])
 
 # geo reg
 if(!"contours_dep.RData"%in%list.files("data"))
-  drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+  )
 
 # rdrop2::drop_upload(file="data/reg_cont.RData",dtoken=token,path="zonage/",autorename = F)
 if(!"reg_cont.RData"%in%list.files("data"))
-  drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+                )
 
 load("data/contours_dep.RData")
 load("data/reg_cont.RData")
@@ -171,7 +180,9 @@ regions = unique(TVS[,c("reg","libreg")])
 
 # rdrop2::drop_upload(file="data/Seuils_arretes.xlsx",dtoken=token,path="zonage/",autorename = F)
 if(!"Seuils_arretes.xlsx"%in%list.files("data"))
-  drop_download("zonage/Seuils_arretes.xlsx",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download("zonage/Seuils_arretes.xlsx",local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+                )
 seuils_reg_mg=read_xlsx("data/Seuils_arretes.xlsx",sheet="mg")
 seuils_reg_sf=read_xlsx("data/Seuils_arretes.xlsx",sheet="sf")%>%rename(check_sf=check)
 seuils_reg_inf=read_xlsx("data/Seuils_arretes.xlsx",sheet="inf")%>%rename(check_inf=check)
@@ -210,7 +221,9 @@ shiny_running = function () {
 # get_TA()
 # rdrop2::drop_upload(file="data/liste_tribunaux_administratifs.RData",dtoken=token,path="zonage/",autorename = F)
 if(!"liste_tribunaux_administratifs.RData"%in%list.files("data"))
-  drop_download("zonage/liste_tribunaux_administratifs.RData",local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download("zonage/liste_tribunaux_administratifs.RData",local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+                )
 
 load("data/liste_tribunaux_administratifs.RData")
 
@@ -233,9 +246,11 @@ vswitch_zonage_mg = function(v){
 file = "agr_reg_majoritaire.RData"
 local_name = paste0("data/",file)
 drop_name = paste0("zonage/",file)
-if(drop_exists(drop_name,dtoken = token)){
+if(drop_exists(drop_name)){
   print("recup régions majoritaires par AGR")
-  drop_download(drop_name,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+  drop_download(drop_name,local_path = "data/",overwrite = T
+                # ,dtoken = token,verbose = T
+                )
 } else {
   print("construction du fichier des régions majoritaires par AGR from scratch")
   source("utils/region_majoritaire.R")

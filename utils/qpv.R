@@ -96,13 +96,21 @@ zonage_qpv = reactive({
         qpv=data.table::copy(hist_qpv)[reg==input$choix_reg,c("cod","zonage_ars")]
         setnames(qpv,"zonage_ars","picked_zonage")
         fwrite(unique(qpv),file=local_name)
-        if(rdrop2::drop_exists(drop_name,dtoken = token))
-          drop_delete(dtoken = token,path = drop_name)
-        drop_upload(dtoken=token,file = local_name,path = paste0("zonage/mg/"),mode = "overwrite",autorename = F)
+        if(rdrop2::drop_exists(drop_name
+                               # ,dtoken = token
+                               ))
+          drop_delete(
+            # dtoken = token,
+            path = drop_name)
+        drop_upload(
+          # dtoken=token,
+          file = local_name,path = paste0("zonage/mg/"),mode = "overwrite",autorename = F)
       } else {
         # FROM SAVED
         if(!save_qpv%in%list.files("data/"))
-          drop_download(drop_name,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+          drop_download(drop_name,local_path = "data/",overwrite = T
+                        # ,dtoken = token
+                        ,verbose = T)
           qpv <- fread(local_name,colClasses = "character")
       }
       

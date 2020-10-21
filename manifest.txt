@@ -41,3 +41,4 @@ utils/handle_geo_data.R
 utils/prep_zonage_mg.R
 utils/prep_zonage_hors_mg.R
 utils/modele_word_arrete.docx
+utils/region_majoritaire.R

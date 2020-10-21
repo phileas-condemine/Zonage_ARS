@@ -118,9 +118,15 @@ prep_zonage <- function(cadre_national=CN,
       
     }
     fwrite(unique(vals),file=local_name)
-    if(rdrop2::drop_exists(drop_name,dtoken = token))
-      drop_delete(dtoken = token,path = drop_name)
-    drop_upload(dtoken=token,file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    if(rdrop2::drop_exists(drop_name
+                           # ,dtoken = token
+                           ))
+      drop_delete(
+        # dtoken = token,
+                  path = drop_name)
+    drop_upload(
+      # dtoken=token,
+                file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
     assign("vals",vals,env)
     
     
@@ -134,7 +140,9 @@ prep_zonage <- function(cadre_national=CN,
       print(paste("try read sheet in dropbox:",attempt))
       attempt <- attempt + 1
       try({
-        drop_download(paste0("zonage/",input$choix_ps,"/",choix_mil),local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+        drop_download(paste0("zonage/",input$choix_ps,"/",choix_mil),local_path = "data/",overwrite = T
+                      # ,dtoken = token
+                      ,verbose = T)
         print(list.files("data/"))
         zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }
@@ -177,8 +185,7 @@ prep_zonage <- function(cadre_national=CN,
     ps_ZE_OD = c("OD","VD")
   }
   radio_buttons[,class:=paste0(
-    ifelse(check_historique|(CN==statut),ifelse(value_is_set," historical_choice",
-                                                " historical_choice"),""),
+    ifelse(check_historique|(CN==statut)," historical_choice",""),
     ifelse(value_set," saved_choice",""),
     ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," temp_minoritaire","")),
     ifelse(is.na(value_set_en_vigueur),"",ifelse(value_set_en_vigueur," en_vigueur_choice",""))

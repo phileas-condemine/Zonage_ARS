@@ -1,4 +1,5 @@
 function(input, output,session) {
+  drop_auth(rdstoken = "droptoken.rds")
   
   # init_gs=reactiveVal(T)
   # zonage_reactif=reactiveVal("")
@@ -247,16 +248,20 @@ function(input, output,session) {
   )
   
   output$dl_ref_zonage_sf <- downloadHandler(
-    filename = 'ref_zonage_sf..sas7bdat',
+    filename = 'ref_zonage_sf.xlsx',
     content = function(file) {
-      file.copy(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"), file, overwrite = T)
+      tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
+      openxlsx::write.xlsx(tmp,file)
+      # file.copy(, file, overwrite = T)
     }
   )
   
   output$dl_ref_zonage_ide <- downloadHandler(
-    filename = 'ref_zonage_ide..sas7bdat',
+    filename = 'ref_zonage_ide.xlsx',
     content = function(file) {
-      file.copy(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"), file, overwrite = T)
+      tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
+      openxlsx::write.xlsx(tmp,file)
+      # file.copy(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"), file, overwrite = T)
     }
   )
   

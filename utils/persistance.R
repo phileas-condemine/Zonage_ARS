@@ -16,18 +16,30 @@ observeEvent(input$save_latest_check,{
   local_name=paste0("data/",sheet_name,".csv")
   drop_name=paste0("zonage/",input$choix_ps,"/",sheet_name,".csv")
   fwrite(unique(my_dt),file=local_name)
-  if(rdrop2::drop_exists(drop_name,dtoken = token))
-    drop_delete(dtoken = token,path = drop_name)
-  drop_upload(dtoken=token,file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+  if(rdrop2::drop_exists(drop_name
+                         # ,dtoken = token
+                         ))
+    drop_delete(
+      # dtoken = token,
+                path = drop_name)
+  drop_upload(
+    # dtoken=token,
+              file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
   
   if(input$choix_ps=="mg"){
     save_qpv = paste("en_vigueur","qpv",input$choix_ps,input$choix_reg,sep="_")
     local_qpv = paste0("data/",save_qpv,".csv")
     drop_qpv = paste0("zonage/mg/",save_qpv,".csv")
     file.copy(paste0("data/qpv_",input$choix_millesime),local_qpv,overwrite = T)
-    if(rdrop2::drop_exists(drop_qpv,dtoken = token))
-      drop_delete(dtoken = token,path = drop_qpv)
-    drop_upload(dtoken=token,file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    if(rdrop2::drop_exists(drop_qpv
+                           # ,dtoken = token
+                           ))
+      drop_delete(
+        # dtoken = token,
+                  path = drop_qpv)
+    drop_upload(
+      # dtoken=token,
+                file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
   }
@@ -54,9 +66,15 @@ observeEvent(c(autorefresh(),input$force_save),{
     local_name=paste0("data/",input$choix_millesime)
     drop_name=paste0("zonage/",input$choix_ps,"/",input$choix_millesime)
     fwrite(unique(my_dt),file=local_name)
-    if(rdrop2::drop_exists(drop_name,dtoken = token))
-      drop_delete(dtoken = token,path = drop_name)
-    drop_upload(dtoken=token,file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    if(rdrop2::drop_exists(drop_name
+                           # ,dtoken = token
+                           ))
+      drop_delete(
+        # dtoken = token,
+                  path = drop_name)
+    drop_upload(
+      # dtoken=token,
+                file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
     timer(Sys.time())
     new_modifs(0)
   }
@@ -66,9 +84,15 @@ observeEvent(c(autorefresh(),input$force_save),{
     save_qpv = paste0("qpv_",input$choix_millesime)
     local_qpv = paste0("data/",save_qpv)
     drop_qpv = paste0("zonage/mg/",save_qpv)
-    if(rdrop2::drop_exists(drop_qpv,dtoken = token))
-      drop_delete(dtoken = token,path = drop_qpv)
-    drop_upload(dtoken=token,file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    if(rdrop2::drop_exists(drop_qpv
+                           # ,dtoken = token
+                           ))
+      drop_delete(
+        # dtoken = token,
+                  path = drop_qpv)
+    drop_upload(
+      # dtoken=token,
+                file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
   }

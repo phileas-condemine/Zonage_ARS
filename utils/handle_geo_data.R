@@ -229,20 +229,32 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     file = paste0(my_reg,"_preprocessed_TVS.RData")
     
-    if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
-      rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+    if(rdrop2::drop_exists(paste0("zonage/",file)
+                           # ,dtoken = token
+                           )){
+      rdrop2::drop_delete(path = paste0("zonage/",file)
+                          # ,dtoken = token
+                          )
     }
-    rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
+    rdrop2::drop_upload(file = paste0("data/",file)
+                        # ,dtoken = token
+                        ,path = "zonage/",autorename = F)
   }
   
   if("BVCV"%in%mailles_geo){
     
     file = paste0(my_reg,"_preprocessed_BVCV.RData")
-    if(rdrop2::drop_exists(paste0("zonage/",file),dtoken = token)){
+    if(rdrop2::drop_exists(paste0("zonage/",file)
+                           # ,dtoken = token
+                           )){
       print("rm bvcv")
-      rdrop2::drop_delete(path = paste0("zonage/",file),dtoken = token)
+      rdrop2::drop_delete(path = paste0("zonage/",file)
+                          # ,dtoken = token
+                          )
     }
-    rdrop2::drop_upload(file = paste0("data/",file),dtoken = token,path = "zonage/",autorename = F)
+    rdrop2::drop_upload(file = paste0("data/",file)
+                        # ,dtoken = token
+                        ,path = "zonage/",autorename = F)
   }
 }
 
@@ -257,7 +269,7 @@ get_geo_data <- function(my_reg,env){
     if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox),dtoken = token)){
       print("récupération de l'historique dropbox")
       rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,
-                            dtoken = token,verbose = T,
+                            # dtoken = token,verbose = T,
                             local_path = "data")
     } else {
       print("construction fonds géo from scratch")
