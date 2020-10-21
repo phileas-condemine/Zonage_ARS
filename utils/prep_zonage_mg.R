@@ -98,13 +98,9 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     drop_name=paste0("zonage/mg/",choix_mil)
     local_name=paste0("data/",choix_mil)
     fwrite(unique(vals),file=local_name)
-    if(rdrop2::drop_exists(drop_name))
-    drop_delete(path = drop_name)
-    drop_upload(file = local_name,path = "zonage/mg/",mode = "overwrite",autorename = F)
+    drop_clean_upload(filename = choix_mil,drop_path = "zonage/mg/")
+    
     assign("vals",vals,env)
-
-    
-    
   } else {
     req(choix_mil%in%my_dropbox_files$name)
     print("using historical data")

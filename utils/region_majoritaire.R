@@ -60,15 +60,12 @@ bvcv_reg_majoritaire=bvcv[,list(reg_majoritaire=reg[1],
 
 uniqueN(BVCV$agr) == nrow(bvcv_reg_majoritaire)
 
-file = "agr_reg_majoritaire.RData"
-local_name = paste0("data/",file)
-drop_name = paste0("zonage/",file)
+filename = "agr_reg_majoritaire.RData"
+local_name = paste0("data/",filename)
 
 tvs_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
 bvcv_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
 save(bvcv_reg_majoritaire,tvs_reg_majoritaire,file = local_name)
-if(rdrop2::drop_exists(drop_name)){
-  print("rm fichier régions majoritaires")
-  rdrop2::drop_delete(path = drop_name)
-}
-rdrop2::drop_upload(file = local_name,path = "zonage/",autorename = F)
+
+drop_clean_upload(filename = filename)
+

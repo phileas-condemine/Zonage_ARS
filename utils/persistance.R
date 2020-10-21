@@ -13,21 +13,21 @@ observeEvent(input$save_latest_check,{
   my_dt[is.na(picked_zonage)]$picked_zonage <- ""
   setorder(my_dt,agr)
   sheet_name=paste("en_vigueur",input$choix_ps,input$choix_reg,sep="_")
-  local_name=paste0("data/",sheet_name,".csv")
-  drop_name=paste0("zonage/",input$choix_ps,"/",sheet_name,".csv")
+  filename = paste0(sheet_name,".csv")
+  local_name=paste0("data/",sheet_name)
   fwrite(unique(my_dt),file=local_name)
-  if(rdrop2::drop_exists(drop_name))
-    drop_delete(path = drop_name)
-  drop_upload(file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+  
+  drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+  
   
   if(input$choix_ps=="mg"){
     save_qpv = paste("en_vigueur","qpv",input$choix_ps,input$choix_reg,sep="_")
-    local_qpv = paste0("data/",save_qpv,".csv")
-    drop_qpv = paste0("zonage/mg/",save_qpv,".csv")
+    filename = paste0(save_qpv,".csv")
+    local_qpv = paste0("data/",filename)
     file.copy(paste0("data/qpv_",input$choix_millesime),local_qpv,overwrite = T)
-    if(rdrop2::drop_exists(drop_qpv))
-      drop_delete(path = drop_qpv)
-    drop_upload(file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    
+    drop_clean_upload(filename = filename,drop_path = "zonage/mg/")
+  
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
   }
@@ -55,25 +55,20 @@ observeEvent(c(autorefresh(),input$force_save),{
                 by="agr",all.x=T)
     my_dt[is.na(picked_zonage)]$picked_zonage <- ""
     setorder(my_dt,agr)
-    sheet_name=input$choix_millesime
-    local_name=paste0("data/",input$choix_millesime)
-    drop_name=paste0("zonage/",input$choix_ps,"/",input$choix_millesime)
+    filename=input$choix_millesime
+    local_name=paste0("data/",filename)
     fwrite(unique(my_dt),file=local_name)
-    if(rdrop2::drop_exists(drop_name))
-      drop_delete(path = drop_name)
-    drop_upload(file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+    
     timer(Sys.time())
     new_modifs(0)
   }
   
   
   if((((difftime(Sys.time(),timer_qpv(),units = "sec") > 20))&new_modifs_qpv()>0)){
-    save_qpv = paste0("qpv_",input$choix_millesime)
-    local_qpv = paste0("data/",save_qpv)
-    drop_qpv = paste0("zonage/mg/",save_qpv)
-    if(rdrop2::drop_exists(drop_qpv))
-      drop_delete(path = drop_qpv)
-    drop_upload(file = local_qpv,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+    filename = paste0("qpv_",input$choix_millesime)# le fichier est déjà enregistré à chaque modif d'un QPV !
+    drop_clean_upload(filename = filename,drop_path = "zonage/mg/")
+    
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
   }

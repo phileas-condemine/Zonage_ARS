@@ -246,5 +246,5 @@ drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/
     }
     rdrop2::drop_delete(path = drop_name)
   }
-  rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F)
+  rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
 }

@@ -135,12 +135,11 @@ observeEvent(input$parse_file,{
   
   
   filenm_no_extension = gsub('(.xls$)|(.xlsx$)|(.csv$)','',input$from_file$name)
-  local_filenm = paste0("data/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
-  drop_filenm = paste0("data/",input$choix_ps,"/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
+  filename = paste0(input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
+  local_filenm = paste0("data/",filename)
   fwrite(unique(my_data),local_filenm)
-  if(rdrop2::drop_exists(drop_filenm))
-    drop_delete(path = drop_filenm)
-  drop_upload(file = local_filenm,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+  
+  drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
   
   updateSelectizeInput(session,'choix_millesime',
                        choices=c(millesimes(),setNames(drop_filenm,filenm_no_extension)),

@@ -91,14 +91,13 @@ zonage_qpv = reactive({
       save_qpv = paste0("qpv_",input$choix_millesime)
       drop_name = paste0("zonage/mg/",save_qpv)
       local_name = paste0("data/",save_qpv)
-      if(!save_qpv%in%dropbox_files()$name){
+      if(!drop_exists(drop_name)){
         # INIT from file zonage 2019
         qpv=data.table::copy(hist_qpv)[reg==input$choix_reg,c("cod","zonage_ars")]
         setnames(qpv,"zonage_ars","picked_zonage")
         fwrite(unique(qpv),file=local_name)
-        if(rdrop2::drop_exists(drop_name))
-          drop_delete(path = drop_name)
-        drop_upload(file = local_name,path = paste0("zonage/mg/"),mode = "overwrite",autorename = F)
+        drop_clean_upload(filename = save_qpv,drop_path = "zonage/mg/")
+        
       } else {
         # FROM SAVED
         if(!save_qpv%in%list.files("data/"))

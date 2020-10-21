@@ -110,17 +110,17 @@ prep_zonage <- function(cadre_national=CN,
     
     setorder(vals,agr)
     if(choix_mil==""){
-      drop_name=paste0("zonage/",input$choix_ps,"/",input$choix_ps,"_",input$choix_reg,"_cadre_national.csv")
-      local_name=paste0("data/",input$choix_ps,"_",input$choix_reg,"_cadre_national.csv")
+      filename=paste0(input$choix_ps,"_",input$choix_reg,"_cadre_national.csv")
+      local_name=paste0("data/",filename)
     } else {
-      drop_name=paste0("zonage/",input$choix_ps,"/",choix_mil)
-      local_name=paste0("data/",choix_mil)
+      filename=choix_mil
+      local_name=paste0("data/",filename)
       
     }
     fwrite(unique(vals),file=local_name)
-    if(rdrop2::drop_exists(drop_name))
-      drop_delete(path = drop_name)
-    drop_upload(file = local_name,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+
+    drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+    
     assign("vals",vals,env)
     
     
