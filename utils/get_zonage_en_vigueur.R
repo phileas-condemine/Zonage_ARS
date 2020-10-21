@@ -34,7 +34,16 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
     zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric())
   }
   # rm(files)
-  message("il faudrait vérifier la région majoritaire pour bien choisir celle \"en vigueur\" à sélectionner, pour l'instant on prend arbitrairement la 1ère du fichier.")
+  # message("il faudrait vérifier la région majoritaire pour bien choisir celle \"en vigueur\" à sélectionner, pour l'instant on prend arbitrairement la 1ère du fichier.")
+  if (ps == "mg"){
+    maj = tvs_reg_majoritaire
+  } else if (ps %in% c("sf","inf")){
+    maj = bvcv_reg_majoritaire
+  }
+  message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
+  zonages_en_vigueur[maj,majoritaire:=1,by=c("agr","reg")]
+  zonages_en_vigueur[is.na(majoritaire),majoritaire:=0]
+  setorder(zonages_en_vigueur,-majoritaire)#majoritaire en priorité
   zonages_en_vigueur = zonages_en_vigueur[,.SD[1],by="agr"]
   zonages_en_vigueur
 }

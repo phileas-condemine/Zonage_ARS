@@ -229,3 +229,17 @@ vswitch_zonage_mg = function(v){
                              ZV = 2,
                              HV = 1))
 }
+
+file = "agr_reg_majoritaire.RData"
+local_name = paste0("data/",file)
+drop_name = paste0("zonage/",file)
+if(drop_exists(file,dtoken = token)){
+  print("recup régions majoritaires par AGR")
+  drop_download(drop_name,local_path = "data/",overwrite = T,dtoken = token,verbose = T)
+} else {
+  print("construction du fichier des régions majoritaires par AGR from scratch")
+  source("utils/region_majoritaire.R")
+}
+load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
+setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
+setnames(tvs_reg_majoritaire,"reg_majoritaire","reg")

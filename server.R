@@ -161,6 +161,7 @@ function(input, output,session) {
           downloadButton("dl_ref_zonage_med","Fichier réf. zonage médecin", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_tvs_com","Corres. TVS - Communes", style = "width:230px;color:#000"),br(),
           downloadButton("dl_pop_tvs","Population jauges", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_reg_maj_tvs","Rég. maj TVS", style = "width:230px;color:#000"),br(),
           downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br()
           ,tags$div(id="loading")
         )
@@ -171,6 +172,7 @@ function(input, output,session) {
           downloadButton("dl_ref_zonage_sf","Fichier réf. zonage SF", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_bvcv_com","Corres. BVCV - Communes", style = "width:230px;color:#000"),br(),
           downloadButton("dl_pop_bvcv_femmes","Population jauges (femmes)", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
           downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br()
           ,tags$div(id="loading")
           
@@ -181,6 +183,7 @@ function(input, output,session) {
           downloadButton("dl_ref_zonage_ide","Fichier réf. zonage IDE", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_bvcv_com","Corres. BVCV - Communes", style = "width:230px;color:#000"),br(),
           downloadButton("dl_pop_bvcv_all","Population jauges", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
           downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
           ,tags$div(id="loading")
           
@@ -188,8 +191,10 @@ function(input, output,session) {
         )
       } else {
         tagList(
-          downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_reg_maj_tvs","Rég. maj TVS", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
           downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
+          downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
           downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
           ,tags$div(id="loading")
         )
@@ -197,8 +202,10 @@ function(input, output,session) {
       
     } else {
       tagList(
-        downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
+        downloadButton("dl_reg_maj_tvs","Rég. maj TVS", style = "width:230px;color:#000"),br(),
+        downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
+        downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
         ,tags$div(id="loading")
       )
@@ -279,6 +286,21 @@ function(input, output,session) {
     }
   )
   
+  
+  
+  output$dl_reg_maj_tvs = downloadHandler(
+    filename = 'region_majoritaire_TVS.xlsx',
+    content = function(file) {
+      openxlsx::write.xlsx(list("region_majoritaire_par_TVS" = tvs_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
+    }
+  )
+  
+  output$dl_reg_maj_bvcv = downloadHandler(
+    filename = 'region_majoritaire_BVCV.xlsx',
+    content = function(file) {
+      openxlsx::write.xlsx(list("region_majoritaire_par_BVCV" = bvcv_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
+    }
+  )
   
   output$dl_zonage_en_vigueur_mg <- downloadHandler(
     filename = 'zonages_en_vigueur_mg.xlsx',

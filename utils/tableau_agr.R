@@ -30,7 +30,7 @@ tableau_reg = reactive({
       progress$inc(1/9, detail = "Vérification de l'historique")
     source("utils/handle_geo_data.R",local=T,encoding = "UTF-8")
     progress$inc(2/9, detail = "Récupération des données géographiques")
-    get_geo_data(environment())
+    get_geo_data(my_reg,environment())
     
     
     

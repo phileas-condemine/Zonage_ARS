@@ -1,5 +1,4 @@
-reg_name=regions[reg==my_reg]$libreg
-my_deps=dep[reg==my_reg]$dep
+
 
 
 #SI LES DONNEES NE SONT PAS DEJA PRE-PROCESSED#
@@ -7,10 +6,12 @@ my_deps=dep[reg==my_reg]$dep
 
 # token <- drop_auth()
 # saveRDS(token, "droptoken.rds")
-token <- readRDS("droptoken.rds")
-drop_acc(dtoken = token)
+# token <- readRDS("droptoken.rds")
+# drop_acc(dtoken = token)
 
 prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = c("TVS","BVCV")){
+  reg_name=regions[reg==my_reg]$libreg
+  my_deps=dep[reg==my_reg]$dep
   nb_deps=length(my_deps)
   communes=lapply(my_deps,function(my_dep){
     if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
@@ -250,7 +251,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
 #####################################################
 
 
-get_geo_data <- function(env){
+get_geo_data <- function(my_reg,env){
   print("ask update contours ?")
   if (!paste0(my_reg,nom_fichier_dropbox)%in%list.files("data/")){
     if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox),dtoken = token)){
