@@ -14,7 +14,7 @@ observeEvent(input$save_latest_check,{
   setorder(my_dt,agr)
   sheet_name=paste("en_vigueur",input$choix_ps,input$choix_reg,sep="_")
   filename = paste0(sheet_name,".csv")
-  local_name=paste0("data/",sheet_name)
+  local_name=paste0("data/",filename)
   fwrite(unique(my_dt),file=local_name)
   
   drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
@@ -27,15 +27,16 @@ observeEvent(input$save_latest_check,{
     file.copy(paste0("data/qpv_",input$choix_millesime),local_qpv,overwrite = T)
     
     drop_clean_upload(filename = filename,drop_path = "zonage/mg/")
-  
+    
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
   }
   
-  message=sprintf("App:ZonageARS\n
-                  Event: la région %s vient de valider une zonage \"en vigueur\" pour les %s !",input$choix_reg,input$choix_ps)
-
-  slackr_bot(message)
+  if(session$clientData$url_pathname=="/Zonage_ARS/"){
+    message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
+    slackr_setup(config_file = "www/slackr_config.txt",echo = F)
+    slackr_bot(message)
+  }
   
   removeModal()
 })

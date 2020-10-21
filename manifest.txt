@@ -16,6 +16,7 @@ www/sketch_inf.html
 www/sketch_sf.html
 www/FAQ_hors_mg.pdf
 www/slackr_config.txt
+www/slackr_config_log.txt
 data/sf/cadre_nat_sf.sas7bdat
 data/inf/cadre_nat_inf.sas7bdat
 data/Shape_files/arr.RData

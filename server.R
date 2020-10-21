@@ -37,6 +37,18 @@ function(input, output,session) {
     } else NULL
   })
   
+  output$html_info = renderText({
+
+    paste(sep = "",
+          # "protocol: ", session$clientData$url_protocol, "\n",
+          # "hostname: ", session$clientData$url_hostname, "\n",
+          "pathname: ", session$clientData$url_pathname, "\n"
+          # "port: ",     session$clientData$url_port,     "\n",
+          # "search: ",   session$clientData$url_search,   "\n"
+    )
+
+  })
+  
   
   
   source("utils/import_file.R",local=T,encoding = "UTF-8")
@@ -222,6 +234,7 @@ function(input, output,session) {
     filename = 'ref_zonage_medecin.xlsx',
     content = function(file) {
       showNotification("Ce fichier contient également la population des QPV")
+      slack_log("ref_zonage_medecin.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       
       file.copy("data/Zonage_medecin_20191231.xlsx", file, overwrite = T)
     }
@@ -231,6 +244,7 @@ function(input, output,session) {
   output$dl_corres_tvs_com <- downloadHandler(
     filename = 'corrs_tvs_com.sas7bdat',
     content = function(file) {
+      slack_log("corrs_tvs_com.sas7bdat",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       file.copy("data/tvs2019.sas7bdat", file, overwrite = T)
     }
   )
@@ -238,6 +252,7 @@ function(input, output,session) {
   output$dl_pop_tvs <- downloadHandler(
     filename = 'pop_tvs.xlsx',
     content = function(file) {
+      slack_log("pop_tvs.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       load(paste0("data/",input$choix_reg,"_preprocessed_TVS.RData"))
       pop_tvs = data.table(communes_TVS)[,c("reg","dep","agr","libagr","depcom","libcom","population")]
       names(pop_tvs) <- c("Région","Département","TVS","Nom TVS","Commune","Nom commune","Population")
@@ -250,6 +265,7 @@ function(input, output,session) {
   output$dl_ref_zonage_sf <- downloadHandler(
     filename = 'ref_zonage_sf.xlsx',
     content = function(file) {
+      slack_log("ref_zonage_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
       openxlsx::write.xlsx(tmp,file)
       # file.copy(, file, overwrite = T)
@@ -259,6 +275,7 @@ function(input, output,session) {
   output$dl_ref_zonage_ide <- downloadHandler(
     filename = 'ref_zonage_ide.xlsx',
     content = function(file) {
+      slack_log("ref_zonage_ide.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
       openxlsx::write.xlsx(tmp,file)
       # file.copy(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"), file, overwrite = T)
@@ -267,15 +284,19 @@ function(input, output,session) {
   
   
   output$dl_corres_bvcv_com <- downloadHandler(
-    filename = 'corrs_bvcv_com.sas7bdat',
+    filename = 'corres_bvcv_com.xlsx',
     content = function(file) {
-      file.copy("data/bvcv2019.sas7bdat", file, overwrite = T)
+      slack_log("corres_bvcv_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+      tmp = haven::read_sas("data/bvcv2019.sas7bdat")
+      openxlsx::write.xlsx(tmp,file)
+      # file.copy("data/bvcv2019.sas7bdat", file, overwrite = T)
     }
   )
   
   output$dl_pop_bvcv_femmes <- downloadHandler(
     filename = 'pop_bvcv_femmes.xlsx',
     content = function(file) {
+      slack_log("pop_bvcv_femmes.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       openxlsx::write.xlsx(pop_femmes,file)
     }
   )
@@ -283,6 +304,7 @@ function(input, output,session) {
   output$dl_pop_bvcv_all <- downloadHandler(
     filename = 'pop_bvcv.xlsx',
     content = function(file) {
+      slack_log("pop_bvcv.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       load(paste0("data/",input$choix_reg,"_preprocessed_BVCV.RData"))
       pop_bvcv = data.table(communes_BVCV)[,c("reg","dep","agr","libagr","depcom","libcom","population")]
       names(pop_bvcv) <- c("Région","Département","BVCV","Nom BVCV","Commune","Nom commune","Population")
@@ -296,6 +318,7 @@ function(input, output,session) {
   output$dl_reg_maj_tvs = downloadHandler(
     filename = 'region_majoritaire_TVS.xlsx',
     content = function(file) {
+      slack_log("region_majoritaire_TVS.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       openxlsx::write.xlsx(list("region_majoritaire_par_TVS" = tvs_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
     }
   )
@@ -303,6 +326,7 @@ function(input, output,session) {
   output$dl_reg_maj_bvcv = downloadHandler(
     filename = 'region_majoritaire_BVCV.xlsx',
     content = function(file) {
+      slack_log("region_majoritaire_BVCV.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       openxlsx::write.xlsx(list("region_majoritaire_par_BVCV" = bvcv_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
     }
   )
@@ -316,6 +340,7 @@ function(input, output,session) {
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg","")
         if(nrow(en_vigueur_agr)>0){
+          slack_log("zonages_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr,"QPV"=en_vigueur_qpv),file = file)
 
@@ -340,6 +365,7 @@ function(input, output,session) {
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_agr = dl_zonage_en_vigueur_agr("sf","")
         if(nrow(en_vigueur_agr)>0){
+          slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
 
@@ -363,6 +389,7 @@ function(input, output,session) {
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_agr = dl_zonage_en_vigueur_agr("inf","")
         if(nrow(en_vigueur_agr)>0){
+          slack_log("zonages_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
 

@@ -46,10 +46,20 @@ library(shinyjs)
 # Then pass the token to each drop_ function
 drop_auth(rdstoken = "droptoken.rds")
 
-slackr_setup(config_file = "www/slackr_config.txt",echo = F)
 
 rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,local_path = "data")
 
+drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
+  local_name = paste0(local_path,filename)
+  drop_name = paste0(drop_path,filename)
+  if(rdrop2::drop_exists(drop_name)){
+    if(!is.null(message)){
+      print(message)
+    }
+    rdrop2::drop_delete(path = drop_name)
+  }
+  rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
+}
 
 vars_to_toggle = c("agr","libagr","communes","population","is_majoritaire","CN","libCN")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
@@ -237,14 +247,14 @@ setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
 setnames(tvs_reg_majoritaire,"reg_majoritaire","reg")
 
 
-drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
-  local_name = paste0(local_path,filename)
-  drop_name = paste0(drop_path,filename)
-  if(rdrop2::drop_exists(drop_name)){
-    if(!is.null(message)){
-      print(message)
-    }
-    rdrop2::drop_delete(path = drop_name)
+slack_log = function(filename,my_reg,my_ps,my_mil,session){
+  filename = filename
+  reg = ifelse(is.null(my_reg),"XX",my_reg)
+  ps = ifelse(is.null(my_ps),"XX",my_ps)
+  mil = ifelse(is.null(my_mil),"XX",my_mil)
+  if(session$clientData$url_pathname=="/Zonage_ARS/"){
+    message=sprintf("App:ZonageARS\nEvent: Téléchargement du fichier %s par la région %s pour la profession %s avec le projet %s",filename,reg,ps,mil)
+    slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
+    slackr_bot(message)
   }
-  rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
 }

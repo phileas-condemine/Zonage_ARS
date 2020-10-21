@@ -43,6 +43,9 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
   })
 })
 
+
+
+
 observeEvent(input$send_pwd,{
   req(input$my_auth)
   
@@ -53,6 +56,17 @@ observeEvent(input$send_pwd,{
     output$auth=renderText({
       "OK"
     })
+    
+    
+    reg = ifelse(!is.null(input$choix_reg),input$choix_reg,"XX")
+    ps = ifelse(!is.null(input$choix_ps),input$choix_ps,"XX")
+    mil = ifelse(!is.null(input$choix_millesime),input$choix_millesime,"XX")
+    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+      message=sprintf("App:ZonageARS\nEvent: Connexion de la région %s pour la profession %s avec le projet %s",reg,ps,mil)
+      slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
+      slackr_bot(message)
+    }
+    
     has_logged_in(T)
     enable_dl_zonage_en_vigueur(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)
@@ -237,7 +251,11 @@ observeEvent(c(input$feedback_send),{
     
     
     # slackr({message})
-    slackr_bot(message)
+    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+      slackr_setup(config_file = "www/slackr_config.txt",echo = F)
+    
+      slackr_bot(message)
+    }
     
     showModal(modalDialog(title="Merci pour votre commentaire !",size="s",
                           footer=NULL,easyClose = T,"Cliquer dans la zone grisée pour revenir à la liste des indicateurs de santé."))
