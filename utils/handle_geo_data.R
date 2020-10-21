@@ -229,32 +229,14 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     file = paste0(my_reg,"_preprocessed_TVS.RData")
     
-    if(rdrop2::drop_exists(paste0("zonage/",file)
-                           # ,dtoken = token
-                           )){
-      rdrop2::drop_delete(path = paste0("zonage/",file)
-                          # ,dtoken = token
-                          )
-    }
-    rdrop2::drop_upload(file = paste0("data/",file)
-                        # ,dtoken = token
-                        ,path = "zonage/",autorename = F)
+    drop_clean_upload(filename = file,message="rm tvs")
+    
   }
   
   if("BVCV"%in%mailles_geo){
     
     file = paste0(my_reg,"_preprocessed_BVCV.RData")
-    if(rdrop2::drop_exists(paste0("zonage/",file)
-                           # ,dtoken = token
-                           )){
-      print("rm bvcv")
-      rdrop2::drop_delete(path = paste0("zonage/",file)
-                          # ,dtoken = token
-                          )
-    }
-    rdrop2::drop_upload(file = paste0("data/",file)
-                        # ,dtoken = token
-                        ,path = "zonage/",autorename = F)
+    drop_clean_upload(filename = file,message="rm bvcv")
   }
 }
 
@@ -266,11 +248,9 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
 get_geo_data <- function(my_reg,env){
   print("ask update contours ?")
   if (!paste0(my_reg,nom_fichier_dropbox)%in%list.files("data/")){
-    if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox),dtoken = token)){
+    if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox))){
       print("récupération de l'historique dropbox")
-      rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,
-                            # dtoken = token,verbose = T,
-                            local_path = "data")
+      rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
     } else {
       print("construction fonds géo from scratch")
       prep_geo_data_from_scratch(my_reg)

@@ -4,9 +4,7 @@
 
 
 dl_zonage_en_vigueur_agr = function(ps,curr_reg){
-  my_files = drop_dir(paste0("/zonage/",ps,"/")
-                      # ,dtoken = token
-                      )
+  my_files = drop_dir(paste0("/zonage/",ps,"/"))
   my_files = data.table(my_files)
   my_files = my_files[grepl(paste0("^en_vigueur_",ps),name)]
   my_files = my_files[!grepl(paste0("^en_vigueur_qpv",ps),name)]
@@ -16,9 +14,7 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
       print(en_vigueur)
       drop_path = paste0("zonage/",ps,"/",en_vigueur)
       local_path = paste0("data/",en_vigueur)
-      drop_download(drop_path,local_path = "data/",overwrite = T
-                    # ,dtoken = token,verbose = T
-                    )
+      drop_download(drop_path,local_path = "data/",overwrite = T)
       infos = gsub("en_vigueur_","",en_vigueur)
       infos = gsub(".csv","",infos)
       

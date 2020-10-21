@@ -3,9 +3,7 @@
 dl_zonage_en_vigueur_qpv = function(ps,curr_reg){
   if (ps == "mg"){
     
-    my_files = drop_dir("zonage/mg/"
-                        # ,dtoken = token
-                        )
+    my_files = drop_dir("zonage/mg/")
     my_files = data.table(my_files)
     my_files = my_files[grepl("^en_vigueur_qpv",name)]
     print("récupération des fichiers de zonage en vigueur")
@@ -14,9 +12,7 @@ dl_zonage_en_vigueur_qpv = function(ps,curr_reg){
         print(en_vigueur)
         drop_path = paste0("zonage/mg/",en_vigueur)
         local_path = paste0("data/",en_vigueur)
-        drop_download(drop_path,local_path = "data/",overwrite = T
-                      # ,dtoken = token,verbose = T
-                      )
+        drop_download(drop_path,local_path = "data/",overwrite = T)
         infos = gsub("en_vigueur_","",en_vigueur)
         infos = gsub(".csv","",infos)
         infos = gsub("qpv_","",infos)

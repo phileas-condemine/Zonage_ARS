@@ -110,17 +110,13 @@ dropbox_files = reactive({
   req(input$choix_reg)
   req(input$choix_ps)
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_files = drop_dir(paste0("zonage/",input$choix_ps)
-                       # ,dtoken = token
-                       )
+  reg_files = drop_dir(paste0("zonage/",input$choix_ps))
   reg_files = data.table(reg_files)
   reg_files = reg_files[grepl(regex,name)]
   reg_files = reg_files[!grepl("qpv_",name)]
   if(input$choix_ps == "mg"){
     regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
-    qpv_files = drop_dir(paste0("zonage/",input$choix_ps)
-                         # ,dtoken = token
-                         )
+    qpv_files = drop_dir(paste0("zonage/",input$choix_ps))
     qpv_files = data.table(qpv_files)
     qpv_files = qpv_files[grepl(regex,name)]
     
@@ -139,12 +135,9 @@ output$ui_millesime=renderUI({
   input$refresh_millesime
   my_reg=input$choix_reg
   reg_name=regions[reg==my_reg]$libreg
-  # browser()
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
   
-  reg_files = drop_dir(paste0("zonage/",input$choix_ps,"/")
-                       # ,dtoken = token
-                       )
+  reg_files = drop_dir(paste0("zonage/",input$choix_ps,"/"))
   reg_files = data.table(reg_files)
   reg_files = reg_files[grepl(regex,name)]
   reg_files = reg_files[!grepl("en_vigueur",name)]

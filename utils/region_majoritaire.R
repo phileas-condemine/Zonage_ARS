@@ -7,9 +7,7 @@
 all_com_tvs = rbindlist(use.names = T,lapply(regions$reg,function(my_reg){
   file = paste0(my_reg,"_preprocessed_TVS.RData")
   if(!file%in%list.files("data/")){
-    rdrop2::drop_download(path = paste0("zonage/",my_reg,"_preprocessed_TVS.RData"),overwrite = T,
-                          # dtoken = token,verbose = T,
-                          local_path = "data")
+    rdrop2::drop_download(path = paste0("zonage/",my_reg,"_preprocessed_TVS.RData"),overwrite = T,local_path = "data")
   }
   load(paste0("data/",file))
   communes_TVS
@@ -39,13 +37,9 @@ all_com_bvcv = rbindlist(use.names = T,lapply(setdiff(regions$reg,"6"),function(
   nom_fichier_dropbox ="_preprocessed_BVCV.RData"
   if(!file%in%list.files("data/")){
 
-    if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox)
-                           # ,dtoken = token
-                           )){
+    if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox))){
       print("récupération de l'historique dropbox")
-      rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,
-                            # dtoken = token,verbose = T,
-                            local_path = "data")
+      rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
     } else {
       print("construction fonds géo from scratch")
       prep_geo_data_from_scratch(my_reg)
@@ -73,14 +67,8 @@ drop_name = paste0("zonage/",file)
 tvs_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
 bvcv_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
 save(bvcv_reg_majoritaire,tvs_reg_majoritaire,file = local_name)
-if(rdrop2::drop_exists(drop_name
-                       # ,dtoken = token
-                       )){
+if(rdrop2::drop_exists(drop_name)){
   print("rm fichier régions majoritaires")
-  rdrop2::drop_delete(path = drop_name
-                      # ,dtoken = token
-                      )
+  rdrop2::drop_delete(path = drop_name)
 }
-rdrop2::drop_upload(file = local_name
-                    # ,dtoken = token
-                    ,path = "zonage/",autorename = F)
+rdrop2::drop_upload(file = local_name,path = "zonage/",autorename = F)

@@ -35,9 +35,7 @@ tableau_reg = reactive({
     
     
     maille_geo = ifelse(input$choix_ps=="mg","TVS","BVCV")
-    historique=rdrop2::drop_history(paste0("zonage/",my_reg,"_preprocessed_",maille_geo,".RData")
-                                    # ,dtoken=token
-                                    ,limit = 1)
+    historique=rdrop2::drop_history(paste0("zonage/",my_reg,"_preprocessed_",maille_geo,".RData"),limit = 1)
     print(historique$server_modified)
     print(historique$client_modified)
     

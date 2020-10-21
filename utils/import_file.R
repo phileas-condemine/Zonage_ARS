@@ -138,15 +138,9 @@ observeEvent(input$parse_file,{
   local_filenm = paste0("data/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
   drop_filenm = paste0("data/",input$choix_ps,"/",input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
   fwrite(unique(my_data),local_filenm)
-  if(rdrop2::drop_exists(drop_filenm
-                         # ,dtoken = token
-                         ))
-    drop_delete(
-      # dtoken = token,
-      path = drop_filenm)
-  drop_upload(
-    # dtoken=token,
-    file = local_filenm,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
+  if(rdrop2::drop_exists(drop_filenm))
+    drop_delete(path = drop_filenm)
+  drop_upload(file = local_filenm,path = paste0("zonage/",input$choix_ps,"/"),mode = "overwrite",autorename = F)
   
   updateSelectizeInput(session,'choix_millesime',
                        choices=c(millesimes(),setNames(drop_filenm,filenm_no_extension)),

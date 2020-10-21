@@ -39,8 +39,6 @@ if(rerun_dep_contours){
                          FUN = function(x)x[1])
   dep_contours = dep_contours[,c("reg","dep","geometry")]
   save(dep_contours,file="data/contours_dep.RData")
-  rdrop2::drop_upload(file="data/contours_dep.RData"
-                      # ,dtoken=token
-                      ,path="zonage/",autorename = F)
+  rdrop2::drop_upload(file="data/contours_dep.RData",path="zonage/",autorename = F)
   
 }
