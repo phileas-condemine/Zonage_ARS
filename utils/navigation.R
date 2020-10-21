@@ -113,6 +113,7 @@ dropbox_files = reactive({
   reg_files = drop_dir(paste0("zonage/",input$choix_ps),dtoken = token)
   reg_files = data.table(reg_files)
   reg_files = reg_files[grepl(regex,name)]
+  reg_files = reg_files[!grepl("qpv_",name)]
   if(input$choix_ps == "mg"){
     regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
     qpv_files = drop_dir(paste0("zonage/",input$choix_ps),dtoken = token)
@@ -141,6 +142,7 @@ output$ui_millesime=renderUI({
   reg_files = data.table(reg_files)
   reg_files = reg_files[grepl(regex,name)]
   reg_files = reg_files[!grepl("en_vigueur",name)]
+  reg_files = reg_files[!grepl("qpv_",name)]
   
   print(head(reg_files))
   if (!is.null(reg_files)){

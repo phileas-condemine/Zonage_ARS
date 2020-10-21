@@ -7,6 +7,7 @@ dl_zonage_en_vigueur_agr = function(ps,curr_reg){
   my_files = drop_dir(paste0("/zonage/",ps,"/"),dtoken = token)
   my_files = data.table(my_files)
   my_files = my_files[grepl(paste0("^en_vigueur_",ps),name)]
+  my_files = my_files[!grepl(paste0("^en_vigueur_qpv",ps),name)]
   print("récupération des fichiers de zonage en vigueur")
   if (length(my_files$name)>0){
     files = lapply(my_files$name,function(en_vigueur){

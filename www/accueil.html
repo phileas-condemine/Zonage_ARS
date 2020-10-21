@@ -13,6 +13,15 @@
       <li> La carte du zonage saisi pour la région ;</li>
       <li> Une ébauche d'arrêté pré-rempli.</li>
    </ul>
+   <p> Vous pouvez également télécharger des données annexes dans le menu "Documents" sur le bandeau latéral gauche. Voici la liste des données téléchargeables :</p>
+   <ul>
+      <li>FAQ (hors médecins généralistes)</li>
+      <li>Fichier du cadre national par profession</li>
+      <li>Tables de correspondance BVCV-communes et TVS-communes</li>
+      <li>Population communale utilisée pour le calcul des jauges</li>
+      <li>Liste des régions majoritaire pour chaque BVCV ou TVS, établie à partir de la population INSEE en vigueur (source des données : geo.api.gouv.fr)</li>
+      <li>Zonages en vigueur par profession (identifiant requis)</li>
+   </ul>
    <h4>Avertissement</h4>
    <p> Afin de pouvoir utiliser ce site dans les meilleures conditions, nous vous conseillons d'utiliser un navigateur web récent et à jour. Nous recommandons l'utilisation de <b>Mozilla Firefox v71 ou ultérieure</b>. </p>
    <h4>Source de données</h4>
@@ -21,7 +30,7 @@
    <p> Les données de populations sont puisées dans différentes sources selon la profession de santé et la région</p>
    <ul>
       <li>Cas général : les données de populations correspondent aux données INSEE les plus récentes qui sont fournies par https://geo.api.gouv.fr/ (la "Date de dernière mise à jour des contours géographiques" affiché dans l'application entre les jauges et le camembert/pie-chart indique la dernière date de collection des données à partir de l'API geo.api.gouv.fr) </li>
-      <li>Les sages-femmes : seule la population féminine est prise en compte. Les données ont été téléchargées sur le site de l'INSEE <a href="https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351">https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351</a> dans le fichier "POP1B – Population par sexe et âge" au format xlsx. Il s'agit donc des données "données de population en 2016 diffusées selon la géographie en vigueur au 1er janvier 2019".</li>
+      <li>Les sages-femmes : seule la population féminine est prise en compte. Les données ont été téléchargées <a href="https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351">ici</a> sur le site de l'INSEE  dans le fichier "POP1B – Population par sexe et âge" au format xlsx. Il s'agit donc des données "données de population en 2016 diffusées selon la géographie en vigueur au 1er janvier 2019".</li>
       <li>Les arrondissements de Paris, Lyon et Marseille ne sont pas des communes. La population utilisée est celle de 2016 (INSEE).</li>
       <li> Pour les QPV quartiers prioritaires de la politique de la ville. La population utilisée est celle de 2015 (INSEE).</li>
       <li> Pour l'île de La Réunion et la profession de médecin généraliste, la géographie est découpée en grands quartiers. La population utilisée est celle de 2015 (INSEE).</li>
@@ -33,4 +42,19 @@
       <li> Infirmiers (IDE) : 2018</li>
    </ul>
    <p>Les données de l'APL ne sont pas mises à jour aussi fréquemment que les données géographiques et démographiques des communes.</p>
+   <h4>Légendes et codes couleurs</h4>
+   <ul>
+      <li>Le tableau de zonage interactif ainsi que la carte interactive et le diagramme "camembert" sont coloriés avec le même code couleur.</li>
+      <ul>
+         <li>Pour les sages-femmes & infirmiers : bleu = très sous-doté, vert pâle = sous-doté, vert = intermédiaire, rose = très doté, rouge = sur-doté</li>
+         <li>Pour les médecins généralistes : bleu = hors-vivier, vert = zone de vigilance, rose = zone d'accompagnement, rouge = zone d'intervention prioritaire</li>
+      </ul>
+   <li>La couleur des lignes du tableau rappel le cadre national.</li>
+   <ul>
+      <li>Pour les sages-femmes & infirmiers : bleu = très sous-doté, vert pâle = sous-doté, vert = intermédiaire, rose = très doté, rouge = sur-doté</li>
+      <li>Pour les médecins généralistes : bleu = hors vivier, vert = vivier, rouge = cadre national</li>
+   </ul>
+   <li>Des cercles rouges autour des boutons radio (case d'option) rappellent le </li>
+
+   </ul>
 </div>
