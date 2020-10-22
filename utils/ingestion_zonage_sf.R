@@ -78,3 +78,34 @@ table(naq$reg)
 naq
 
 openxlsx::write.xlsx(list(paca = paca,hdf=hdf,ara=ara,naq=naq),"data/zonages_pris_hors_app/sf/diff_zonage_nat_vs_picked_zonage.xlsx")
+
+
+
+# BFC
+my_reg = "27"
+bfc = readxl::read_excel("data/zonages_pris_hors_app/sf/zonage_sf_BFC.xlsx",sheet = 3)[,c(5,16)]
+names(bfc) <- c("agr","picked_zonage")
+bfc = data.table(bfc)
+table(bfc$picked_zonage)
+bfc[,picked_zonage:=substr(picked_zonage,1,1)]
+bfc[,agr:=stringr::str_pad(agr,5,"right","_")]
+bfc = merge(histo,bfc,by="agr",all=T)
+bfc = bfc[reg==my_reg | !is.na(picked_zonage)]#ma région ou bien zonage pris
+bfc = bfc[zonage_nat!=picked_zonage]# modification par rapport au national
+table(bfc$reg)
+bfc
+
+
+# BRE
+my_reg = "53"
+bre = readxl::read_excel("data/zonages_pris_hors_app/sf/zonage_sf_BRE.xlsx",sheet = 3)[,c(5,16)]
+names(bre) <- c("agr","picked_zonage")
+bre = data.table(bre)
+table(bre$picked_zonage)
+bre[,picked_zonage:=substr(picked_zonage,1,1)]
+bre[,agr:=stringr::str_pad(agr,5,"right","_")]
+bre = merge(histo,bre,by="agr",all=T)
+bre = bre[reg==my_reg | !is.na(picked_zonage)]#ma région ou bien zonage pris
+bre = bre[zonage_nat!=picked_zonage]# modification par rapport au national
+table(bre$reg)
+bre
