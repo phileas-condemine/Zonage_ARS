@@ -39,12 +39,12 @@ observeEvent(c(input$search_qpv,input$communes_map_marker_click),{
 output$edit_qpv_options = renderUI({
   if(!is.null(input$edit_one_qpv)&length(input$edit_one_qpv)>0){
     
-    info_qpv = hist_qpv[cod %in% input$edit_one_qpv]
-    info_tvs = TVS[TVS$agr == info_qpv$agr][1]#une ligne par commune
+    info_qpv = hist_qpv()[cod %in% input$edit_one_qpv]
+    info_tvs = TVS()[TVS$agr == info_qpv$agr][1]#une ligne par commune
     info_curr = tableau_reg()[agr==info_qpv$agr]
     
     tagList(
-      tags$p(paste0("Région : ",regions[reg==info_qpv$reg]$libreg)),
+      tags$p(paste0("Région : ",regions_reac()[reg==info_qpv$reg]$libreg)),
       tags$p(paste0("TVS : ", info_tvs$libagr," (",info_tvs$agr, ")")),
       tags$p(paste0("Nom QPV : ", info_qpv$libqpv)),
       tags$p(paste0("Population : ",info_qpv$pop)),
@@ -78,7 +78,7 @@ observeEvent(c(input$save_zonage_qpv),{
 
 zonage_qpv_en_vigueur = reactive({
   source(paste0("utils/get_qpv_zonage_en_vigueur.R"),local=T,encoding = "UTF-8")
-  qpv_zonages_en_vigueur = dl_zonage_en_vigueur_qpv(input$choix_ps,input$choix_reg)
+  qpv_zonages_en_vigueur = dl_zonage_en_vigueur_qpv(input$choix_ps,dropbox_ps_folder(),input$choix_reg)
   qpv_zonages_en_vigueur
 })
 zonage_qpv = reactive({
@@ -89,14 +89,14 @@ zonage_qpv = reactive({
       
       
       save_qpv = paste0("qpv_",input$choix_millesime)
-      drop_name = paste0("zonage/mg/",save_qpv)
+      drop_name = paste0(dropbox_ps_folder(),save_qpv)
       local_name = paste0("data/",save_qpv)
       if(!drop_exists(drop_name)){
         # INIT from file zonage 2019
-        qpv=data.table::copy(hist_qpv)[reg==input$choix_reg,c("cod","zonage_ars")]
+        qpv=data.table::copy(hist_qpv())[reg==input$choix_reg,c("cod","zonage_ars")]
         setnames(qpv,"zonage_ars","picked_zonage")
         fwrite(unique(qpv),file=local_name)
-        drop_clean_upload(filename = save_qpv,drop_path = "zonage/mg/")
+        drop_clean_upload(filename = save_qpv,drop_path = dropbox_ps_folder())
         
       } else {
         # FROM SAVED
@@ -136,14 +136,14 @@ observeEvent(c(vals_reac()),{
       latest = vals_reac()
       old = last_zonage_tvs()
       modified = data.table(merge(latest,old,by="agr",suffixes=c(".new",".old")))[picked_zonage.new!=picked_zonage.old]
-      tvs_has_qpv = modified$agr%in%hist_qpv$agr
+      tvs_has_qpv = modified$agr%in%hist_qpv()$agr
       if(tvs_has_qpv){
         showNotification("Attention, ce TVS contient des QPV, merci de vérifier la cohérence du zonage de ces QPV.",
                          closeButton = T,type = "warning")
         
         ### force QPV to new zonage if more convenient ZIP > ZAC > ZV > HV
         # cur_qpv = zonage_qpv()
-        # qpv = cur_qpv %>% merge(hist_qpv[,c("cod","agr")],by="cod") %>% merge(modified,by="agr")
+        # qpv = cur_qpv %>% merge(hist_qpv()[,c("cod","agr")],by="cod") %>% merge(modified,by="agr")
         # 
         # qpv$qpv_zonage_score = vswitch_zonage_mg(qpv$picked_zonage)
         # qpv$tvs_zonage_score = vswitch_zonage_mg(qpv$picked_zonage.new)

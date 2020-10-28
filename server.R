@@ -1,5 +1,75 @@
 function(input, output,session) {
   drop_auth(rdstoken = "droptoken.rds")
+  params = fread("params.csv",sep=":")
+  source("utils/load_files.R",encoding = "UTF-8")
+  
+  
+  dropbox_folder = reactive({
+    req(session$clientData$url_pathname)
+    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+      "zonage/"
+    } else {
+      "zonage_dev/"
+      }
+  })
+  
+  observeEvent(session$clientData$url_pathname,{
+    req(session$clientData$url_pathname)
+    if(session$clientData$url_pathname!="/Zonage_ARS/"){
+      showNotification(HTML("<p><b>Attention</b>, vous êtes sur une page de test.<br>",
+                            "<a href=\"https://drees.shinyapps.io/Zonage_ARS/\">",
+                            "Me rediriger vers la bonne adresse</a>.<br></p>"),duration = NULL,type = "warning")
+    }
+  })
+  
+  dropbox_ps_folder = reactive({
+    req(input$choix_ps)
+    paste0(dropbox_folder(),input$choix_ps,"/")
+  })
+  
+  TVS = reactive(get_TVS(dropbox_folder(),params[file=="tvs"]$name))
+  
+  dep = reactive(unique(TVS()[,c("dep","reg","libdep")]))
+  
+  mom_markers = reactive(get_QPV(dropbox_folder(),params[file=="qpv"]$name))
+  
+  hist_qpv = reactive(get_hist_qpv(dropbox_folder(),params[file=="zonage_mg"]$name))
+  
+  BVCV = reactive(get_BVCV(dropbox_folder(),params[file=="bvcv"]$name))
+  
+  pop_femmes = reactive({get_pop_femmes(dropbox_folder(),params[file=="pop_femmes"]$name)})
+  
+  dep_contours = reactive({get_dep_contours(dropbox_folder(),params[file=="contours_dep"]$name)})
+  
+  reg_cont = reactive({get_reg_contours(dropbox_folder(),params[file=="contours_reg"]$name)})
+  
+  regions_reac = reactive({get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())})
+  
+  TA = reactive({get_TA(dropbox_folder(),params[file=="liste_tribunaux"]$name)})
+
+  
+  
+  # REG MAJORITAIRE
+  
+  file = "agr_reg_majoritaire.RData"
+  local_name = paste0("data/",file)
+  drop_name = paste0("zonage/",file)
+  if(drop_exists(drop_name)){
+    print("recup régions majoritaires par AGR")
+    drop_download(drop_name,local_path = "data/",overwrite = T
+                  # ,verbose = T
+    )
+  } else {
+    print("construction du fichier des régions majoritaires par AGR from scratch")
+    source("utils/region_majoritaire.R")
+  }
+  load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
+  setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
+  setnames(tvs_reg_majoritaire,"reg_majoritaire","reg")
+  bvcv_reg_majoritaire
+  tvs_reg_majoritaire
+  
+  
   
   # init_gs=reactiveVal(T)
   # zonage_reactif=reactiveVal("")
@@ -26,6 +96,18 @@ function(input, output,session) {
     data.table("agr"="","picked_zonage"="")
   )
   
+  output$ui_choix_reg = renderUI({
+    regions = regions_reac()
+    selectizeInput('choix_reg','Sélectionner votre région',width = "100%",
+                   choices=setNames(regions$reg,regions$libreg),multiple=T,
+                   options = list(placeholder = 'Le nom de votre région',plugins= list('remove_button'),maxItems=1))%>%shinyInput_label_embed(
+                     icon("question-circle") %>%
+                       bs_embed_tooltip(title = "Choisissez la région dont vous souhaitez renseigner le zonage.")
+                   )
+  })
+  
+  
+  
   output$rappel_ps = renderUI({
     if(!is.null(input$choix_ps)&!is.null(input$choix_millesime)){
       tagList(tags$h2(paste0(
@@ -36,19 +118,7 @@ function(input, output,session) {
         )))
     } else NULL
   })
-  
-  output$html_info = renderText({
 
-    paste(sep = "",
-          # "protocol: ", session$clientData$url_protocol, "\n",
-          # "hostname: ", session$clientData$url_hostname, "\n",
-          "pathname: ", session$clientData$url_pathname, "\n"
-          # "port: ",     session$clientData$url_port,     "\n",
-          # "search: ",   session$clientData$url_search,   "\n"
-    )
-
-  })
-  
   
   
   source("utils/import_file.R",local=T,encoding = "UTF-8")
@@ -100,7 +170,7 @@ function(input, output,session) {
       
       #### QPV
       
-      infos_zonage_qpv = merge(hist_qpv[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
+      infos_zonage_qpv = merge(hist_qpv()[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
       setnames(infos_zonage_qpv,"picked_zonage","picked_zonage_qpv")
       infos_zonage_qpv = merge(infos_zonage_qpv,unique(tableau_reg()[,.(agr,CN)]),by="agr")
       infos_zonage_qpv = merge(infos_zonage_qpv,vals_reac(),by="agr")
@@ -236,19 +306,27 @@ function(input, output,session) {
       showNotification("Ce fichier contient également la population des QPV")
       slack_log("ref_zonage_medecin.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
       
-      file.copy("data/Zonage_medecin_20191231.xlsx", file, overwrite = T)
+      file.copy(paste0("data/",params[file=="zonage_mg"]$name), file, overwrite = T)
     }
   )
   
   
   output$dl_corres_tvs_com <- downloadHandler(
-    filename = 'corrs_tvs_com.sas7bdat',
+    filename = 'corrs_tvs_com.xlsx',
     content = function(file) {
-      slack_log("corrs_tvs_com.sas7bdat",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      file.copy("data/tvs2019.sas7bdat", file, overwrite = T)
+      slack_log("corrs_tvs_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+      corres = haven::read_sas(paste0("data/",params[file=="tvs"]$name))
+      openxlsx::write.xlsx(corres,file)
     }
   )
-  
+  output$dl_corres_bvcv_com <- downloadHandler(
+    filename = 'corres_bvcv_com.xlsx',
+    content = function(file) {
+      slack_log("corres_bvcv_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+      corres = haven::read_sas(paste0("data/",params[file=="bvcv"]$name))
+      openxlsx::write.xlsx(corres,file)
+    }
+  )
   output$dl_pop_tvs <- downloadHandler(
     filename = 'pop_tvs.xlsx',
     content = function(file) {
@@ -257,18 +335,19 @@ function(input, output,session) {
       pop_tvs = data.table(communes_TVS)[,c("reg","dep","agr","libagr","depcom","libcom","population")]
       names(pop_tvs) <- c("Région","Département","TVS","Nom TVS","Commune","Nom commune","Population")
       openxlsx::write.xlsx(pop_tvs,file)
-      
-      # file.copy("data/tvs2019.sas7bdat", file, overwrite = T)
-    }
+      }
   )
   
   output$dl_ref_zonage_sf <- downloadHandler(
     filename = 'ref_zonage_sf.xlsx',
     content = function(file) {
       slack_log("ref_zonage_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
+      filename = params[file="zonage_sf"]$name
+      if(!filename%in%list.files("data/")){
+        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+        }
+      tmp = haven::read_sas(paste0("data/",filename))
       openxlsx::write.xlsx(tmp,file)
-      # file.copy(, file, overwrite = T)
     }
   )
   
@@ -276,28 +355,23 @@ function(input, output,session) {
     filename = 'ref_zonage_ide.xlsx',
     content = function(file) {
       slack_log("ref_zonage_ide.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      tmp = haven::read_sas(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
+      filename = params[file="zonage_inf"]$name
+      if(!filename%in%list.files("data/")){
+        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      }
+      tmp = haven::read_sas(paste0("data/",filename))
       openxlsx::write.xlsx(tmp,file)
-      # file.copy(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"), file, overwrite = T)
     }
   )
   
   
-  output$dl_corres_bvcv_com <- downloadHandler(
-    filename = 'corres_bvcv_com.xlsx',
-    content = function(file) {
-      slack_log("corres_bvcv_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      tmp = haven::read_sas("data/bvcv2019.sas7bdat")
-      openxlsx::write.xlsx(tmp,file)
-      # file.copy("data/bvcv2019.sas7bdat", file, overwrite = T)
-    }
-  )
+
   
   output$dl_pop_bvcv_femmes <- downloadHandler(
     filename = 'pop_bvcv_femmes.xlsx',
     content = function(file) {
       slack_log("pop_bvcv_femmes.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      openxlsx::write.xlsx(pop_femmes,file)
+      openxlsx::write.xlsx(pop_femmes(),file)
     }
   )
   
@@ -319,7 +393,7 @@ function(input, output,session) {
     filename = 'region_majoritaire_TVS.xlsx',
     content = function(file) {
       slack_log("region_majoritaire_TVS.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      openxlsx::write.xlsx(list("region_majoritaire_par_TVS" = tvs_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
+      openxlsx::write.xlsx(list("region_majoritaire_par_TVS" = tvs_reg_majoritaire,"codes_regions"=regions_reac()[,c("reg","libreg")]),file)
     }
   )
   
@@ -327,7 +401,7 @@ function(input, output,session) {
     filename = 'region_majoritaire_BVCV.xlsx',
     content = function(file) {
       slack_log("region_majoritaire_BVCV.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      openxlsx::write.xlsx(list("region_majoritaire_par_BVCV" = bvcv_reg_majoritaire,"codes_regions"=regions[,c("reg","libreg")]),file)
+      openxlsx::write.xlsx(list("region_majoritaire_par_BVCV" = bvcv_reg_majoritaire,"codes_regions"=regions_reac()[,c("reg","libreg")]),file)
     }
   )
   
@@ -336,73 +410,74 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg","")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",dropbox_ps_folder(),"")
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg","")
+        en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",dropbox_ps_folder(),"")
         if(nrow(en_vigueur_agr)>0){
           slack_log("zonages_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr,"QPV"=en_vigueur_qpv),file = file)
-
+          
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les médecins généralistes sur l'application pour l'instant",type = "message",duration = 10)
         }
       } else {
-        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
-                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
-                              actionButton("send_pwd2","Soumettre")))
-
+        showModal(modalDialog(title="Identification requise",easyClose = F,
+                              footer=tagList(actionButton("send_pwd2","Soumettre"),modalButton("Annuler")),
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification")
+                              ))
+        
       }
-
+      
     }
   )
-
-
+  
+  
   output$dl_zonage_en_vigueur_sf <- downloadHandler(
     filename = 'zonages_en_vigueur_sf.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf","")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",dropbox_ps_folder(),"")
         if(nrow(en_vigueur_agr)>0){
           slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
-
+          
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les sages-femmes sur l'application pour l'instant",type = "message",duration = 10)
         }
       } else {
-        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
-                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
-                              actionButton("send_pwd2","Soumettre")))
-
+        showModal(modalDialog(title="Identification requise",easyClose = F,
+                              footer=tagList(actionButton("send_pwd2","Soumettre"),modalButton("Annuler")),
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification")))
+        
       }
-
+      
     }
   )
-
+  
   output$dl_zonage_en_vigueur_inf <- downloadHandler(
     filename = 'zonages_en_vigueur_inf.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf","")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",dropbox_ps_folder(),"")
         if(nrow(en_vigueur_agr)>0){
           slack_log("zonages_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
-
+          
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les infirmiers sur l'application pour l'instant",type = "message",duration = 10)
         }
       } else {
-        showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
-                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification"),
-                              actionButton("send_pwd2","Soumettre")))
-
+        showModal(modalDialog(title="Identification requise",easyClose = F,
+                              footer=tagList(actionButton("send_pwd2","Soumettre"),modalButton("Annuler")),
+                              passwordInput("my_auth2",label = "",placeholder = "Clef d'identification")))
+        
       }
-
+      
     }
   )
   

@@ -82,7 +82,6 @@ tagList(
       
       tabItems(
         tabItem(tabName = "accueil",
-                # textOutput("html_info"),
                 includeHTML("www/accueil.html"),
                 fluidRow(div(style="margin-left:40px",actionButton("go_params","Choix de la région, de la profession de santé"))),
                 tags$br(),
@@ -96,12 +95,8 @@ tagList(
         tabItem(tabName = "my_params",
                 fluidRow(id="choix_region_millesime",
                          div(class="col-sm-12 inbody_selector",
-                             selectizeInput('choix_reg','Sélectionner votre région',width = "100%",
-                                            choices=setNames(regions$reg,regions$libreg),multiple=T,
-                                            options = list(placeholder = 'Le nom de votre région',plugins= list('remove_button'),maxItems=1))%>%shinyInput_label_embed(
-                                              icon("question-circle") %>%
-                                                bs_embed_tooltip(title = "Choisissez la région dont vous souhaitez renseigner le zonage.")
-                                            ))),
+                             uiOutput("ui_choix_reg")
+                         )),
                 fluidRow(
                   conditionalPanel("input.choix_reg === null",
                                    column(12,shinycssloaders::withSpinner(

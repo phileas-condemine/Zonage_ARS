@@ -10,8 +10,8 @@
 # drop_acc(dtoken = token)
 
 prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = c("TVS","BVCV")){
-  reg_name=regions[reg==my_reg]$libreg
-  my_deps=dep[reg==my_reg]$dep
+  reg_name=regions_reac()[reg==my_reg]$libreg
+  my_deps=dep()[reg==my_reg]$dep
   nb_deps=length(my_deps)
   communes=lapply(my_deps,function(my_dep){
     if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
@@ -32,11 +32,12 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   names(communes)[which(names(communes)=="code")]<-"depcom"
   
   if(my_reg %in% c(11,84,93)){
-    load("data/Shape_files/arr.RData")
-    # z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
-    #                                             sheet="Zonage_communes")[,c(4,6,10)]
-    # names(z_pop) <- c("tvs","depcom","population")
-    z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+    filename = params[file="polygones_arrondissements_PLM"]$name
+    if(!filename%in%list.files("data/")){
+      drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+    }
+    load(paste0("data/",filename))
+    z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
                               sheet="Zonage_TVS")[,c(5,5,11)]
     names(z_pop) <- c("tvs","depcom","population")
     
@@ -76,7 +77,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   # on va récupérer les données des communes des régions adjacentes. 
   other_deps <- c()
   for(a in mailles_geo){
-    AGR <- get(a)
+    AGR <- get(a)()
     AGR_pertinents=AGR[agr%in%unique(AGR[depcom%in%communes$depcom]$agr)]
     other_deps_one=unique(AGR_pertinents$dep)
     other_deps_one=other_deps[!other_deps_one%in%my_deps]
@@ -110,7 +111,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     other_communes=do.call("rbind",other_communes)
     
     for(a in mailles_geo){
-      AGR <- get(a)
+      AGR <- get(a)()
       communes_pertinentes <- AGR_pertinents$depcom
       assign(paste("communes_pertinentes",a,sep="_"),communes_pertinentes)
     }
@@ -128,14 +129,19 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   communes2 <- communes
   
   for(a in mailles_geo){
-    AGR <- get(a)
+    AGR <- get(a)()
     
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
     
     if(my_reg == 4 & a =="TVS"){
-      load("data/Shape_files/grdquart_reu.RData")
-      z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+      
+      filename = params[file="polygones_grands_quartiers_reunion"]$name
+      if(!filename%in%list.files("data/")){
+        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      }
+      load(paste0("data/",filename))
+      z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
                                 sheet="Zonage_TVS")[,c(2,1,11)]
       names(z_pop) <- c("reg","agr","population")
       z_pop = z_pop[z_pop$reg==4,]
@@ -154,7 +160,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     }
     if(my_reg == 6 & a == "TVS"){
       #### LA POPULATION N'EST PAS FOURNIE PAR L'API GEO POUR MAYOTTE
-      z_pop = readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+      z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
                                 sheet="Zonage_TVS")[,c(2,5,11)]
       names(z_pop) <- c("reg","agr","population")
       z_pop = z_pop[z_pop$reg==6,]
@@ -229,14 +235,14 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     file = paste0(my_reg,"_preprocessed_TVS.RData")
     
-    drop_clean_upload(filename = file,message="rm tvs")
+    drop_clean_upload(filename = file,message="rm tvs",drop_path=dropbox_folder())
     
   }
   
   if("BVCV"%in%mailles_geo){
     
     file = paste0(my_reg,"_preprocessed_BVCV.RData")
-    drop_clean_upload(filename = file,message="rm bvcv")
+    drop_clean_upload(filename = file,message="rm bvcv",drop_path=dropbox_folder())
   }
 }
 
@@ -245,12 +251,12 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
 #####################################################
 
 
-get_geo_data <- function(my_reg,env){
+get_geo_data <- function(my_reg,path,env){
   print("ask update contours ?")
   if (!paste0(my_reg,nom_fichier_dropbox)%in%list.files("data/")){
-    if(rdrop2::drop_exists(paste0("zonage/",my_reg,nom_fichier_dropbox))){
+    if(rdrop2::drop_exists(paste0(path,my_reg,nom_fichier_dropbox))){
       print("récupération de l'historique dropbox")
-      rdrop2::drop_download(path = paste0("zonage/",my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
+      rdrop2::drop_download(path = paste0(path,my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
     } else {
       print("construction fonds géo from scratch")
       prep_geo_data_from_scratch(my_reg)

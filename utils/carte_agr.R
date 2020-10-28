@@ -2,12 +2,12 @@ coord_qpv = reactive({
   
   req(input$choix_reg)
   my_reg=input$choix_reg
-  reg_name=regions[reg==my_reg]$libreg
-  my_deps=dep[reg==my_reg]$dep
-  my_qpv <- mom_markers
+  reg_name=regions_reac()[reg==my_reg]$libreg
+  my_deps=dep()[reg==my_reg]$dep
+  my_qpv <- mom_markers()
   my_qpv$dep = gsub("^0","",substr(my_qpv$CODE_QP,3,5))
   my_qpv = my_qpv[my_qpv$dep%in%my_deps,]
-  my_qpv = merge(my_qpv,hist_qpv[,c("cod","pop")],by.x="CODE_QP",by.y="cod")
+  my_qpv = merge(my_qpv,hist_qpv()[,c("cod","pop")],by.x="CODE_QP",by.y="cod")
   my_qpv = merge(my_qpv,zonage_qpv(),by.x="CODE_QP",by.y="cod")
   
 })
@@ -309,8 +309,8 @@ observeEvent(input$update_contours,{
   if(!is.null(input$update_contours)&!is.null(input$choix_reg)){
     if(input$update_contours){
       my_reg=input$choix_reg
-      reg_name=regions[reg==my_reg]$libreg
-      my_deps=dep[reg==my_reg]$dep
+      reg_name=regions_reac()[reg==my_reg]$libreg
+      my_deps=dep()[reg==my_reg]$dep
       source("utils/handle_geo_data.R")
       prep_geo_data_from_scratch(my_reg,refresh_geojson=T)
     }

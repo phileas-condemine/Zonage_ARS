@@ -6,6 +6,8 @@ if(server_ip %in% c("54.204.34.9","164.131.131.193","54.204.36.75","54.204.37.78
                     "34.203.76.245","3.217.214.132","34.197.152.155")){
   options(encoding = 'UTF-8')
 } else {
+  # options(shiny.fullstacktrace = TRUE)
+  # options(shiny.trace = TRUE)
   options(shiny.error = browser)
 }
 
@@ -47,8 +49,6 @@ library(shinyjs)
 drop_auth(rdstoken = "droptoken.rds")
 
 
-rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,local_path = "data")
-
 drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
   local_name = paste0(local_path,filename)
   drop_name = paste0(drop_path,filename)
@@ -61,7 +61,6 @@ drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/
   rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
 }
 
-vars_to_toggle = c("agr","libagr","communes","population","is_majoritaire","CN","libCN")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                   "Liste des départements"="departements",
                                   "Liste communes"="communes",
@@ -95,97 +94,6 @@ vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP",
                          inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
 
 
-# com to agr
-# drop_delete(path = "zonage/bvcv2019.sas7bdat")
-# drop_upload(file = "data/tvs2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
-if(!"tvs2019.sas7bdat"%in%list.files("data")){
-  rdrop2::drop_download(path = "zonage/tvs2019.sas7bdat",overwrite = T,local_path = "data")
-}
-TVS = haven::read_sas("data/tvs2019.sas7bdat")
-names(TVS) <- c("depcom","libcom","agr","libagr","reg","dep","libdep","libreg")
-TVS=data.table(TVS)
-# TVS$agr = stringi::stri_pad_left(TVS$agr,5,"0")
-TVS$agr = stringi::stri_pad_right(TVS$agr,5,"_")
-table(nchar(TVS$agr))
-
-# QPV
-if(!"qpv_markers_pop.RData"%in%list.files("data")){
-  rdrop2::drop_download(path = "zonage/qpv_markers_pop.RData",overwrite = T,local_path = "data")
-}
-load("data/qpv_markers_pop.RData")
-
-
-
-
-# drop_upload(file = "data/bvcv2019.sas7bdat",path = "zonage",mode = "overwrite",autorename = F)
-if(!"bvcv2019.sas7bdat"%in%list.files("data")){
-  rdrop2::drop_download(path = "zonage/bvcv2019.sas7bdat",overwrite = T,local_path = "data")
-}
-
-
-BVCV = haven::read_sas("data/bvcv2019.sas7bdat") %>% 
-  select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
-BVCV=data.table(BVCV)
-setnames(BVCV,c('bvcv','libbvcv'),c('agr','libagr'))
-BVCV$agr = stringi::stri_pad_right(BVCV$agr,5,"_")
-table(nchar(BVCV$agr))
-
-# drop_upload(file = "data/Zonage_medecin_20191231.xlsx",
-# path = "zonage",mode = "overwrite",autorename = F)
-
-if(!"Zonage_medecin_20191231.xlsx"%in%list.files("data")){
-  rdrop2::drop_download(path = "zonage/Zonage_medecin_20191231.xlsx",overwrite = T,local_path = "data")
-}
-
-hist_qpv <- readxl::read_excel("data/Zonage_medecin_20191231.xlsx",sheet = "Zonage_QPV")[,c(1,3,5,6,10,12)]
-hist_qpv = data.table(hist_qpv)
-names(hist_qpv) <- c("reg","agr","cod","libqpv","zonage_ars","pop")
-hist_qpv[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
-hist_qpv[zonage_ars=="Hors vivier",zonage_ars:="HV"]
-hist_qpv=hist_qpv%>%mutate_if(is.factor,as.character)%>%data.table%>%unique
-hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
-
-# source("utils/handle_insee_pop.R")
-if(!"pop_femme2016.RData"%in%list.files("data"))
-  drop_download("zonage/pop_femme2016.RData",local_path = "data/",overwrite = T)
-load("data/pop_femme2016.RData")
-
-dep = unique(TVS[,c("dep","reg","libdep")])
-
-# geo reg
-if(!"contours_dep.RData"%in%list.files("data"))
-  drop_download("zonage/contours_dep.RData",local_path = "data/",overwrite = T)
-
-# rdrop2::drop_upload(file="data/reg_cont.RData",path="zonage/",autorename = F)
-if(!"reg_cont.RData"%in%list.files("data"))
-  drop_download("zonage/reg_cont.RData",local_path = "data/",overwrite = T)
-
-load("data/contours_dep.RData")
-load("data/reg_cont.RData")
-names(reg_cont)[which(names(reg_cont)=='code_insee')]<-'reg'
-names(reg_cont)[which(names(reg_cont)=='nom')]<-'libreg'
-# nm reg
-regions = unique(TVS[,c("reg","libreg")])
-
-# rdrop2::drop_upload(file="data/Seuils_arretes.xlsx",path="zonage/",autorename = F)
-if(!"Seuils_arretes.xlsx"%in%list.files("data"))
-  drop_download("zonage/Seuils_arretes.xlsx",local_path = "data/",overwrite = T)
-seuils_reg_mg=read_xlsx("data/Seuils_arretes.xlsx",sheet="mg")
-seuils_reg_sf=read_xlsx("data/Seuils_arretes.xlsx",sheet="sf")%>%rename(check_sf=check)
-seuils_reg_inf=read_xlsx("data/Seuils_arretes.xlsx",sheet="inf")%>%rename(check_inf=check)
-regions=merge(regions,
-              seuils_reg_mg %>% select(-libreg),
-              by="reg")
-regions=merge(regions,
-              seuils_reg_sf %>% select(-libreg),
-              by="reg")
-regions=merge(regions,
-              seuils_reg_inf %>% select(-libreg),
-              by="reg")
-
-
-
-
 regions_derogatoires = c("84","11","93","32")
 
 shiny_running = function () {
@@ -204,15 +112,7 @@ shiny_running = function () {
   isNamespace(namespace_frame) && environmentName(namespace_frame) == 'shiny'
 }
 
-# source("utils/prep_liste_TribunauxAdministratifs.R",echo = T)
-# get_TA()
-# rdrop2::drop_upload(file="data/liste_tribunaux_administratifs.RData",path="zonage/",autorename = F)
-if(!"liste_tribunaux_administratifs.RData"%in%list.files("data"))
-  drop_download("zonage/liste_tribunaux_administratifs.RData",local_path = "data/",overwrite = T
-                # ,verbose = T
-                )
 
-load("data/liste_tribunaux_administratifs.RData")
 
 mois_noms = c("janvier","février","mars","avril","mai","juin",
               "juillet","août","septembre","octobre","novembre","décembre")
@@ -230,21 +130,7 @@ vswitch_zonage_mg = function(v){
                              HV = 1))
 }
 
-file = "agr_reg_majoritaire.RData"
-local_name = paste0("data/",file)
-drop_name = paste0("zonage/",file)
-if(drop_exists(drop_name)){
-  print("recup régions majoritaires par AGR")
-  drop_download(drop_name,local_path = "data/",overwrite = T
-                # ,verbose = T
-                )
-} else {
-  print("construction du fichier des régions majoritaires par AGR from scratch")
-  source("utils/region_majoritaire.R")
-}
-load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
-setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
-setnames(tvs_reg_majoritaire,"reg_majoritaire","reg")
+
 
 
 slack_log = function(filename,my_reg,my_ps,my_mil,session){

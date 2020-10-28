@@ -1,6 +1,6 @@
 library(data.table)
 #prep fichier histo
-histo = haven::read_sas("data/sf/cadre_nat_sf.sas7bdat")[,c(1,2,4)]
+histo = haven::read_sas("data/cadre_nat_sf.sas7bdat")[,c(1,2,4)]
 names(histo) <- c("reg","agr","zonage_nat")
 histo=data.table(histo)
 histo[,agr:=stringr::str_pad(agr,5,"right","_")]

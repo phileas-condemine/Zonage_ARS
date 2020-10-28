@@ -29,9 +29,9 @@ observeEvent(input$go_zonage,{
     
     updateTabsetPanel(session,"sidebarmenu","zonage")
     
-    showModal(modalDialog(title="Identification requise",footer=NULL,easyClose = F,
-                          passwordInput("my_auth",label = "",placeholder = "Clef d'identification"),
-                          actionButton("send_pwd","Soumettre")))
+    showModal(modalDialog(title="Identification requise",easyClose = F,
+                          footer=tagList(actionButton("send_pwd","Soumettre"),modalButton("Annuler")),
+                          passwordInput("my_auth",label = "",placeholder = "Clef d'identification")))
   }
 })
 
@@ -48,8 +48,8 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
 
 observeEvent(input$send_pwd,{
   req(input$my_auth)
-  
-  auth = fread("data/auth.txt")
+  path2auth = paste0("zonage/",params[name=="auth"]$file)
+  auth = get_auth(dropbox_folder(),path2auth)
   auth = auth[key==input$my_auth & reg == input$choix_reg]
   if(nrow(auth)>0){
     # print("OK")
@@ -78,8 +78,8 @@ observeEvent(input$send_pwd,{
 
 observeEvent(input$send_pwd2,{
   req(input$my_auth2)
-  
-  auth = fread("data/auth.txt")
+  path2auth = paste0("zonage/",params[name=="auth"]$file)
+  auth = get_auth(dropbox_folder(),path2auth)
   auth = auth[key==input$my_auth2]
   if(nrow(auth)>0){
     # print("OK")
@@ -109,9 +109,9 @@ observeEvent(input$choix_reg_map_shape_click,{
 
 output$choix_reg_map=renderLeaflet({
   print("create map")
-  bbox_reg <- st_bbox(reg_cont[as.numeric(reg_cont$reg)>10,]) %>% 
+  bbox_reg <- st_bbox(reg_cont()[as.numeric(reg_cont$reg)>10,]) %>% 
     as.vector()
-  leaflet(data = reg_cont,options = leafletOptions(zoomControl = FALSE)) %>%
+  leaflet(data = reg_cont(),options = leafletOptions(zoomControl = FALSE)) %>%
     htmlwidgets::onRender("function(el, x) {
         L.control.zoom({ position: 'bottomleft' }).addTo(this)
     }")%>%
@@ -124,20 +124,24 @@ dropbox_files = reactive({
   req(input$choix_reg)
   req(input$choix_ps)
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_files = drop_dir(paste0("zonage/",input$choix_ps))
+  reg_files = drop_dir(dropbox_ps_folder())
   reg_files = data.table(reg_files)
-  reg_files = reg_files[grepl(regex,name)]
-  reg_files = reg_files[!grepl("qpv_",name)]
+  if(nrow(reg_files)>0){#premier filtre
+    reg_files = reg_files[grepl(regex,name)]
+    reg_files = reg_files[!grepl("qpv_",name)]
+  }
   if(input$choix_ps == "mg"){
     regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
-    qpv_files = drop_dir(paste0("zonage/",input$choix_ps))
+    qpv_files = drop_dir(dropbox_ps_folder())
     qpv_files = data.table(qpv_files)
-    qpv_files = qpv_files[grepl(regex,name)]
+    if(nrow(qpv_files)>0){#premier filtre
+      qpv_files = qpv_files[grepl(regex,name)]
+    }
     
     reg_files <- rbind(reg_files,qpv_files)
   }
   
-  if(nrow(reg_files)>0){
+  if(nrow(reg_files)>0){#s'il en reste
     print("found google files !")
     reg_files
   } else NULL
@@ -148,18 +152,21 @@ output$ui_millesime=renderUI({
   req(input$choix_ps)
   input$refresh_millesime
   my_reg=input$choix_reg
-  reg_name=regions[reg==my_reg]$libreg
+  reg_name=regions_reac()[reg==my_reg]$libreg
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  
-  reg_files = drop_dir(paste0("zonage/",input$choix_ps,"/"))
-  reg_files = data.table(reg_files)
-  reg_files = reg_files[grepl(regex,name)]
-  reg_files = reg_files[!grepl("en_vigueur",name)]
-  reg_files = reg_files[!grepl("qpv_",name)]
-  
-  print(head(reg_files))
+  reg_files = drop_dir(dropbox_ps_folder())
+
   if (!is.null(reg_files)){
-    if(nrow(reg_files)>0){
+    
+    if(nrow(reg_files)>0){#premier filtre
+      reg_files = data.table(reg_files)
+      reg_files = reg_files[grepl(regex,name)]
+      reg_files = reg_files[!grepl("en_vigueur",name)]
+      reg_files = reg_files[!grepl("qpv_",name)]
+      print(head(reg_files))
+    }
+    
+    if(nrow(reg_files)>0){#s'il en reste encore
       millesimes(setNames(reg_files$name,
                           reg_files$name%>%
                             gsub(pattern = paste0(input$choix_ps,"_",input$choix_reg,"_"),replacement = "")%>%
@@ -171,7 +178,9 @@ output$ui_millesime=renderUI({
   print("millesimes") ; print(millesimes())
   
   # no_archive(nrow(reg_google_files)==0)
-  
+  if(length(millesimes())==1 & millesimes()==""){
+    showNotification("Aucun projet en cours, merci de créer un \"nouveau projet de zonage\" en cliquant sur la disquette",type = "warning",duration = 10)
+  }
   selectizeInput('choix_millesime',"",width="100%",
                  choices=millesimes(),selected=millesimes()[1],
                  options = list(placeholder = 'Dernier arrêté ou saisie en cours',

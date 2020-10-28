@@ -1,6 +1,6 @@
 get_TA <- function(){
-  download.file("https://gitlab.com/DREES_code/formulaire_zonage_ars/raw/master/data/list_tribunaux_administratifs.txt?inline=false","data/list_tribunaux_administratifs.txt")
-  TA=readLines("data/list_tribunaux_administratifs.txt",encoding = "UTF-8")
+  # download.file("https://gitlab.com/DREES_code/formulaire_zonage_ars/raw/master/utils/list_tribunaux_administratifs.txt?inline=false","utils/list_tribunaux_administratifs.txt")
+  TA=readLines("utils/list_tribunaux_administratifs.txt",encoding = "UTF-8")
   TA=TA[TA!=""]
   TA=gsub("Tribunal administratif de ","",TA)
   TA=gsub("\\*","",TA)

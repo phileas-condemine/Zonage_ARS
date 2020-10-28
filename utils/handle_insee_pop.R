@@ -6,6 +6,7 @@ pop = fread("data/BTT_TD_POP1B_2016.txt",fill=T)
 pop_femmes = pop[SEXE==2,.(population=round(sum(NB))),by="CODGEO"]
 save(pop_femmes,file = "data/pop_femme2016.RData")
 rdrop2::drop_upload(file="data/pop_femme2016.RData",path="zonage/",autorename = F)
+rdrop2::drop_upload(file="data/pop_femme2016.RData",path="zonage_dev/",autorename = F)
 # table(pop$NIVGEO)
 # pop[,sum(NB),by=SEXE]
 # pop[,sum(NB),by=AGED100]

@@ -95,10 +95,10 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     if(choix_mil==""){
       choix_mil = paste0("mg_",input$choix_reg,"_cadre_national.csv")
     }
-    drop_name=paste0("zonage/mg/",choix_mil)
+    drop_name=paste0(dropbox_ps_folder(),choix_mil)
     local_name=paste0("data/",choix_mil)
     fwrite(unique(vals),file=local_name)
-    drop_clean_upload(filename = choix_mil,drop_path = "zonage/mg/")
+    drop_clean_upload(filename = choix_mil,drop_path = dropbox_ps_folder())
     
     assign("vals",vals,env)
   } else {
@@ -112,7 +112,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
       attempt <- attempt + 1
       try(
         {
-          drop_download(paste0("zonage/mg/",choix_mil),local_path = "data/",overwrite = T,verbose = T)
+          drop_download(paste0(dropbox_ps_folder(),choix_mil),local_path = "data/",overwrite = T,verbose = T)
           print(list.files("data/"))
           zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }

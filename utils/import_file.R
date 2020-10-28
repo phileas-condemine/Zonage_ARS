@@ -139,7 +139,7 @@ observeEvent(input$parse_file,{
   local_filenm = paste0("data/",filename)
   fwrite(unique(my_data),local_filenm)
   
-  drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+  drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
   
   updateSelectizeInput(session,'choix_millesime',
                        choices=c(millesimes(),setNames(drop_filenm,filenm_no_extension)),

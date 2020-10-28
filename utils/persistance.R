@@ -6,7 +6,7 @@ observeEvent(input$save_latest_check,{
   removeUI(session = session,selector = "#shiny-modal button.btn",immediate = T)
   print("Persistance")
   my_reg=input$choix_reg
-  reg_name=regions[reg%in%my_reg]$libreg
+  reg_name=regions_reac()[reg%in%my_reg]$libreg
   my_dt=merge(tableau_reg()[,"agr"],
               vals_reac(),
               by="agr",all.x=T)
@@ -17,7 +17,7 @@ observeEvent(input$save_latest_check,{
   local_name=paste0("data/",filename)
   fwrite(unique(my_dt),file=local_name)
   
-  drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+  drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
   
   
   if(input$choix_ps=="mg"){
@@ -26,7 +26,7 @@ observeEvent(input$save_latest_check,{
     local_qpv = paste0("data/",filename)
     file.copy(paste0("data/qpv_",input$choix_millesime),local_qpv,overwrite = T)
     
-    drop_clean_upload(filename = filename,drop_path = "zonage/mg/")
+    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     timer_qpv(Sys.time())
     new_modifs_qpv(0)
@@ -50,7 +50,7 @@ observeEvent(c(autorefresh(),input$force_save),{
     print("Persistance")
     last_force_save(input$force_save)
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     my_dt=merge(tableau_reg()[,"agr"],
                 vals_reac(),
                 by="agr",all.x=T)
@@ -59,7 +59,7 @@ observeEvent(c(autorefresh(),input$force_save),{
     filename=input$choix_millesime
     local_name=paste0("data/",filename)
     fwrite(unique(my_dt),file=local_name)
-    drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     timer(Sys.time())
     new_modifs(0)
@@ -68,7 +68,7 @@ observeEvent(c(autorefresh(),input$force_save),{
   
   if((((difftime(Sys.time(),timer_qpv(),units = "sec") > 20))&new_modifs_qpv()>0)){
     filename = paste0("qpv_",input$choix_millesime)# le fichier est déjà enregistré à chaque modif d'un QPV !
-    drop_clean_upload(filename = filename,drop_path = "zonage/mg/")
+    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     timer_qpv(Sys.time())
     new_modifs_qpv(0)

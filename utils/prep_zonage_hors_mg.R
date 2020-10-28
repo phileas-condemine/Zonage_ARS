@@ -2,7 +2,15 @@
 # input = list(choix_ps="inf",choix_reg=24)
 # load(sprintf("data/%s_preprocessed_BVCV.RData",input$choix_reg))
 # my_reg = input$choix_reg
-zonage_historique=sas7bdat::read.sas7bdat(paste0("data/",input$choix_ps,"/cadre_nat_",input$choix_ps,".sas7bdat"))
+
+if(input$choix_ps=="sf"){
+  filename = params[file=="zonage_sf"]$name
+} else if (input$choix_ps =="inf"){
+  filename = params[file=="zonage_inf"]$name
+}
+drop_download(path = paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+
+zonage_historique=sas7bdat::read.sas7bdat(paste0("data/cadre_nat_",input$choix_ps,".sas7bdat"))
 zonage_historique$zonage_nat=factor(zonage_historique$zonage_nat)
 
 
@@ -44,13 +52,14 @@ prep_zonage <- function(cadre_national=CN,
                         vals_zonage_historique=VZN,
                         my_dropbox_files,choix_mil,env){
   bvcv=data.table(communes_BVCV)
+  # uniqueN(bvcv$agr)
   # fix à insérer dans le handle geo data parce que TVS : reg is numeric vs BVCV : reg is character de taille 2.
   bvcv[,reg:=as.numeric(reg)]
   if(input$choix_ps == "sf"){
     print("hack pop sf")
     bvcv[,population:=NULL]
-    print(paste0("merge OK: ",round(100*mean(bvcv$depcom %in% pop_femmes$CODGEO)),"%"))
-    bvcv = merge(bvcv,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
+    print(paste0("merge OK: ",round(100*mean(bvcv$depcom %in% pop_femmes()$CODGEO)),"%"))
+    bvcv = merge(bvcv,pop_femmes(),by.x="depcom",by.y="CODGEO",all.x=T)
   }
   bvcv[,"pop_bvcv_per_reg":=.(sum(population)),by=c("agr","reg")]
   setorder(bvcv,-pop_bvcv_per_reg)
@@ -119,7 +128,7 @@ prep_zonage <- function(cadre_national=CN,
     }
     fwrite(unique(vals),file=local_name)
 
-    drop_clean_upload(filename = filename,drop_path = paste0("zonage/",input$choix_ps,"/"))
+    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     assign("vals",vals,env)
     
@@ -134,7 +143,7 @@ prep_zonage <- function(cadre_national=CN,
       print(paste("try read sheet in dropbox:",attempt))
       attempt <- attempt + 1
       try({
-        drop_download(paste0("zonage/",input$choix_ps,"/",choix_mil),local_path = "data/",overwrite = T,verbose = T)
+        drop_download(paste0(dropbox_ps_folder(),choix_mil),local_path = "data/",overwrite = T,verbose = T)
         print(list.files("data/"))
         zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }

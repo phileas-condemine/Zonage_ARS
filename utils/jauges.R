@@ -6,7 +6,7 @@ zonage_pop_reac=reactive({
     infos=merge(tableau_reg()[,c("agr","population")],
                 vals_reac(),by="agr",all.x=T)
     
-    infos_qpv = merge(hist_qpv,zonage_qpv(),by="cod")[,c("agr","cod","picked_zonage","pop")]
+    infos_qpv = merge(hist_qpv(),zonage_qpv(),by="cod")[,c("agr","cod","picked_zonage","pop")]
     setnames(infos_qpv,c("picked_zonage","pop"),c("picked_zonage_qpv","pop_qpv"))
     
     infos_qpv = merge(infos_qpv,infos,by="agr")
@@ -64,7 +64,7 @@ zonage_pop_reac_md=reactive({
 output$threshold_ZIP=flexdashboard::renderGauge({
   print("Jauge ZIP")
   req(input$choix_reg)
-  info_reg=regions[reg%in%input$choix_reg]
+  info_reg=regions_reac()[reg%in%input$choix_reg]
   min_val=info_reg$SN
   max_val=info_reg$maxZIP
   req(max_val)
@@ -87,7 +87,7 @@ output$threshold_ZIP=flexdashboard::renderGauge({
 output$threshold_ZAC=flexdashboard::renderGauge({
   print("Jauge ZAC")
   req(input$choix_reg)
-  info_reg=regions[reg%in%input$choix_reg]
+  info_reg=regions_reac()[reg%in%input$choix_reg]
   min_val=0
   max_val=info_reg$maxZAC
   req(max_val)
@@ -110,7 +110,7 @@ output$threshold_ZAC=flexdashboard::renderGauge({
 output$threshold_MD=flexdashboard::renderGauge({ #changer pour que ça soit en % du vivier, pas de la pop régionale
   print("Jauge marge dérogatoire")
   req(input$choix_reg)
-  info_reg=regions[reg%in%input$choix_reg]
+  info_reg=regions_reac()[reg%in%input$choix_reg]
   min_val=0
   max_val=5
   req(max_val)
@@ -136,7 +136,7 @@ output$threshold_MD=flexdashboard::renderGauge({ #changer pour que ça soit en %
 output$threshold_UD=flexdashboard::renderGauge({ #spécifier les zones d'échange
   print("Jauge UD")
   req(input$choix_reg)
-  info_reg=regions[reg%in%input$choix_reg]
+  info_reg=regions_reac()[reg%in%input$choix_reg]
   print(info_reg)
   min_val=0
   max_val=if(input$choix_ps=='sf'){info_reg$UD_sf}else if(input$choix_ps=='inf'){info_reg$UD_inf}
@@ -161,7 +161,7 @@ output$threshold_UD=flexdashboard::renderGauge({ #spécifier les zones d'échang
 output$threshold_OD=flexdashboard::renderGauge({ #spécifier les zones d'échange
   print("Jauge OD")
   req(input$choix_reg)
-  info_reg=regions[reg%in%input$choix_reg]
+  info_reg=regions_reac()[reg%in%input$choix_reg]
   min_val=0
   max_val=if(input$choix_ps=='sf'){info_reg$OD_sf}else if(input$choix_ps=='inf'){info_reg$OD_inf}
   print(max_val)

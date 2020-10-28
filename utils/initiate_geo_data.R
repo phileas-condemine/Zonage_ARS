@@ -4,11 +4,12 @@ my_reg = 28
 my_reg = 84 # ARA
 my_reg = 4 #La Réunion
 todo = c(11,84,93)#PLM - Réu
-todo = setdiff(regions$reg,6)#no mayotte
+todo = setdiff(regions_reac()$reg,6)#no mayotte
+todo = 11
 for (my_reg in todo){#Mayotte est exclue !
   print(my_reg)
-  reg_name=regions[reg==my_reg]$libreg
-  my_deps=dep[reg==my_reg]$dep
+  reg_name=regions_reac()[reg==my_reg]$libreg
+  my_deps=dep()[reg==my_reg]$dep
   source("utils/handle_geo_data.R",local = T)
   prep_geo_data_from_scratch(my_reg)
   
@@ -16,16 +17,19 @@ for (my_reg in todo){#Mayotte est exclue !
 
 
 my_reg = 6
-reg_name=regions[reg==my_reg]$libreg
-my_deps=dep[reg==my_reg]$dep
+reg_name=regions_reac()[reg==my_reg]$libreg
+my_deps=dep()[reg==my_reg]$dep
 source("utils/handle_geo_data.R",local = T)
 prep_geo_data_from_scratch(my_reg,mailles_geo=c("TVS"))
 
 
 
 
+rerun_dep_contours = T
 rerun_dep_contours = F
 
+path = "zonage/"
+path = "zonage_dev/"
 if(rerun_dep_contours){
   files = list.files("data/")
   files = grep("preprocessed_BVCV.RData",files,value=T)
@@ -39,6 +43,6 @@ if(rerun_dep_contours){
                          FUN = function(x)x[1])
   dep_contours = dep_contours[,c("reg","dep","geometry")]
   save(dep_contours,file="data/contours_dep.RData")
-  rdrop2::drop_upload(file="data/contours_dep.RData",path="zonage/",autorename = F)
+  rdrop2::drop_upload(file="data/contours_dep.RData",path=path,autorename = F)
   
 }

@@ -3,7 +3,7 @@ output$download_table = downloadHandler(
   filename = function() {
     req(input$choix_reg)
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     paste0(reg_name,".xlsx")
   },
   content = function(file) {
@@ -68,7 +68,7 @@ output$download_table = downloadHandler(
       
     } else if(input$choix_ps=="sf"){
       infos[,population:=NULL]
-      infos = merge(infos,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
+      infos = merge(infos,pop_femmes(),by.x="depcom",by.y="CODGEO",all.x=T)
       names(infos) <- c("Code de la commune","Nom du bassin de vie ou pseudo-canton",
                         "Code du bassin de vie ou pseudo-canton",
                         "Nom de la commune",
@@ -80,7 +80,7 @@ output$download_table = downloadHandler(
     #### Ajout des QPV
     if(input$choix_ps == "mg"){
       
-      infos_zonage_qpv = merge(hist_qpv[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
+      infos_zonage_qpv = merge(hist_qpv()[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
       setnames(infos_zonage_qpv,"picked_zonage","picked_zonage_qpv")
       infos_zonage_qpv = merge(infos_zonage_qpv,vals_reac(),by="agr")
       
@@ -101,12 +101,12 @@ output$download_plot <- downloadHandler(
   filename = function() {
     req(input$choix_reg)
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     paste0(reg_name,"_",input$choix_ps,".png")
   },
   content = function(file) {
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     infos=merge(tableau_reg()[,c("agr","libagr","population","CN","communes_codes")],
                 vals_reac(),by="agr",all.x=T)
     infos <- infos%>%mutate_if(is.factor,as.character)
@@ -151,12 +151,12 @@ output$download_plot <- downloadHandler(
     names(my_colors) <- nb_per_zonage$zonage_nb
     # https://stackoverflow.com/questions/61286108/error-in-cpl-transformx-crs-aoi-pipeline-reverse-ogrcreatecoordinatetrans
     st_crs(contours_reg) <- 4326
-    st_crs(dep_contours) <- 4326
+    # st_crs(dep_contours) <- 4326
     g <- ggplot(data=contours_reg)+ 
       ggspatial::annotation_map_tile(zoomin = 0)+
       geom_sf(aes(fill=zonage_nb),alpha=.5)+theme(legend.title = element_blank())+
       labs(caption=paste0("Source : COG ",year(Sys.Date()),", date : ",format.Date(Sys.Date(),"%d/%m/%Y")))+
-      geom_sf(data=dep_contours[dep_contours$reg==input$choix_reg,],aes(fill=NA),color="black",show.legend = F,lwd=1.5)+
+      geom_sf(data=dep_contours()[dep_contours()$reg==input$choix_reg,],aes(fill=NA),color="black",show.legend = F,lwd=1.5)+
       ggrepel::geom_label_repel(
         data = head(contours_reg,20),
         # data = contours_reg,
@@ -186,13 +186,13 @@ output$download_plot <- downloadHandler(
 output$download_arrete <- downloadHandler(
   filename = function() {
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     paste0(input$choix_ps,"_",reg_name,"_model.docx")
   },
   content = function(file) {
 
     my_reg=input$choix_reg
-    reg_name=regions[reg%in%my_reg]$libreg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
     # showNotification("Merci de patienter pendant que nous générons l'arrêté contenant la carte et le(s) tableau(x).",type = "message",duration = NULL)
     
     withProgress(message = "Merci de patienter pendant que nous générons l'arrêté contenant la carte et le(s) tableau(x).", {
@@ -212,7 +212,7 @@ output$download_arrete <- downloadHandler(
       }
       
       my_reg=input$choix_reg
-      reg_name=regions[reg%in%my_reg]$libreg
+      reg_name=regions_reac()[reg%in%my_reg]$libreg
       
       # LA TABLE
       
@@ -274,7 +274,7 @@ output$download_arrete <- downloadHandler(
         
         my_table$dansMaRegion=NULL
 
-        my_table2 = merge(hist_qpv[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
+        my_table2 = merge(hist_qpv()[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
         setnames(my_table2,"picked_zonage","picked_zonage_qpv")
         my_table2 = merge(my_table2,vals_reac(),by="agr")
         
@@ -301,7 +301,7 @@ output$download_arrete <- downloadHandler(
         
       } else if(input$choix_ps=="sf"){
         my_table[,population:=NULL]
-        my_table = merge(my_table,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
+        my_table = merge(my_table,pop_femmes(),by.x="depcom",by.y="CODGEO",all.x=T)
         names(my_table) <- c("Code de la commune","Nom du bassin de vie ou pseudo-canton",
                              "Code du bassin de vie ou pseudo-canton",
                              "Nom de la commune",
@@ -362,8 +362,8 @@ output$download_arrete <- downloadHandler(
       # names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
       # }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
       names(my_colors) <- nb_per_zonage$zonage_nb
-      st_crs(contours_reg) <- 4326
-      st_crs(dep_contours) <- 4326
+      # st_crs(contours_reg) <- 4326
+      
       # https://stackoverflow.com/questions/61286108/error-in-cpl-transformx-crs-aoi-pipeline-reverse-ogrcreatecoordinatetrans
       g <- ggplot(data=contours_reg)+ 
         ggspatial::annotation_map_tile(zoomin = 0)+
@@ -428,7 +428,7 @@ output$download_arrete <- downloadHandler(
 )
 
 observeEvent(input$generate_arrete,{
-  my_TAs=TA[reg%in%input$choix_reg]$TA
+  my_TAs=TA()[reg%in%input$choix_reg]$TA
   if(input$choix_ps%in%c("mg","inf","sf")){
     showModal(modalDialog(title="Informations relatives à l'arrêté",
                           size="l",easyClose = T,footer=NULL,
