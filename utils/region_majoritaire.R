@@ -1,6 +1,5 @@
 
-
-#### TVS
+#### TVS        
 
 # source("global.R")
 
@@ -18,8 +17,8 @@ tvs = tvs[,.("pop_tvs_per_reg"=sum(population)),by=c("agr","reg","libagr")]
 tvs[,reg:=gsub("^0","",reg)]
 setorder(tvs,-pop_tvs_per_reg)
 tvs_reg_majoritaire=tvs[,list(reg_majoritaire=reg[1],
-                              prop_pop_pct = 100*pop_tvs_per_reg[1]/sum(pop_tvs_per_reg),
-                              distr = paste(paste0("reg n°: ",reg," (",100*pop_tvs_per_reg/sum(pop_tvs_per_reg),"%)"),collapse = ", ")),
+                              prop_pop_pct = round(100*pop_tvs_per_reg[1]/sum(pop_tvs_per_reg),1),
+                              distr = paste(paste0("reg ",reg," (",round(100*pop_tvs_per_reg/sum(pop_tvs_per_reg),1),"%)"),collapse = ", ")),
                         by=c("agr","libagr")]
 
 uniqueN(TVS[reg!="4"]$agr) == nrow(tvs_reg_majoritaire[reg_majoritaire!="4"])
@@ -54,8 +53,8 @@ bvcv = bvcv[,.("pop_bvcv_per_reg"=sum(population)),by=c("agr","reg","libagr")]
 bvcv[,reg:=gsub("^0","",reg)]
 setorder(bvcv,-pop_bvcv_per_reg)
 bvcv_reg_majoritaire=bvcv[,list(reg_majoritaire=reg[1],
-                                prop_pop_pct = 100*pop_bvcv_per_reg[1]/sum(pop_bvcv_per_reg),
-                                distr = paste(paste0("reg n°: ",reg," (",100*pop_bvcv_per_reg/sum(pop_bvcv_per_reg),"%)"),collapse = ", ")),
+                                prop_pop_pct = round(100*pop_bvcv_per_reg[1]/sum(pop_bvcv_per_reg),1),
+                                distr = paste(paste0("reg ",reg," (",round(100*pop_bvcv_per_reg/sum(pop_bvcv_per_reg),1),"%)"),collapse = ", ")),
                           by=c("agr","libagr")]
 
 uniqueN(BVCV()$agr) == nrow(bvcv_reg_majoritaire)

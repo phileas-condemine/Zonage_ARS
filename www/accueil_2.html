@@ -1,0 +1,33 @@
+
+<div style="margin-left: 40px;margin-right: 40px;">
+    <h4>Avertissement</h4>
+   <p> Afin de pouvoir utiliser ce site dans les meilleures conditions, nous vous conseillons d'utiliser un navigateur web récent et à jour. Nous recommandons l'utilisation de <b>Mozilla Firefox v71 ou ultérieure</b>. </p>
+   <h4>Sources des données</h4>
+   <p> Les contours géographiques sont récupérés via <a href="https://geo.api.gouv.fr/">l'API geo.api.gouv.fr</a>, un service fourni par Etalab, qui s'appuie sur le <a href="https://www.insee.fr/fr/information/2560452">code officiel géographique</a> le plus récent.
+   La "date de dernière mise à jour des contours géographiques" affichée dans l'application sous les jauges indique la dernière date de collection des données à partir de l'API geo.api.gouv.fr.</p>
+   <p> Les données de population sont puisées dans différentes sources selon la profession de santé et la zone géographique.  </p>
+    <ul> 
+    <li> Pour les zonages hors sages-femmes, elles sont issues de <a href="https://geo.api.gouv.fr/">l'API geo.api.gouv.fr</a>, qui fournit la population communale la plus récente diffusée par l'Insee. Pour les arrondissements de Paris, Lyon et Marseille, les données ont été manuellement téléchargées sur le site de l'Insee (recensement de la population 2016). </li>
+     <li> Pour le zonage sages-femmes, seule la population féminine est prise en compte. Les données ont été téléchargées manuellement depuis le site de l'Insee (<a href="https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351">population 2016 par sexe et âge</a>).</li>
+      <li> Les données de population des quartiers prioritaires de la politique de la ville (QPV) ont été téléchargées manuellement sur le site de l'Insee (<a href="https://www.insee.fr/fr/statistiques/4170727?sommaire=2500477">estimations démographiques 2015)</a>.</li>
+      <li> La population des grands quartiers (maille déorgatoire du zonage médecin pour l'île de La Réunion) a été calculée à partir des données de population à l'IRIS, téléchargées depuis le site de l'Insee (<a href="https://www.insee.fr/fr/statistiques/3627376">bases infracommunales du recensement de la population 2015</a>).</li>
+   </ul>
+   <p> Les données de l'APL sont les dernières données publiées par la DREES sur <a href="https://drees.shinyapps.io/carto-apl/">le site de dataviz dédié</a>, soit le millésime 2018.</p>
+   <p>NB : Les données de l'APL ne sont pas mises à jour aussi fréquemment que les données géographiques et démographiques des communes.</p>
+   <h4>Légendes et codes couleurs</h4>
+   <ul>
+      <li>Le tableau de zonage interactif ainsi que la carte interactive et le diagramme "camembert" sont coloriés avec le même code couleur :</li>
+      <ul>
+         <li>Pour les sages-femmes & infirmiers : bleu = très sous-doté, vert pâle = sous-doté, vert = intermédiaire, rose = très doté, rouge = sur-doté ;</li>
+         <li>Pour les médecins généralistes : bleu = hors-vivier, vert = zone de vigilance, rose = zone d'accompagnement, rouge = zone d'intervention prioritaire.</li>
+      </ul>
+   <li>La couleur des lignes du tableau rappelle le cadre national :</li>
+   <ul>
+      <li>Pour les sages-femmes & infirmiers : bleu = très sous-doté, vert pâle = sous-doté, vert = intermédiaire, rose = très doté, rouge = sur-doté ;</li>
+      <li>Pour les médecins généralistes : bleu = hors vivier, vert = vivier, rouge = cadre national.</li>
+   </ul>
+   <li>Des cercles rouges autour des boutons radio (cases d'option) rappellent le zonage pris dans le dernier arrêté (téléchargeable dans Documents > Fichier réf. zonage médecin/SF/IDE) ou, à défaut, le cadre national.</li>
+   <li>Des cercles bleus autour des boutons radio (cases d'option) indiquent le zonage en vigueur pris dans une région voisine.</li>
+   </ul>
+   <p> Un tableau situé sous le tableau interactif récapitule les zonages qui diffèrent du cadre national.</p>
+</div>

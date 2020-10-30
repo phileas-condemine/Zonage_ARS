@@ -241,6 +241,7 @@ function(input, output,session) {
       if(input$choix_ps=="mg"){
         
         tagList(
+          downloadButton("dl_faq_mg","FAQ", style = "width:230px;color:#000"),br(),
           downloadButton("dl_ref_zonage_med","Fichier réf. zonage médecin", style = "width:230px;color:#000"),br(),
           downloadButton("dl_corres_tvs_com","Corres. TVS - Communes", style = "width:230px;color:#000"),br(),
           downloadButton("dl_pop_tvs","Population jauges", style = "width:230px;color:#000"),br(),
@@ -521,6 +522,14 @@ function(input, output,session) {
     filename = 'FAQ_hors_mg.pdf',
     content = function(file) {
       file.copy("www/FAQ_hors_mg.pdf", file, overwrite = T)
+      
+    }
+  )
+  
+  output$dl_faq_hors_mg <- downloadHandler(
+    filename = 'FAQ_mg.pdf',
+    content = function(file) {
+      file.copy("www/FAQ_mg.pdf", file, overwrite = T)
       
     }
   )
