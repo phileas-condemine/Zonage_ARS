@@ -343,7 +343,7 @@ function(input, output,session) {
     filename = 'ref_zonage_sf.xlsx',
     content = function(file) {
       slack_log("ref_zonage_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      filename = params[file="zonage_sf"]$name
+      filename = params[file=="zonage_sf"]$name
       if(!filename%in%list.files("data/")){
         drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
         }
@@ -356,7 +356,7 @@ function(input, output,session) {
     filename = 'ref_zonage_ide.xlsx',
     content = function(file) {
       slack_log("ref_zonage_ide.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      filename = params[file="zonage_inf"]$name
+      filename = params[file=="zonage_inf"]$name
       if(!filename%in%list.files("data/")){
         drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
       }

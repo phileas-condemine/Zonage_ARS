@@ -32,7 +32,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   names(communes)[which(names(communes)=="code")]<-"depcom"
   
   if(my_reg %in% c(11,84,93)){
-    filename = params[file="polygones_arrondissements_PLM"]$name
+    filename = params[file=="polygones_arrondissements_PLM"]$name
     if(!filename%in%list.files("data/")){
       drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
     }
@@ -136,7 +136,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     if(my_reg == 4 & a =="TVS"){
       
-      filename = params[file="polygones_grands_quartiers_reunion"]$name
+      filename = params[file=="polygones_grands_quartiers_reunion"]$name
       if(!filename%in%list.files("data/")){
         drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
       }

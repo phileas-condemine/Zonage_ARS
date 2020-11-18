@@ -4,7 +4,8 @@ server.R
 global.R
 params.csv
 droptoken.rds
-www/accueil.html         
+www/accueil_1.html       
+www/accueil_2.html         
 www/custom_scripts.js    
 www/dt_callback.js       
 www/footer_accueil.html  
