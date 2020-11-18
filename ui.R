@@ -221,7 +221,7 @@ tagList(
                                                                                   tags$br(),
                                                                                   fluidRow(
                                                                                     column(6,textOutput("date_contours_update")),
-                                                                                    column(6,actionButton("update_contours","Mettre à jour",icon=icon("cogs")))
+                                                                                    column(6,actionButton("update_contours","Mettre à jour Géo.",icon=icon("cogs")))
                                                                                   ),
                                                                                   tags$br(),
                                                                                   fluidRow(

@@ -37,7 +37,12 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
       drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
     }
     load(paste0("data/",filename))
-    z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
+    
+    filename = params[file=="zonage_mg"]$name
+    if(!filename%in%list.files("data/")){
+      drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+    }
+    z_pop = readxl::read_xlsx(paste0("data/",filename),
                               sheet="Zonage_TVS")[,c(5,5,11)]
     names(z_pop) <- c("tvs","depcom","population")
     
@@ -141,7 +146,11 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
         drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
       }
       load(paste0("data/",filename))
-      z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
+      filename = params[file=="zonage_mg"]$name
+      if(!filename%in%list.files("data/")){
+        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      }
+      z_pop = readxl::read_xlsx(paste0("data/",filename),
                                 sheet="Zonage_TVS")[,c(2,1,11)]
       names(z_pop) <- c("reg","agr","population")
       z_pop = z_pop[z_pop$reg==4,]
@@ -160,7 +169,12 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     }
     if(my_reg == 6 & a == "TVS"){
       #### LA POPULATION N'EST PAS FOURNIE PAR L'API GEO POUR MAYOTTE
-      z_pop = readxl::read_xlsx(paste0("data/",params[file=="zonage_mg"]$name),
+      
+      filename = params[file=="zonage_mg"]$name
+      if(!filename%in%list.files("data/")){
+        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      }
+      z_pop = readxl::read_xlsx(paste0("data/",filename),
                                 sheet="Zonage_TVS")[,c(2,5,11)]
       names(z_pop) <- c("reg","agr","population")
       z_pop = z_pop[z_pop$reg==6,]
