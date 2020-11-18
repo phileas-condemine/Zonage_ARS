@@ -15,6 +15,7 @@ www/sketch_mg.html
 www/sketch_inf.html          
 www/sketch_sf.html
 www/FAQ_hors_mg.pdf
+www/FAQ_mg.pdf
 www/slackr_config.txt
 www/slackr_config_log.txt
 data/geojson/init_geojson.txt
