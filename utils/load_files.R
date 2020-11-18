@@ -82,7 +82,7 @@ get_hist_qpv = function(dropbox_folder,filename){
 get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   # rdrop2::drop_upload(file=paste0("data/",seuils_filename),path="zonage/",autorename = F)
   print("get seuils")
-  if(!filename%in%list.files("data"))
+  if(!seuils_filename%in%list.files("data"))
     drop_download(paste0(dropbox_folder,seuils_filename),local_path = "data/",overwrite = T)
   seuils_reg_mg=read_xlsx(paste0("data/",seuils_filename),sheet="mg")
   seuils_reg_sf=read_xlsx(paste0("data/",seuils_filename),sheet="sf")%>%rename(check_sf=check)
