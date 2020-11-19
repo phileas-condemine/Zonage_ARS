@@ -39,6 +39,16 @@ output$download_table = downloadHandler(
         picked_zonage=="Int"~"Intermédiaire",
         picked_zonage=="VD"~"Très doté",
         picked_zonage=="OD"~"Sur-doté"))
+    } else if (input$choix_ps == "mg"){
+      print(table(infos$picked_zonage))
+      infos <- infos %>% mutate(picked_zonage=case_when(
+        picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+        picked_zonage=="HV"~"Hors-vivier",
+        picked_zonage=="Non-spécifié"~"Non-spécifié",
+        picked_zonage=="ZV"~"Zone de vigilance",
+        picked_zonage=="ZAC"~"Zone d'action complémentaire",
+        picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+      ))
     }
     
     
@@ -82,7 +92,28 @@ output$download_table = downloadHandler(
       
       infos_zonage_qpv = merge(hist_qpv()[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
       setnames(infos_zonage_qpv,"picked_zonage","picked_zonage_qpv")
+      
+      
+      infos_zonage_qpv <- infos_zonage_qpv %>% mutate(picked_zonage_qpv=case_when(
+        picked_zonage_qpv=="Erreur TVS-COM"~"Erreur TVS-COM",
+        picked_zonage_qpv=="HV"~"Hors-vivier",
+        picked_zonage_qpv=="Non-spécifié"~"Non-spécifié",
+        picked_zonage_qpv=="ZV"~"Zone de vigilance",
+        picked_zonage_qpv=="ZAC"~"Zone d'action complémentaire",
+        picked_zonage_qpv=="ZIP"~"Zone d'intervention prioritaire"
+      ))
       infos_zonage_qpv = merge(infos_zonage_qpv,vals_reac(),by="agr")
+      
+
+      infos_zonage_qpv <- infos_zonage_qpv %>% mutate(picked_zonage=case_when(
+        picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+        picked_zonage=="HV"~"Hors-vivier",
+        picked_zonage=="Non-spécifié"~"Non-spécifié",
+        picked_zonage=="ZV"~"Zone de vigilance",
+        picked_zonage=="ZAC"~"Zone d'action complémentaire",
+        picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+      ))
+      
       
       infos_zonage_qpv = infos_zonage_qpv[picked_zonage_qpv!=picked_zonage,c("libqpv","cod","pop","picked_zonage_qpv","picked_zonage")]
       names(infos_zonage_qpv) <- c("Nom du QPV","Code du QPV","Population","Zonage QPV","Zonage du TVS")
@@ -118,13 +149,24 @@ output$download_plot <- downloadHandler(
         picked_zonage=="Int"~"Intermédiaire",
         picked_zonage=="VD"~"Très doté",
         picked_zonage=="OD"~"Sur-doté"))
+    } else if (input$choix_ps == "mg"){
+      print(table(infos$picked_zonage))
+      infos <- infos %>% mutate(picked_zonage=case_when(
+        picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+        picked_zonage=="HV"~"Hors-vivier",
+        picked_zonage=="Non-spécifié"~"Non-spécifié",
+        picked_zonage=="ZV"~"Zone de vigilance",
+        picked_zonage=="ZAC"~"Zone d'action complémentaire",
+        picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+        ))
     }
     infos <- infos %>% mutate(nom_zonage=paste0(libagr,": ",picked_zonage))
     contours_reg=merge(fond_de_carte()[,c("agr","geometry")],infos,by.x="agr",
                        by.y="agr",all.x=T)
     contours_reg <- contours_reg %>% arrange(-population)
     if(input$choix_ps=="mg"){
-      lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+      # lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+      lev = c("Erreur TVS-COM","Hors-vivier","Non-spécifié","Zone de vigilance","Zone d'action complémentaire","Zone d'intervention prioritaire")
     }else{
       lev = c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")
       }
@@ -138,9 +180,9 @@ output$download_plot <- downloadHandler(
     
     contours_reg = merge(contours_reg,nb_per_zonage[,c("picked_zonage","zonage_nb")],by="picked_zonage")
     
-    factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
-    }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
-    contours_reg$picked_zonage,alpha=.3)
+    # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+    # }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
+    # contours_reg$picked_zonage,alpha=.3)
     if(input$choix_ps=='mg'){
       my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
     } else if (input$choix_ps %in% c("sf","inf")){
@@ -247,6 +289,16 @@ output$download_arrete <- downloadHandler(
           picked_zonage=="Int"~"Intermédiaire",
           picked_zonage=="VD"~"Très doté",
           picked_zonage=="OD"~"Sur-doté"))
+      } else if (input$choix_ps == "mg"){
+        print(table(infos$picked_zonage))
+        my_table <- my_table %>% mutate(picked_zonage=case_when(
+          picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+          picked_zonage=="HV"~"Hors-vivier",
+          picked_zonage=="Non-spécifié"~"Non-spécifié",
+          picked_zonage=="ZV"~"Zone de vigilance",
+          picked_zonage=="ZAC"~"Zone d'action complémentaire",
+          picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+        ))
       }
       
       
@@ -276,7 +328,27 @@ output$download_arrete <- downloadHandler(
 
         my_table2 = merge(hist_qpv()[,c("cod","libqpv","agr","pop")],zonage_qpv(),by="cod")
         setnames(my_table2,"picked_zonage","picked_zonage_qpv")
+        
+        my_table2 <- my_table2 %>% mutate(picked_zonage_qpv=case_when(
+          picked_zonage_qpv=="Erreur TVS-COM"~"Erreur TVS-COM",
+          picked_zonage_qpv=="HV"~"Hors-vivier",
+          picked_zonage_qpv=="Non-spécifié"~"Non-spécifié",
+          picked_zonage_qpv=="ZV"~"Zone de vigilance",
+          picked_zonage_qpv=="ZAC"~"Zone d'action complémentaire",
+          picked_zonage_qpv=="ZIP"~"Zone d'intervention prioritaire"
+        ))
+        
         my_table2 = merge(my_table2,vals_reac(),by="agr")
+
+        my_table2 <- my_table2 %>% mutate(picked_zonage=case_when(
+          picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+          picked_zonage=="HV"~"Hors-vivier",
+          picked_zonage=="Non-spécifié"~"Non-spécifié",
+          picked_zonage=="ZV"~"Zone de vigilance",
+          picked_zonage=="ZAC"~"Zone d'action complémentaire",
+          picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+        ))
+        
         
         my_table2 = my_table2[picked_zonage_qpv!=picked_zonage,c("libqpv","cod","pop","picked_zonage_qpv","picked_zonage")]
         names(my_table2) <- c("Nom du QPV","Code du QPV","Population","Zonage QPV","Zonage du TVS")
@@ -329,6 +401,16 @@ output$download_arrete <- downloadHandler(
           picked_zonage=="Int"~"Intermédiaire",
           picked_zonage=="VD"~"Très doté",
           picked_zonage=="OD"~"Sur-doté"))
+      } else if (input$choix_ps == "mg"){
+        print(table(infos$picked_zonage))
+        infos <- infos %>% mutate(picked_zonage=case_when(
+          picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
+          picked_zonage=="HV"~"Hors-vivier",
+          picked_zonage=="Non-spécifié"~"Non-spécifié",
+          picked_zonage=="ZV"~"Zone de vigilance",
+          picked_zonage=="ZAC"~"Zone d'action complémentaire",
+          picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
+        ))
       }
       
       
@@ -337,7 +419,9 @@ output$download_arrete <- downloadHandler(
                          by.y="agr",all.x=T)
       contours_reg <- contours_reg %>% arrange(-population)
       if(input$choix_ps=="mg"){
-        lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+        # lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+        lev = c("Erreur TVS-COM","Hors-vivier","Non-spécifié","Zone de vigilance","Zone d'action complémentaire","Zone d'intervention prioritaire")
+        
       }else{
         lev = c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")
       }
@@ -351,9 +435,9 @@ output$download_arrete <- downloadHandler(
       
       contours_reg = merge(contours_reg,nb_per_zonage[,c("picked_zonage","zonage_nb")],by="picked_zonage")
       
-      factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
-      }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
-      contours_reg$picked_zonage,alpha=.3)
+      # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+      # }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
+      # contours_reg$picked_zonage,alpha=.3)
       if(input$choix_ps=='mg'){
         my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
       } else if (input$choix_ps %in% c("sf","inf")){

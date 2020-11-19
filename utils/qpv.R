@@ -38,9 +38,9 @@ observeEvent(c(input$search_qpv,input$communes_map_marker_click),{
 
 output$edit_qpv_options = renderUI({
   if(!is.null(input$edit_one_qpv)&length(input$edit_one_qpv)>0){
-    
+    # browser()
     info_qpv = hist_qpv()[cod %in% input$edit_one_qpv]
-    info_tvs = TVS()[TVS$agr == info_qpv$agr][1]#une ligne par commune
+    info_tvs = TVS()[agr == info_qpv$agr][1]#une ligne par commune
     info_curr = tableau_reg()[agr==info_qpv$agr]
     
     tagList(

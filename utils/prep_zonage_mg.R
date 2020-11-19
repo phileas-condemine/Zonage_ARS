@@ -1,13 +1,17 @@
 ###### LOAD HIST TVS
 # readxl::excel_sheets("data/Zonage_medecin_20191231.xlsx")
 
+
+filename = params[file=="zonage_mg"]$name
+if(!filename%in%list.files("data/")){
+  drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+}
+
 if(my_reg!="4"){
-  # zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
-  #                                   sheet="Zonage_communes")[,c(2,4,8,9)]
-  zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+  zonage_historique=readxl::read_xlsx(paste0("data/",filename),
                                       sheet="Zonage_TVS")[,c(2,5,7,8)]
 } else if (my_reg=="4"){
-  zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
+  zonage_historique=readxl::read_xlsx(paste0("data/",filename),
                                       sheet="Zonage_TVS")[,c(2,1,7,8)]
 }
 zonage_historique=data.table(zonage_historique)
