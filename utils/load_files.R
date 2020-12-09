@@ -48,8 +48,8 @@ get_BVCV = function(dropbox_folder,filename){
     rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = "data")
   }
   
-  BVCV = haven::read_sas(paste0("data/",filename)) %>%
-    select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
+  BVCV = haven::read_sas(paste0("data/",filename)) #%>%
+    # select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
   BVCV=data.table(BVCV)
   setnames(BVCV,c('bvcv','libbvcv'),c('agr','libagr'))
   BVCV$agr = stringi::stri_pad_right(BVCV$agr,5,"_")

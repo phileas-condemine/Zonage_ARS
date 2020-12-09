@@ -86,7 +86,9 @@ tableau_reg = reactive({
     }
     
     # On remplace les valeurs en s'appuyant sur les zonages en vigueur des autres régions.
-    vals = data.table(vals)[zonages_en_vigueur[majoritaire==1],picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
+    if(nrow(zonages_en_vigueur)>0){
+      vals = data.table(vals)[zonages_en_vigueur[majoritaire==1],picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
+    }
     vals = data.frame(vals)
     default_vals(vals)
     current_mapped_data(vals)
