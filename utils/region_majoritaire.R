@@ -29,7 +29,7 @@ unique(tvs_reg_majoritaire[!agr%in%TVS()$agr])
 
 
 #### BVCV
-source("utils/handle_geo_data.R",local = T)
+source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
 all_com_bvcv = rbindlist(use.names = T,lapply(setdiff(regions_reac()$reg,"6"),function(my_reg){
   print(my_reg)
   file = paste0(my_reg,"_preprocessed_BVCV.RData")

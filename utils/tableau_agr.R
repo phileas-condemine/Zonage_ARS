@@ -86,9 +86,8 @@ tableau_reg = reactive({
     }
     
     # On remplace les valeurs en s'appuyant sur les zonages en vigueur des autres régions.
-    vals = data.table(vals)[zonages_en_vigueur,picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
+    vals = data.table(vals)[zonages_en_vigueur[majoritaire==1],picked_zonage:=i.en_vigueur_autre_reg,on="agr"]
     vals = data.frame(vals)
-    
     default_vals(vals)
     current_mapped_data(vals)
     
@@ -99,12 +98,12 @@ tableau_reg = reactive({
       tvs = rbind(tvs[degre_liberte==1],tvs[degre_liberte==0],tvs[is.na(degre_liberte)])
       
       tvs
-    }else{
+    } else {
       bvcv = merge(bvcv,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
       bvcv[,degre_liberte := (ZE_UD+ZE_OD)*is_majoritaire]
       
       bvcv = rbind(bvcv[degre_liberte==1],bvcv[degre_liberte==0],bvcv[is.na(degre_liberte)])
-      
+
       bvcv
     }
   }

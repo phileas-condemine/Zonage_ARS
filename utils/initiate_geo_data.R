@@ -10,7 +10,7 @@ for (my_reg in todo){#Mayotte est exclue !
   print(my_reg)
   reg_name=regions_reac()[reg==my_reg]$libreg
   my_deps=dep()[reg==my_reg]$dep
-  source("utils/handle_geo_data.R",local = T)
+  source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
   prep_geo_data_from_scratch(my_reg)
   
 }
@@ -19,7 +19,7 @@ for (my_reg in todo){#Mayotte est exclue !
 my_reg = 6
 reg_name=regions_reac()[reg==my_reg]$libreg
 my_deps=dep()[reg==my_reg]$dep
-source("utils/handle_geo_data.R",local = T)
+source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
 prep_geo_data_from_scratch(my_reg,mailles_geo=c("TVS"))
 
 

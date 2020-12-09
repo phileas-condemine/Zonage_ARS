@@ -80,12 +80,13 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   
   # Pour savoir si la région est "majoritaire" dans le TVS ou BVCV, 
   # on va récupérer les données des communes des régions adjacentes. 
+  
   other_deps <- c()
   for(a in mailles_geo){
     AGR <- get(a)()
     AGR_pertinents=AGR[agr%in%unique(AGR[depcom%in%communes$depcom]$agr)]
     other_deps_one=unique(AGR_pertinents$dep)
-    other_deps_one=other_deps[!other_deps_one%in%my_deps]
+    other_deps_one=other_deps_one[!other_deps_one%in%my_deps]
     other_deps <- c(other_deps,other_deps_one)
     # assign(paste("other_deps",a,sep="_"),other_deps)
   }

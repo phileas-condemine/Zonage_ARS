@@ -13,7 +13,8 @@ drop_download(path = paste0(dropbox_folder(),filename),local_path = "data/",over
 zonage_historique=sas7bdat::read.sas7bdat(paste0("data/cadre_nat_",input$choix_ps,".sas7bdat"))
 zonage_historique$zonage_nat=factor(zonage_historique$zonage_nat)
 
-
+# table(zonage_historique$ZE_UD)
+# table(zonage_historique$ZE_OD)
 
 levels(zonage_historique$zonage_nat) <- c("VUD","UD","Int","VD","OD")
 zonage_historique=zonage_historique%>%
@@ -149,7 +150,6 @@ prep_zonage <- function(cadre_national=CN,
         }
       )
     } 
-    # browser()
     zonage_saved = zonage_saved%>%mutate_all(as.character)%>%
     mutate(agr=stringi::stri_pad_right(agr,5,"_"))
     assign("vals",zonage_saved,env)
@@ -185,6 +185,7 @@ prep_zonage <- function(cadre_national=CN,
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
+  
   radio_buttons[,class:=paste0(
     ifelse(check_historique|(CN==statut)," historical_choice",""),
     ifelse(value_set," saved_choice",""),

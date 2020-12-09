@@ -15,7 +15,6 @@ coord_qpv = reactive({
 output$communes_map=renderLeaflet({
   print("Carto")
   if(has_logged_in()){
-
     infos=merge(tableau_reg()[,c("agr","population","CN","communes_codes")],
                 default_vals(),by="agr",all.x=T)
     infos <- infos%>%mutate_if(is.factor,as.character)
@@ -311,8 +310,11 @@ observeEvent(input$update_contours,{
       my_reg=input$choix_reg
       reg_name=regions_reac()[reg==my_reg]$libreg
       my_deps=dep()[reg==my_reg]$dep
-      source("utils/handle_geo_data.R")
+      source("utils/handle_geo_data.R",local=T,encoding = "UTF-8")
+      showNotification("Une fois les données mises à jour, l'application va redémarrer et vous devrez vous reconnecter.",type = "message",duration = NULL)
       prep_geo_data_from_scratch(my_reg,refresh_geojson=T)
+      session$reload()
+      
     }
   }
 })

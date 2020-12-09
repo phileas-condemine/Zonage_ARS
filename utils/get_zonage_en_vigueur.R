@@ -4,7 +4,6 @@
 
 
 dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
-  # browser()
   my_files = drop_dir(path)
   my_files = data.table(my_files)
   if(nrow(my_files)>0){

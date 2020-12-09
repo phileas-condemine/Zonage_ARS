@@ -51,7 +51,6 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
   tvs[,reg:=gsub("^0","",reg)]
   setorder(tvs,-pop_tvs_per_reg)
-  # browser()
   tvs=tvs[,list(departements=paste(unique(dep),collapse=", "),
                 regions=paste(unique(reg),collapse=", "),
                 communes=paste(unique(libcom),collapse=", "),

@@ -61,7 +61,7 @@ function(input, output,session) {
     )
   } else {
     print("construction du fichier des régions majoritaires par AGR from scratch")
-    source("utils/region_majoritaire.R")
+    source("utils/region_majoritaire.R",local=T,encoding="UTF-8")
   }
   load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
   setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
@@ -154,7 +154,6 @@ function(input, output,session) {
   ##### Recap modif #####
   
   output$recap_dt = renderDataTable({
-    # browser()
     infos <- vals_reac()
     req(!is.null(infos))
     if(input$choix_ps=="mg"){
