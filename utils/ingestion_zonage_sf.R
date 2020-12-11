@@ -77,7 +77,6 @@ naq = naq[zonage_nat!=picked_zonage]# modification par rapport au national
 table(naq$reg)
 naq
 
-openxlsx::write.xlsx(list(paca = paca,hdf=hdf,ara=ara,naq=naq),"data/zonages_pris_hors_app/sf/diff_zonage_nat_vs_picked_zonage.xlsx")
 
 
 
@@ -109,3 +108,24 @@ bre = bre[reg==my_reg | !is.na(picked_zonage)]#ma région ou bien zonage pris
 bre = bre[zonage_nat!=picked_zonage]# modification par rapport au national
 table(bre$reg)
 bre
+
+
+# GE
+my_reg = "44"
+ge = readxl::read_excel("data/zonages_pris_hors_app/sf/zonage_sf_GE.xlsx",sheet = 2)[,c(5,16)]
+names(ge) <- c("agr","picked_zonage")
+ge = data.table(ge)
+table(ge$picked_zonage)
+ge[,picked_zonage:=substr(picked_zonage,1,1)]
+ge[,agr:=stringr::str_pad(agr,5,"right","_")]
+ge = merge(histo,ge,by="agr",all=T)
+ge = ge[reg==my_reg | !is.na(picked_zonage)]#ma région ou bien zonage pris
+ge = ge[zonage_nat!=picked_zonage]# modification par rapport au national
+table(ge$reg)
+ge
+
+
+openxlsx::write.xlsx(list(paca = paca,hdf=hdf,ara=ara,naq=naq,bfc=bfc,bre=bre,ge=ge),
+                     "data/zonages_pris_hors_app/sf/diff_zonage_nat_vs_picked_zonage.xlsx")
+
+
