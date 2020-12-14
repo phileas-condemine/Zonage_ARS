@@ -98,6 +98,7 @@ function(input, output,session) {
   
   output$ui_choix_reg = renderUI({
     regions = regions_reac()
+    setorder(regions,libreg)
     selectizeInput('choix_reg','Sélectionner votre région',width = "100%",
                    choices=setNames(regions$reg,regions$libreg),multiple=T,
                    options = list(placeholder = 'Le nom de votre région',plugins= list('remove_button'),maxItems=1))%>%shinyInput_label_embed(
@@ -228,7 +229,7 @@ function(input, output,session) {
     if(input$open_form_justification){
       if (nrow(info_recap_reac())>0){
         infos = info_recap_reac()
-        save_justification = paste0("justification_",input$choix_millesime)
+        save_justification = paste0("justification_",input$choix_millesime,".csv")
         drop_name = paste0(dropbox_ps_folder(),save_justification)
         local_name = paste0("data/",save_justification)
         
@@ -257,7 +258,7 @@ function(input, output,session) {
   observeEvent(input$validation_justification,{
     req(input$justification_zonage)
     if(input$justification_zonage!=""){
-      save_justification = paste0("justification_",input$choix_millesime)
+      save_justification = paste0("justification_",input$choix_millesime,".csv")
       drop_name = paste0(dropbox_ps_folder(),save_justification)
       local_name = paste0("data/",save_justification)
       justification=data.table(time=as.character(Sys.time()),txt=gsub('"','',input$justification_zonage))

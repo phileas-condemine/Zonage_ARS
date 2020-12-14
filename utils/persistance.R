@@ -5,40 +5,90 @@ observeEvent(input$save_latest_check,{
   removeUI(session = session,selector = "#save_latest_check",immediate = T)
   removeUI(session = session,selector = "#shiny-modal button.btn",immediate = T)
   print("Persistance")
-  my_reg=input$choix_reg
-  reg_name=regions_reac()[reg%in%my_reg]$libreg
-  my_dt=merge(tableau_reg()[,"agr"],
-              vals_reac(),
-              by="agr",all.x=T)
-  my_dt[is.na(picked_zonage)]$picked_zonage <- ""
-  setorder(my_dt,agr)
-  sheet_name=paste("en_vigueur",input$choix_ps,input$choix_reg,sep="_")
-  filename = paste0(sheet_name,".csv")
-  local_name=paste0("data/",filename)
-  fwrite(unique(my_dt),file=local_name)
   
-  drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
-  
-  
-  if(input$choix_ps=="mg"){
-    save_qpv = paste("en_vigueur","qpv",input$choix_ps,input$choix_reg,sep="_")
-    filename = paste0(save_qpv,".csv")
-    local_qpv = paste0("data/",filename)
-    file.copy(paste0("data/qpv_",input$choix_millesime),local_qpv,overwrite = T)
+  has_recap_w_missing_justification = F
+  if(!is.null(info_recap_reac())){
+    if(nrow(info_recap_reac())>0){
+      filename = paste0("justification_",input$choix_millesime,".csv")
+      print("filename")
+      print(filename)
+      if(!filename%in%list.files("data")){
+        has_recap_w_missing_justification = T
+      }
+    }
+  }
+  if(input$choix_ps=="mg" & has_recap_w_missing_justification){
+    
+    
+    showModal(modalDialog(title="Merci de vérifier le contenu du champ \"justification du zonage pris\" avant de valider votre zonage.",
+                          "Le zonage n'a pas été sauvegardé, il pourra l'être une fois que vous aurez ajouté/relu le champ \"justification du zonage pris\" en cliquant sur le bouton éponyme situé au dessus du tableau de zonage.",
+                          footer = modalButton("J'ai compris"),easyClose = T,size="m"))
+    
+    
+  } else {
+    
+    
+    
+    my_reg=input$choix_reg
+    reg_name=regions_reac()[reg%in%my_reg]$libreg
+    my_dt=merge(tableau_reg()[,"agr"],
+                vals_reac(),
+                by="agr",all.x=T)
+    my_dt[is.na(picked_zonage)]$picked_zonage <- ""
+    setorder(my_dt,agr)
+    sheet_name=paste("en_vigueur",input$choix_ps,input$choix_reg,sep="_")
+    filename = paste0(sheet_name,".csv")
+    local_name=paste0("data/",filename)
+    fwrite(unique(my_dt),file=local_name)
     
     drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
-    timer_qpv(Sys.time())
-    new_modifs_qpv(0)
+    
+    if(input$choix_ps=="mg"){
+      #### add qpv
+      save_qpv = paste("en_vigueur","qpv",input$choix_ps,input$choix_reg,sep="_")
+      filename = paste0(save_qpv,".csv")
+      local_qpv = paste0("data/",filename)
+      file.copy(paste0("data/qpv_",input$choix_millesime,".csv"),local_qpv,overwrite = T)
+      drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
+      
+      
+      #### add justification
+      if(!is.null(info_recap_reac())){
+        if(nrow(info_recap_reac())>0){
+
+          filename_millesimed = paste0("justification_",input$choix_millesime,".csv")
+          if(filename_millesimed%in%list.files("data")){
+            save_justification = paste("en_vigueur","justification",input$choix_ps,input$choix_reg,sep="_")
+            filename = paste0(save_justification,".csv")
+            local_justification = paste0("data/",filename)
+            file.copy(paste0("data/",filename_millesimed),local_justification,overwrite = T)
+            drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
+            # } else {
+            #   showModal(modalDialog(title="Merci de vérifier le contenu du champ \"justification du zonage pris\" avant de valider votre zonage.",
+            #                         "Le zonage n'a pas été sauvegardé, il pourra l'être une fois que vous aurez ajouté/relu le champ \"justification du zonage pris\" en cliquant sur le bouton éponyme situé au dessus du tableau de zonage."))
+            # }
+          }
+        }
+      }
+      
+      
+      
+      timer_qpv(Sys.time())
+      new_modifs_qpv(0)
+      
+    }
+    
+    
+    
+    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+      message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
+      slackr_setup(config_file = "www/slackr_config.txt",echo = F)
+      slackr_bot(message)
+    }
+    
+    removeModal()
   }
-  
-  if(session$clientData$url_pathname=="/Zonage_ARS/"){
-    message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
-    slackr_setup(config_file = "www/slackr_config.txt",echo = F)
-    slackr_bot(message)
-  }
-  
-  removeModal()
 })
 
 last_force_save = reactiveVal(-1)
@@ -67,7 +117,7 @@ observeEvent(c(autorefresh(),input$force_save),{
   
   
   if((((difftime(Sys.time(),timer_qpv(),units = "sec") > 20))&new_modifs_qpv()>0)){
-    filename = paste0("qpv_",input$choix_millesime)# le fichier est déjà enregistré à chaque modif d'un QPV !
+    filename = paste0("qpv_",input$choix_millesime,".csv")# le fichier est déjà enregistré à chaque modif d'un QPV !
     drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     timer_qpv(Sys.time())

@@ -61,7 +61,7 @@ output$edit_qpv_options = renderUI({
 observeEvent(c(input$save_zonage_qpv),{
   if(!is.null(input$edit_one_qpv)&length(input$edit_one_qpv)>0&!is.null(input$zonage_one_qpv)){
     if(input$zonage_one_qpv!=zonage_qpv()[cod%in%input$edit_one_qpv]$picked_zonage){
-      save_qpv = paste0("qpv_",input$choix_millesime)
+      save_qpv = paste0("qpv_",input$choix_millesime,".csv")
       local_name = paste0("data/",save_qpv)
       qpv = copy(zonage_qpv())
       qpv[cod%in%input$edit_one_qpv,picked_zonage:=input$zonage_one_qpv]
@@ -87,7 +87,7 @@ zonage_qpv = reactive({
     if(input$choix_ps=="mg"){
       
       
-      save_qpv = paste0("qpv_",input$choix_millesime)
+      save_qpv = paste0("qpv_",input$choix_millesime,".csv")
       drop_name = paste0(dropbox_ps_folder(),save_qpv)
       local_name = paste0("data/",save_qpv)
       if(!drop_exists(drop_name)){
@@ -157,7 +157,7 @@ observeEvent(c(vals_reac()),{
         #   
         #   cur_qpv[qpv_update_zonage_qpv,picked_zonage:=i.picked_zonage.new,on="cod"]
         #   
-        #   save_qpv = paste0("qpv_",input$choix_millesime)
+        #   save_qpv = paste0("qpv_",input$choix_millesime,".csv")
         #   local_name = paste0("data/",save_qpv,".csv")
         #   fwrite(cur_qpv,file=local_name)
         #   new_modifs_qpv(new_modifs_qpv()+1)
