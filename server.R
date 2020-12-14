@@ -10,7 +10,7 @@ function(input, output,session) {
       "zonage/"
     } else {
       "zonage_dev/"
-      }
+    }
   })
   
   observeEvent(session$clientData$url_pathname,{
@@ -46,7 +46,7 @@ function(input, output,session) {
   regions_reac = reactive({get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())})
   
   TA = reactive({get_TA(dropbox_folder(),params[file=="liste_tribunaux"]$name)})
-
+  
   
   
   # REG MAJORITAIRE
@@ -118,7 +118,7 @@ function(input, output,session) {
         )))
     } else NULL
   })
-
+  
   
   
   source("utils/import_file.R",local=T,encoding = "UTF-8")
@@ -153,6 +153,8 @@ function(input, output,session) {
   
   ##### Recap modif #####
   
+  info_recap_reac = reactiveVal()
+  
   output$recap_dt = renderDataTable({
     infos <- vals_reac()
     req(!is.null(infos))
@@ -181,6 +183,13 @@ function(input, output,session) {
         infos = rbind(infos,infos_zonage_qpv)
       }
       
+      if (nrow(infos)>0){
+        info_recap_reac(copy(infos))
+        removeNotification("justification_form_available",session)
+        showNotification("Le bouton \"Justification du zonage pris\" vous permet d'ajouter des commentaires à l'attention de la DGOS et de la CNAM pour étayer vos choix de zonage.",
+                         duration = NULL,id = "justification_form_available",type = "message")
+      }
+      
       
     } else if (input$choix_ps %in% c("sf","inf")){
       load(paste0("data/",input$choix_reg,"_preprocessed_BVCV.RData"))
@@ -205,6 +214,61 @@ function(input, output,session) {
                 ))
     } else NULL
   })
+  
+  output$ui_open_form_justification = renderUI({
+    req(info_recap_reac())
+    if(nrow(info_recap_reac())>0){
+      actionButton("open_form_justification","Justification du zonage pris",icon=icon("edit"))
+    }
+    
+  })
+  
+  observeEvent(input$open_form_justification,{
+    req(input$open_form_justification)
+    if(input$open_form_justification){
+      if (nrow(info_recap_reac())>0){
+        infos = info_recap_reac()
+        save_justification = paste0("justification_",input$choix_millesime)
+        drop_name = paste0(dropbox_ps_folder(),save_justification)
+        local_name = paste0("data/",save_justification)
+        
+        if(!drop_exists(drop_name)){
+          # INIT from file zonage 2019
+          justification=data.table(time=as.character(Sys.time()),txt="")
+        } else {
+          # FROM SAVED
+          if(!save_justification%in%list.files("data/"))
+            drop_download(drop_name,local_path = "data/",overwrite = T,verbose = T)
+          justification <- fread(local_name,colClasses = "character",encoding="UTF-8")
+        }
+        showModal(modalDialog(title="Explications du choix de zonage",
+                              "Merci de préciser les indicateurs complémentaires utilisés pour déterminer le zonage.",
+                              # "N'hésitez pas à justifier le zonage pris pour chaque TVS et chaque QPPV",
+                              # "Rappel des zonages pris qui diffèrent du cadre national: ",
+                              # paste(paste0(infos$libagr," (",infos$agr,") zonage choisi: ",infos$picked_zonage," (cadre national: ",infos$CN,")"),collapse=" - "),
+                              textAreaInput("justification_zonage",NULL,value=justification$txt[1],placeholder = "Insérer votre texte ici...",
+                                            width = "800px",height = "400px",resize = "both"),easyClose = F,size="l",
+                              footer=tagList(modalButton("Annuler"),actionButton("validation_justification","Valider",icon=icon("check")))))
+        
+      }
+    }
+  })
+  
+  observeEvent(input$validation_justification,{
+    req(input$justification_zonage)
+    if(input$justification_zonage!=""){
+      save_justification = paste0("justification_",input$choix_millesime)
+      drop_name = paste0(dropbox_ps_folder(),save_justification)
+      local_name = paste0("data/",save_justification)
+      justification=data.table(time=as.character(Sys.time()),txt=gsub('"','',input$justification_zonage))
+      fwrite(justification,file=local_name)
+      drop_clean_upload(filename = save_justification,drop_path = dropbox_ps_folder())
+    }
+    removeModal()
+  })
+  
+  
+  
   
   vals_reac=reactive({
     if(has_logged_in()){
@@ -335,7 +399,7 @@ function(input, output,session) {
       pop_tvs = data.table(communes_TVS)[,c("reg","dep","agr","libagr","depcom","libcom","population")]
       names(pop_tvs) <- c("Région","Département","TVS","Nom TVS","Commune","Nom commune","Population")
       openxlsx::write.xlsx(pop_tvs,file)
-      }
+    }
   )
   
   output$dl_ref_zonage_sf <- downloadHandler(
@@ -345,7 +409,7 @@ function(input, output,session) {
       filename = params[file=="zonage_sf"]$name
       if(!filename%in%list.files("data/")){
         drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
-        }
+      }
       tmp = haven::read_sas(paste0("data/",filename))
       openxlsx::write.xlsx(tmp,file)
     }
@@ -365,7 +429,7 @@ function(input, output,session) {
   )
   
   
-
+  
   
   output$dl_pop_bvcv_femmes <- downloadHandler(
     filename = 'pop_bvcv_femmes.xlsx',
@@ -425,7 +489,7 @@ function(input, output,session) {
         showModal(modalDialog(title="Identification requise",easyClose = F,
                               footer=tagList(actionButton("send_pwd2","Soumettre"),modalButton("Annuler")),
                               passwordInput("my_auth2",label = "",placeholder = "Clef d'identification")
-                              ))
+        ))
         
       }
       

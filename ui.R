@@ -183,6 +183,7 @@ tagList(
                                                             uiOutput("rappel_ps"),
                                                             uiOutput("ui_toggle_qpv"),
                                                             uiOutput("ui_search_qpv"),
+                                                            uiOutput("ui_open_form_justification"),
                                                             # uiOutput("ui_zonage_dt"),
                                                             DTOutput("zonage_dt"),
                                                             tags$br(),
