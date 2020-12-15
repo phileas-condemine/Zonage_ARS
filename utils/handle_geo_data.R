@@ -115,7 +115,8 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     
     other_communes=do.call("rbind",other_communes)
-    
+    communes_pertinentes_TVS = ""#init
+    communes_pertinentes_BVCV = ""#init
     for(a in mailles_geo){
       AGR <- get(a)()
       communes_pertinentes <- AGR_pertinents$depcom
