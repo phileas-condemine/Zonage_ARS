@@ -101,7 +101,6 @@ tableau_reg = reactive({
       
       tvs
     } else {
-      browser()
       bvcv = merge(bvcv,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
       bvcv[,degre_liberte := (ZE_UD+ZE_OD)*is_majoritaire]
       
