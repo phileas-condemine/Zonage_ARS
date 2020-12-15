@@ -52,12 +52,12 @@ drop_auth(rdstoken = "droptoken.rds")
 drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
   local_name = paste0(local_path,filename)
   drop_name = paste0(drop_path,filename)
-  if(rdrop2::drop_exists(drop_name)){
-    if(!is.null(message)){
-      print(message)
-    }
-    rdrop2::drop_delete(path = drop_name)
-  }
+  # if(rdrop2::drop_exists(drop_name)){
+  #   if(!is.null(message)){
+  #     print(message)
+  #   }
+  #   rdrop2::drop_delete(path = drop_name)
+  # }
   rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
 }
 

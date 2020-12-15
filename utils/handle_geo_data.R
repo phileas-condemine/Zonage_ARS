@@ -266,7 +266,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
 #####################################################
 
 
-get_geo_data <- function(my_reg,path,env){
+get_geo_data <- function(my_reg,path,env,my_ps){
   print("ask update contours ?")
   if (!paste0(my_reg,nom_fichier_dropbox)%in%list.files("data/")){
     if(rdrop2::drop_exists(paste0(path,my_reg,nom_fichier_dropbox))){
@@ -274,7 +274,12 @@ get_geo_data <- function(my_reg,path,env){
       rdrop2::drop_download(path = paste0(path,my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
     } else {
       print("construction fonds géo from scratch")
-      prep_geo_data_from_scratch(my_reg)
+      if(my_ps=="mg"){
+        mailles_geo = "TVS"
+      } else {
+        mailles_geo = "BVCV"
+      }
+      prep_geo_data_from_scratch(my_reg,mailles_geo=mailles_geo)
     }
   } else {
     print("fichier fonds géo déjà présent")

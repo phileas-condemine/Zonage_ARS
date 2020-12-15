@@ -312,7 +312,14 @@ observeEvent(input$update_contours,{
       my_deps=dep()[reg==my_reg]$dep
       source("utils/handle_geo_data.R",local=T,encoding = "UTF-8")
       showNotification("Une fois les données mises à jour, l'application va redémarrer et vous devrez vous reconnecter.",type = "message",duration = NULL)
-      prep_geo_data_from_scratch(my_reg,refresh_geojson=T)
+      my_ps = input$choix_ps
+      if(my_ps=="mg"){
+        mailles_geo = "TVS"
+      } else {
+        mailles_geo = "BVCV"
+      }
+      
+      prep_geo_data_from_scratch(my_reg,refresh_geojson=T,mailles_geo=mailles_geo)
       session$reload()
       
     }
