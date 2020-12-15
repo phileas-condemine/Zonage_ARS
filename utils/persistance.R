@@ -81,7 +81,7 @@ observeEvent(input$save_latest_check,{
     
     
     
-    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+    if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
       slackr_setup(config_file = "www/slackr_config.txt",echo = F)
       slackr_bot(message)

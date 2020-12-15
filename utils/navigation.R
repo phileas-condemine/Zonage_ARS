@@ -44,7 +44,7 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
 })
 
 
-
+log_is_admin = reactiveVal(F)
 
 observeEvent(input$send_pwd,{
   req(input$my_auth)
@@ -57,11 +57,16 @@ observeEvent(input$send_pwd,{
       "OK"
     })
     
+    if(grepl("phileas",auth$name)){
+      log_is_admin(T)
+    } else {
+      log_is_admin(F)
+    }
     
     reg = ifelse(!is.null(input$choix_reg),input$choix_reg,"XX")
     ps = ifelse(!is.null(input$choix_ps),input$choix_ps,"XX")
     mil = ifelse(!is.null(input$choix_millesime),input$choix_millesime,"XX")
-    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+    if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       message=sprintf("App:ZonageARS\nEvent: Connexion de la région %s pour la profession %s avec le projet %s",reg,ps,mil)
       slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
       slackr_bot(message)
@@ -260,7 +265,7 @@ observeEvent(c(input$feedback_send),{
     
     
     # slackr({message})
-    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+    if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       slackr_setup(config_file = "www/slackr_config.txt",echo = F)
     
       slackr_bot(message)
