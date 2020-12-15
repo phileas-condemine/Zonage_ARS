@@ -114,7 +114,7 @@ prep_zonage <- function(cadre_national=CN,
   if(!choix_mil%in%my_dropbox_files$name){
     print("from default values")
     radio_buttons$value_set = F
-
+    
     vals=data.table(vals_zonage_historique[,c("bvcv","CN")])
     setnames(vals,c("bvcv","CN"),c("agr","picked_zonage"))
     
@@ -128,7 +128,7 @@ prep_zonage <- function(cadre_national=CN,
       
     }
     fwrite(unique(vals),file=local_name)
-
+    
     drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
     
     assign("vals",vals,env)
@@ -147,22 +147,23 @@ prep_zonage <- function(cadre_national=CN,
         drop_download(paste0(dropbox_ps_folder(),choix_mil),local_path = "data/",overwrite = T,verbose = T)
         print(list.files("data/"))
         zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
-        }
+      }
       )
     } 
-    zonage_saved = zonage_saved%>%mutate_all(as.character)%>%
-    mutate(agr=stringi::stri_pad_right(agr,5,"_"))
+    zonage_saved = zonage_saved%>%
+      mutate_all(as.character)%>%
+      mutate(agr=stringi::stri_pad_right(agr,5,"_"))
     assign("vals",zonage_saved,env)
     
     zonage_saved$value_set=T
-
+    
     radio_buttons=merge(radio_buttons,zonage_saved,
                         by.x=c("agr","statut"),
                         by.y=c("agr","picked_zonage"),all.x=T)
     radio_buttons=data.table(radio_buttons)
     radio_buttons[is.na(value_set),value_set:=F]
     
-
+    
   }
   zonages_en_vigueur$value_set_en_vigueur = T
   radio_buttons = merge(radio_buttons, zonages_en_vigueur,
@@ -177,7 +178,7 @@ prep_zonage <- function(cadre_national=CN,
   radio_buttons[(zonage_en_vigueur),check_historique:=F]
   #Pour différencier le cas où la valeur a déjà été remplie (ancienne valeur) ou non.
   radio_buttons[,value_is_set:=sum(value_set)>0,by="agr"]
-    
+  
   if (input$choix_ps == "sf"){
     ps_ZE_UD = c("Int","UD")
     ps_ZE_OD = c("OD","VD")
@@ -194,10 +195,10 @@ prep_zonage <- function(cadre_national=CN,
   )]
   
   radio_buttons[,checked:=
-    ifelse(check_historique|(CN==statut),ifelse(value_is_set,F,T),F)+
-    ifelse(value_set,T,F)+
-    ifelse(is.na(value_provisoire_mino),F,ifelse(value_provisoire_mino&statut=="Int",T,F))+
-    ifelse(is.na(value_set_en_vigueur),F,ifelse(value_set_en_vigueur,T,F))
+                  ifelse(check_historique|(CN==statut),ifelse(value_is_set,F,T),F)+
+                  ifelse(value_set,T,F)+
+                  ifelse(is.na(value_provisoire_mino),F,ifelse(value_provisoire_mino&statut=="Int",T,F))+
+                  ifelse(is.na(value_set_en_vigueur),F,ifelse(value_set_en_vigueur,T,F))
   ]
   
   radio_buttons[,extra:=paste0(
@@ -205,7 +206,7 @@ prep_zonage <- function(cadre_national=CN,
     ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage'","")),
     ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
   )]
-    
+  
   
   radio_buttons[,html:=sprintf(
     "<input type='radio' name='%s' value='%s' class='zonage_radio_button%s'%s%s/>",
@@ -214,6 +215,11 @@ prep_zonage <- function(cadre_national=CN,
     class,
     ifelse(checked>0," checked='checked'",""),
     extra)]
+  
+  none_check = radio_buttons[,.(checked=sum(checked)),by="agr"][checked==0]
+  if(nrow(none_check)>0){
+    showNotification(sprintf("Aucune case n'est cochée pour les BVCV suivants : %s. Merci de veiller à renseigner le zonage pour ces zones.",paste(none_check$agr,collapse=", ")),duration = NULL,type = "error",closeButton = T)
+  }
   
   # radio_buttons[,html:=sprintf(
   #   "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s%s'%s/>",
@@ -229,7 +235,7 @@ prep_zonage <- function(cadre_national=CN,
   #   
   # )]
   
-
+  
   # print("radio_buttons3") ; print(head(radio_buttons))
   
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")

@@ -156,6 +156,11 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     )]
   }
   
+  none_check = radio_buttons[,.(checked=grepl("checked='checked",html)),by="agr"][checked==0]
+  if(nrow(none_check)>0){
+    showNotification(sprintf("Aucune case n'est cochée pour les TVS suivants : %s. Merci de veiller à renseigner le zonage pour ces zones.",paste(none_check$agr,collapse=", ")),duration = NULL,type = "error",closeButton = T)
+  }
+  
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")
   tvs=merge(tvs,radio_buttons,by="agr")
 
