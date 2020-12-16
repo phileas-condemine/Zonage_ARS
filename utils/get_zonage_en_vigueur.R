@@ -86,8 +86,8 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
           en_vigueur_autre_reg=="ZIP"~"1 -Zone d'intervention prioritaire"))%>%
           # mutate(reg=as.character(reg))%>%
           data.table()
-      
-      en_vigueur=merge(en_vigueur,TVS(),by=c("agr","reg"),all.x=T)
+      tvs = unique(TVS()[,.(reg,libreg,agr,libagr)])
+      en_vigueur=merge(en_vigueur,tvs,by=c("agr","reg"),all.x=T)
       setnames(en_vigueur,"agr","TVS")
       setnames(en_vigueur,"libagr","TVS_libelle")
     } else if (ps %in% c("sf","inf")){
@@ -99,7 +99,10 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
         en_vigueur_autre_reg=="OD"~"5 - Sur-doté"))%>%
         # mutate(reg=as.character(reg))%>%
         data.table()
-      en_vigueur=merge(en_vigueur,BVCV()[,reg:=as.numeric(reg)],by=c("agr","reg"),all.x=T)
+      bvcv = unique(BVCV()[,.(reg,agr,libagr)])
+      bvcv[,reg:=as.numeric(reg)]
+      
+      en_vigueur=merge(en_vigueur,bvcv,by=c("agr","reg"),all.x=T)
       en_vigueur = merge(en_vigueur,unique(TVS()[,.(reg,libreg)]),by="reg")
       setnames(en_vigueur,"agr","BVCV")
       setnames(en_vigueur,"libagr","BVCV_libelle")
