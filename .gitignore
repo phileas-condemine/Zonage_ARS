@@ -34,3 +34,5 @@ www/slackr_config_log.txt
 rosm.cache/
 utils/deploy_dev.R
 utils/test_arrete*
+.ipynb_checkpoints/
+quickstart.py
