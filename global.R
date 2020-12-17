@@ -43,6 +43,9 @@ library(plotly)
 library(slackr)
 library(shinyjs)
 
+library(gmailr)
+gm_auth_configure(path = "credentials.json")
+gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche ! il fallait suivre les instructions de récup des credentials pour Python "quickstart.py"
 
 
 # Then pass the token to each drop_ function

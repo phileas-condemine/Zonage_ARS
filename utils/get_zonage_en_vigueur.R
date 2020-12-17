@@ -45,7 +45,7 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
   } else if (ps %in% c("sf","inf")){
     maj = bvcv_reg_majoritaire
   }
-  message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
+  base::message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
   if(nrow(zonages_en_vigueur)>0){
     zonages_en_vigueur[maj,majoritaire:=1,on=c("agr","reg")]
     zonages_en_vigueur[is.na(majoritaire),majoritaire:=0]

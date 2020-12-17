@@ -59,6 +59,17 @@ observeEvent(input$send_pwd,{
     
     if(grepl("phileas",auth$name)){
       log_is_admin(T)
+      email <- gm_mime() %>%
+        # gm_to("blandine.legendre@sante.gouv.fr") %>%
+        gm_to("phileas.condemine@sante.gouv.fr")%>%
+        gm_cc("phileas.condemine@gmail.com")%>%
+        gm_subject("Envoi de mail via R") %>%
+        gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
+                                 sprintf("Une connexion a été réalisée avec la clef universelle sur l'app %s%s<br>",session$clientData$url_hostname,session$clientData$url_pathname),
+                                 "A bientôt<br>",
+                                 "Philéas</p>"))
+      
+      gm_send_message(email)
     } else {
       log_is_admin(F)
     }

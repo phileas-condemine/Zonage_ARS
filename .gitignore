@@ -21,7 +21,6 @@ googlesheets_token.rds
 *.gif
 data/SF/
 data/Shape_files_qppv/
-a924da283165ded31d5fb98542b0974f_drees-zonage-ars@sante.gouv.fr
 Leaflet.glify-2.1.0/
 _config.yml
 contours_reg.zip
@@ -36,3 +35,5 @@ utils/deploy_dev.R
 utils/test_arrete*
 .ipynb_checkpoints/
 quickstart.py
+.secrets/
+token.pickle
