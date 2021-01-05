@@ -93,6 +93,12 @@ observeEvent(input$send_pwd,{
     enable_dl_zonage_en_vigueur(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)
     removeModal()
+    removeNotification("error_w_key",session)
+    
+  } else {
+    
+    removeNotification("error_w_key",session)
+    showNotification("Clef erronnée",type="error",id="error_w_key",duration=NULL)
   }
   
 })
@@ -111,8 +117,13 @@ observeEvent(input$send_pwd2,{
     enable_dl_zonage_en_vigueur(T)
     # outputOptions(output, "auth2", suspendWhenHidden=FALSE)
     removeModal()
+    removeNotification("error_w_key",session)
     showNotification("Identification validée, merci de renouveler la demande de téléchargement.",type = "message")
     
+  } else {
+    
+    removeNotification("error_w_key",session)
+    showNotification("Clef erronnée",type="error",id="error_w_key",duration=NULL)
   }
   
 })
