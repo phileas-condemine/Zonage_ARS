@@ -485,10 +485,10 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",dropbox_ps_folder(),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",paste0(dropbox_folder(),"mg/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"mg")
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",dropbox_ps_folder(),"")
+        en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",paste0(dropbox_folder(),"mg/"),"")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("zonages_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
@@ -515,7 +515,7 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",dropbox_ps_folder(),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"mg/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
@@ -541,7 +541,7 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",dropbox_ps_folder(),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"mg/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())

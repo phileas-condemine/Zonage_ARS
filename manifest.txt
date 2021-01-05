@@ -19,6 +19,7 @@ www/FAQ_hors_mg.pdf
 www/FAQ_mg.pdf
 www/slackr_config.txt
 www/slackr_config_log.txt
+www/get_ip.js
 data/geojson/init_geojson.txt
 utils/load_files.R
 utils/ARS.png
