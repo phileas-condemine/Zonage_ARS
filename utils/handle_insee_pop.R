@@ -1,17 +1,12 @@
 library(data.table)
-
-# 2016 https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351
-# 2017 https://www.insee.fr/fr/statistiques/4515539?sommaire=4516122 
-
-annee = "2017"
-
-pop = fread(paste0("data/BTT_TD_POP1B_",annee,".txt"),fill=T)
+# https://www.insee.fr/fr/statistiques/4171341?sommaire=4171351
+pop = fread("data/BTT_TD_POP1B_2016.txt",fill=T)
 
 # pop_femmes = pop[AGED100>=15 & AGED100 <= 49 & SEXE==2,.(population=round(sum(NB))),by="CODGEO"]
 pop_femmes = pop[SEXE==2,.(population=round(sum(NB))),by="CODGEO"]
-save(pop_femmes,file = paste0("data/pop_femme",annee,".RData"))
-rdrop2::drop_upload(file=paste0("data/pop_femme",annee,".RData"),path="zonage/",autorename = F)
-rdrop2::drop_upload(file=paste0("data/pop_femme",annee,".RData"),path="zonage_dev/",autorename = F)
+save(pop_femmes,file = "data/pop_femme2016.RData")
+rdrop2::drop_upload(file="data/pop_femme2016.RData",path="zonage/",autorename = F)
+rdrop2::drop_upload(file="data/pop_femme2016.RData",path="zonage_dev/",autorename = F)
 # table(pop$NIVGEO)
 # pop[,sum(NB),by=SEXE]
 # pop[,sum(NB),by=AGED100]
