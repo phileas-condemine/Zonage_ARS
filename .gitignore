@@ -35,6 +35,5 @@ utils/deploy_dev.R
 utils/test_arrete*
 .ipynb_checkpoints/
 quickstart.py
-Messages_utilisateurs.docx
 .secrets/
 token.pickle
