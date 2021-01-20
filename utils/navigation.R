@@ -45,6 +45,7 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
 
 
 log_is_admin = reactiveVal(F)
+IP <- reactive({ input$getIP })
 
 observeEvent(input$send_pwd,{
   req(input$my_auth)
@@ -59,9 +60,25 @@ observeEvent(input$send_pwd,{
     
     if(grepl("phileas",auth$name)){
       log_is_admin(T)
+      key = "clef universelle"
     } else {
       log_is_admin(F)
+      key = paste0("région ",auth$name)
     }
+    
+    
+    email <- gm_mime() %>%
+      gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+      # gm_cc("phileas.condemine@gmail.com")%>%
+      gm_subject("Envoi de mail via R") %>%
+      gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
+                               sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
+                               sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
+                               ifelse(is.null(IP()),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP()$city,IP()$region,IP()$country,IP()$org)),
+                               "A bientôt<br>",
+                               "Philéas</p>"))
+    gm_send_message(email)
+    
     
     reg = ifelse(!is.null(input$choix_reg),input$choix_reg,"XX")
     ps = ifelse(!is.null(input$choix_ps),input$choix_ps,"XX")
@@ -76,6 +93,12 @@ observeEvent(input$send_pwd,{
     enable_dl_zonage_en_vigueur(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)
     removeModal()
+    removeNotification("error_w_key",session)
+    
+  } else {
+    
+    removeNotification("error_w_key",session)
+    showNotification("Clef erronnée",type="error",id="error_w_key",duration=NULL)
   }
   
 })
@@ -94,8 +117,13 @@ observeEvent(input$send_pwd2,{
     enable_dl_zonage_en_vigueur(T)
     # outputOptions(output, "auth2", suspendWhenHidden=FALSE)
     removeModal()
+    removeNotification("error_w_key",session)
     showNotification("Identification validée, merci de renouveler la demande de téléchargement.",type = "message")
     
+  } else {
+    
+    removeNotification("error_w_key",session)
+    showNotification("Clef erronnée",type="error",id="error_w_key",duration=NULL)
   }
   
 })

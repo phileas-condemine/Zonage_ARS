@@ -29,6 +29,8 @@ tagList(
                 ,includeCSS("www/my_styles.css")
                 # https://stackoverflow.com/questions/17966089/how-to-replace-and-with-lt-and-gt-with-jquery-or-js
                 ,includeScript("www/custom_scripts.js")
+                ,includeScript("www/get_ip.js")
+                
                 ,useShinyalert()  # Set up shinyalert
                 ,useShinyjs()
                 

@@ -19,6 +19,7 @@ www/FAQ_hors_mg.pdf
 www/FAQ_mg.pdf
 www/slackr_config.txt
 www/slackr_config_log.txt
+www/get_ip.js
 data/geojson/init_geojson.txt
 utils/load_files.R
 utils/ARS.png
@@ -41,3 +42,5 @@ utils/prep_zonage_mg.R
 utils/prep_zonage_hors_mg.R
 utils/modele_word_arrete.docx
 utils/region_majoritaire.R
+.secrets/fbc5fe5f1b9501fb39a3686784bf63a1_drees.zonage.ars@gmail.com
+credentials.json
