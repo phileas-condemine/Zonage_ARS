@@ -149,25 +149,3 @@ slack_log = function(filename,my_reg,my_ps,my_mil,session){
     slackr_bot(message)
   }
 }
-
-
-
-correspondants_CNAM = c(
-  "EMIN.AGAMALIYEV@assurance-maladie.fr",
-  "anne.du-castel@assurance-maladie.fr",
-  "AQUILINO.FRANCISCO@assurance-maladie.fr",
-  "claire.traon@assurance-maladie.fr",
-  "agnes.guerin@assurance-maladie.fr",
-  "christelle.capdepon@assurance-maladie.fr",
-  "laurent.plard@assurance-maladie.fr")
-
-
-correspondants_DGOS = c(
-  "clemence.lamoril@sante.gouv.fr",
-  "carole.merle@sante.gouv.fr"
-  )
-
-correspondants_dev_drees = c(
-  "phileas.condemine@sante.gouv.fr",
-  "blandine.legendre@sante.gouv.fr"
-)
