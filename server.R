@@ -382,7 +382,7 @@ function(input, output,session) {
     content = function(file) {
       if(!log_is_admin())
         slack_log("corrs_tvs_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      corres = haven::read_sas(paste0("data/",params[file=="tvs"]$name))
+      corres = fread(paste0("data/",params[file=="tvs"]$name), header=T)
       openxlsx::write.xlsx(corres,file)
     }
   )
@@ -391,7 +391,7 @@ function(input, output,session) {
     content = function(file) {
       if(!log_is_admin())
         slack_log("corres_bvcv_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      corres = haven::read_sas(paste0("data/",params[file=="bvcv"]$name))
+      corres = fread(paste0("data/",params[file=="bvcv"]$name))
       openxlsx::write.xlsx(corres,file)
     }
   )
