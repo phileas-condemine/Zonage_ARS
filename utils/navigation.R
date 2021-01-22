@@ -44,7 +44,6 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
 })
 
 
-log_is_admin = reactiveVal(F)
 IP <- reactive({ input$getIP })
 
 observeEvent(input$send_pwd,{
@@ -114,6 +113,16 @@ observeEvent(input$send_pwd2,{
     # output$auth2=renderText({
     #   "OK"
     # })
+    
+    if(grepl("phileas",auth$name)){
+      log_is_admin(T)
+      key = "clef universelle"
+    } else {
+      log_is_admin(F)
+      key = paste0("région ",auth$name)
+    }
+    
+    
     enable_dl_zonage_en_vigueur(T)
     # outputOptions(output, "auth2", suspendWhenHidden=FALSE)
     removeModal()

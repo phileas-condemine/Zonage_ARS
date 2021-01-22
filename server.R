@@ -2,6 +2,7 @@ function(input, output,session) {
   drop_auth(rdstoken = "droptoken.rds")
   params = fread("params.csv",sep=":")
   source("utils/load_files.R",encoding = "UTF-8")
+  log_is_admin = reactiveVal(F)
   
   
   dropbox_folder = reactive({
@@ -518,10 +519,12 @@ function(input, output,session) {
         en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
         if(nrow(en_vigueur_agr)>0){
-          if(!log_is_admin())
-            slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
+          
+          if(!log_is_admin())
+            slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les sages-femmes sur l'application pour l'instant",type = "message",duration = 10)
@@ -542,12 +545,19 @@ function(input, output,session) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"inf/"),"")
+        print("dl done")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf")
+        print("pred done")
         if(nrow(en_vigueur_agr)>0){
-          if(!log_is_admin())
-            slack_log("zonages_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+
+
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
+          
+          print("is admin ?")
+          print(log_is_admin())
+          if(!log_is_admin())
+            slack_log("zonages_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les infirmiers sur l'application pour l'instant",type = "message",duration = 10)
