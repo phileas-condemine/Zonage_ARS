@@ -515,7 +515,7 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"mg/"),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
@@ -541,7 +541,7 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"mg/"),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"inf/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
