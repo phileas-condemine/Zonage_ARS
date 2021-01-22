@@ -492,7 +492,7 @@ function(input, output,session) {
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("zonages_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr,"QPV"=en_vigueur_qpv),file = file)
           
         } else {
@@ -520,7 +520,7 @@ function(input, output,session) {
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
           
         } else {
@@ -546,7 +546,7 @@ function(input, output,session) {
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("zonages_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$reg)),type="message",duration=10)
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
           
         } else {
