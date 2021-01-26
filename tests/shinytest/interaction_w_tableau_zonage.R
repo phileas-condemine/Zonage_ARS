@@ -100,9 +100,9 @@ testthat::test_that("choose millesime or create one",{
   print("page zonage is now loaded !")
 })
 
-test_that("Interact with the zonage table",{
-  
-})
+# test_that("Interact with the zonage table",{
+#   
+# })
 
 
 
