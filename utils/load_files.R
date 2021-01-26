@@ -84,6 +84,8 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   print("get seuils")
   if(!seuils_filename%in%list.files("data"))
     drop_download(paste0(dropbox_folder,seuils_filename),local_path = "data/",overwrite = T)
+  
+  # browser()
   seuils_reg_mg=read_xlsx(paste0("data/",seuils_filename),sheet="mg")
   seuils_reg_sf=read_xlsx(paste0("data/",seuils_filename),sheet="sf")%>%rename(check_sf=check)
   seuils_reg_inf=read_xlsx(paste0("data/",seuils_filename),sheet="inf")%>%rename(check_inf=check)
@@ -97,6 +99,8 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   regions=merge(regions,
                 seuils_reg_inf %>% select(-libreg),
                 by="reg")
+  # validUTF8(regions$libreg)
+  regions[!validUTF8(libreg),libreg:=iconv(libreg,"latin1","UTF-8")]
   regions
 }
 

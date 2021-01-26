@@ -2,17 +2,38 @@ source("global.R")
 # my_reg = regions$reg[1]
 my_reg = 28
 my_reg = 84 # ARA
+my_reg = 11 
 my_reg = 4 #La Réunion
-todo = c(11,84,93)#PLM - Réu
+todo = c(11,84,93)#PLM
 todo = setdiff(regions_reac()$reg,6)#no mayotte
 todo = 11
-for (my_reg in todo){#Mayotte est exclue !
+drop_auth(rdstoken = "droptoken.rds")
+params = fread("params.csv",sep=":")
+dropbox_folder = function(){
+  "zonage_dev/"
+}
+
+TVS = function(){
+  get_TVS(dropbox_folder(),params[file=="tvs"]$name)
+}
+
+dep = function(){
+  unique(TVS()[,c("dep","reg","libdep")])
+}
+
+regions_reac = function(){
+  get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())
+}
+
+BVCV = function(){get_BVCV(dropbox_folder(),params[file=="bvcv"]$name)}
+
+
+for (my_reg in todo){
   print(my_reg)
   reg_name=regions_reac()[reg==my_reg]$libreg
   my_deps=dep()[reg==my_reg]$dep
   source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
   prep_geo_data_from_scratch(my_reg)
-  
 }
 
 
