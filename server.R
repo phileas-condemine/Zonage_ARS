@@ -6,7 +6,9 @@ function(input, output,session) {
   
   
   dropbox_folder = reactive({
+    #browser()
     req(session$clientData$url_pathname)
+    #browser()
     if(session$clientData$url_pathname=="/Zonage_ARS/"){
       "zonage/"
     } else {
@@ -383,7 +385,7 @@ function(input, output,session) {
     content = function(file) {
       if(!log_is_admin())
         slack_log("corrs_tvs_com.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-      corres = haven::read_sas(paste0("data/",params[file=="tvs"]$name))
+      corres = fread(paste0("data/",params[file=="tvs"]$name))
       openxlsx::write.xlsx(corres,file)
     }
   )
@@ -482,20 +484,20 @@ function(input, output,session) {
   )
   
   output$dl_zonage_en_vigueur_mg <- downloadHandler(
-    filename = 'zonages_en_vigueur_mg.xlsx',
+    filename = 'Zonage_en_vigueur_mg.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",paste0(dropbox_folder(),"mg/"),"")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"mg")
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"mg")
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",paste0(dropbox_folder(),"mg/"),"")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
-            slack_log("zonages_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+            slack_log("Zonage_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
-          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr,"QPV"=en_vigueur_qpv),file = file)
-          
+          openxlsx::write.xlsx(list("TVS"=en_vigueur_agr,"COM"=en_vigueur_com,"QPV"=en_vigueur_qpv),file = file)
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les médecins généralistes sur l'application pour l'instant",type = "message",duration = 10)
         }
@@ -512,20 +514,19 @@ function(input, output,session) {
   
   
   output$dl_zonage_en_vigueur_sf <- downloadHandler(
-    filename = 'zonages_en_vigueur_sf.xlsx',
+    filename = 'Zonage_en_vigueur_sf.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
-        source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"")
-        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
+      source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+      en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",dropbox_ps_folder(),"")
+      en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"sf")
         if(nrow(en_vigueur_agr)>0){
-
-          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
-          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
-          
           if(!log_is_admin())
-            slack_log("zonages_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
-          
+            slack_log("Zonage_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
+          showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
+          openxlsx::write.xlsx(list("BVCV"=en_vigueur_agr,"COM"=en_vigueur_com),file = file)
+
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les sages-femmes sur l'application pour l'instant",type = "message",duration = 10)
         }
@@ -540,19 +541,19 @@ function(input, output,session) {
   )
   
   output$dl_zonage_en_vigueur_inf <- downloadHandler(
-    filename = 'zonages_en_vigueur_inf.xlsx',
+    filename = 'Zonage_en_vigueur_inf.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"inf/"),"")
         print("dl done")
         en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf")
-        print("pred done")
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"inf")
         if(nrow(en_vigueur_agr)>0){
-
-
+          if(!log_is_admin())
+            slack_log("Zonage_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
-          openxlsx::write.xlsx(list("AGR"=en_vigueur_agr),file = file)
+          openxlsx::write.xlsx(list("BVCV"=en_vigueur_agr,"COM"=en_vigueur_com),file = file)
           
           print("is admin ?")
           print(log_is_admin())

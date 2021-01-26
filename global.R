@@ -1,5 +1,5 @@
 # devtools::install_github("rstudio/DT")
-download.file(url = "http://ipinfo.io/ip",mode = "wb",
+download.file(url = "https://api64.ipify.org/",mode = "wb",
               destfile = "current_ip.txt")
 server_ip=readLines("current_ip.txt")
 if(server_ip %in% c("54.204.34.9","164.131.131.193","54.204.36.75","54.204.37.78",
@@ -50,7 +50,6 @@ gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche !
 
 # Then pass the token to each drop_ function
 drop_auth(rdstoken = "droptoken.rds")
-
 
 drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
   local_name = paste0(local_path,filename)

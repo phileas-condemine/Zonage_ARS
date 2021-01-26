@@ -38,14 +38,13 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     }
     load(paste0("data/",filename))
     
-    filename = params[file=="zonage_mg"]$name
+    filename = params[file=="pop_plm"]$name
     if(!filename%in%list.files("data/")){
       drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
     }
-    z_pop = readxl::read_xlsx(paste0("data/",filename),
-                              sheet="Zonage_TVS")[,c(5,5,11)]
-    names(z_pop) <- c("tvs","depcom","population")
-    
+    load(paste0("data/",filename))
+    z_pop <- pop_plm
+    print(head(z_pop))
     arr = lapply(arr,function(x){
       x@data$depcom = as.character(x@data$depcom)
       tmp = x@data
@@ -56,6 +55,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
       x@data = tmp
       x
     })
+    print(head(arr))
     
   }
   

@@ -23,3 +23,11 @@ rdrop2::drop_upload(file="data/pop_femme2016.RData",path="zonage_dev/",autorenam
 # stat_age = stat_age[NB1>0 | NB2>0]
 # setorder(stat_age,-diff)
 # head(stat_age[NB1 + NB2 > 1000],10)
+
+
+pop_plm = pop[substr(CODGEO,1,3)%in%c("751","132","693"),.(population=round(sum(NB))),by="CODGEO"]
+setnames(pop_plm,"CODGEO","depcom")
+pop_plm$tvs=pop_plm$depcom
+save(pop_plm,file = paste0("data/pop_plm",annee,".RData"))
+rdrop2::drop_upload(file=paste0("data/pop_plm",annee,".RData"),path="zonage/",autorename = F)
+rdrop2::drop_upload(file=paste0("data/pop_plm",annee,".RData"),path="zonage_dev/",autorename = F)

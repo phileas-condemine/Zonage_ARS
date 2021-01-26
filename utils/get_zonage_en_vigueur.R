@@ -4,12 +4,12 @@
 
 
 dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
+  print(path)
   my_files = drop_dir(path)
   my_files = data.table(my_files)
   if(nrow(my_files)>0){
     my_files = my_files[grepl(paste0("^en_vigueur_",ps),name)]
     my_files = my_files[!grepl(paste0("^en_vigueur_qpv",ps),name)]
-    print("récupération des fichiers de zonage en vigueur")
     if (length(my_files$name)>0){
       files = lapply(my_files$name,function(en_vigueur){
         print(en_vigueur)
@@ -52,14 +52,11 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
     setorder(zonages_en_vigueur,-majoritaire)#majoritaire en priorité
     zonages_en_vigueur = zonages_en_vigueur[,.SD[1],by="agr"]
   }
-  zonages_en_vigueur
+  return(zonages_en_vigueur)
 }
 
 
 prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
-  
-  
-  
   
   if(nrow(en_vigueur)>0){
     en_vigueur$majoritaire=NULL
@@ -90,6 +87,9 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
       en_vigueur=merge(en_vigueur,tvs,by=c("agr","reg"),all.x=T)
       setnames(en_vigueur,"agr","TVS")
       setnames(en_vigueur,"libagr","TVS_libelle")
+      setnames(en_vigueur,"majoritaire","region_majoritaire")
+      en_vigueur <- en_vigueur[, c("region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
+      
     } else if (ps %in% c("sf","inf")){
       en_vigueur <- en_vigueur %>% mutate(en_vigueur_autre_reg=case_when(
         en_vigueur_autre_reg=="VUD"~"1 - Très sous-doté",
@@ -110,9 +110,39 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
     setnames(en_vigueur,"reg","region")
     setnames(en_vigueur,"libreg","region_libelle")
     setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
+    setnames(en_vigueur,"majoritaire","region_majoritaire")
+    en_vigueur <- en_vigueur[, c("region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
+    en_vigueur$BVCV = gsub(x=en_vigueur$BVCV,pattern="_",replacement="")
     
     
   }
   return(en_vigueur)
+}
+
+
+prepare_zonage_en_vigueur_com_for_export = function(en_vigueur,ps){
+ 
+  if(nrow(en_vigueur)>0){
+
+    if (ps == "mg"){
+      tvs = TVS()[,.(agr,depcom,libcom)]
+      setnames(tvs, "agr", "TVS")
+      en_vigueur <- merge(en_vigueur, tvs, by = "TVS")
+      en_vigueur <- en_vigueur[, c("depcom","libcom","region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
+
+    } else if (ps %in% c("sf","inf")){
+      bvcv = BVCV()[,.(agr,depcom,libcom)]
+      setnames(bvcv, "agr", "BVCV")
+      en_vigueur$BVCV = stringi::stri_pad_right(en_vigueur$BVCV,5,"_")
+      en_vigueur <- merge(en_vigueur, bvcv, by = "BVCV")
+      en_vigueur <- en_vigueur[, c("depcom","libcom","region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
+      en_vigueur$BVCV = gsub(x=en_vigueur$BVCV,pattern="_",replacement="")
+      
+    }
+  }
+  
+  
+  return(en_vigueur)
+  
 }
 
