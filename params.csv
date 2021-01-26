@@ -1,7 +1,7 @@
 file:name
 auth:auth.txt
-bvcv:bvcv2020.sas7bdat
-tvs:tvs2019.sas7bdat
+bvcv:bvcv2020.csv
+tvs:tvs2020.csv
 qpv:qpv_markers_pop.RData
 zonage_mg:Zonage_medecin_20191231.xlsx
 zonage_sf:cadre_nat_sf.sas7bdat
