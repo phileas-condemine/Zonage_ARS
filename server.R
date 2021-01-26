@@ -6,9 +6,7 @@ function(input, output,session) {
   
   
   dropbox_folder = reactive({
-    #browser()
     req(session$clientData$url_pathname)
-    #browser()
     if(session$clientData$url_pathname=="/Zonage_ARS/"){
       "zonage/"
     } else {
@@ -493,6 +491,7 @@ function(input, output,session) {
         en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"mg")
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",paste0(dropbox_folder(),"mg/"),"")
+        
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("Zonage_en_vigueur_mg.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
@@ -517,16 +516,15 @@ function(input, output,session) {
     filename = 'Zonage_en_vigueur_sf.xlsx',
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
-      source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-      en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",dropbox_ps_folder(),"")
-      en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
+        source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"")
+        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
         en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"sf")
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("Zonage_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
           showNotification(sprintf("Actuellement %s ARS ont validé leur zonage sur l'application",uniqueN(en_vigueur_agr$region)),type="message",duration=10)
           openxlsx::write.xlsx(list("BVCV"=en_vigueur_agr,"COM"=en_vigueur_com),file = file)
-
         } else {
           showNotification("Aucune ARS n'a validé son zonage pour les sages-femmes sur l'application pour l'instant",type = "message",duration = 10)
         }

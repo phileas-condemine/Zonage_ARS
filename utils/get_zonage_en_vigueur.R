@@ -87,7 +87,11 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
       en_vigueur=merge(en_vigueur,tvs,by=c("agr","reg"),all.x=T)
       setnames(en_vigueur,"agr","TVS")
       setnames(en_vigueur,"libagr","TVS_libelle")
+      setnames(en_vigueur,"reg","region")
+      setnames(en_vigueur,"libreg","region_libelle")
+      setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
       setnames(en_vigueur,"majoritaire","region_majoritaire")
+
       en_vigueur <- en_vigueur[, c("region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
       
     } else if (ps %in% c("sf","inf")){
@@ -106,13 +110,14 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
       en_vigueur = merge(en_vigueur,unique(TVS()[,.(reg,libreg)]),by="reg")
       setnames(en_vigueur,"agr","BVCV")
       setnames(en_vigueur,"libagr","BVCV_libelle")
+      setnames(en_vigueur,"reg","region")
+      setnames(en_vigueur,"libreg","region_libelle")
+      setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
+      setnames(en_vigueur,"majoritaire","region_majoritaire")
+      en_vigueur <- en_vigueur[, c("region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
+      en_vigueur$BVCV = gsub(x=en_vigueur$BVCV,pattern="_",replacement="")
     }
-    setnames(en_vigueur,"reg","region")
-    setnames(en_vigueur,"libreg","region_libelle")
-    setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
-    setnames(en_vigueur,"majoritaire","region_majoritaire")
-    en_vigueur <- en_vigueur[, c("region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
-    en_vigueur$BVCV = gsub(x=en_vigueur$BVCV,pattern="_",replacement="")
+
     
     
   }

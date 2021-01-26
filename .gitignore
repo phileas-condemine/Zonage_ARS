@@ -37,3 +37,4 @@ utils/test_arrete*
 quickstart.py
 .secrets/
 token.pickle
+tests/shinytest/snapshot-current/*.xlsx
