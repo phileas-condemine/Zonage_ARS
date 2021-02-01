@@ -105,9 +105,9 @@ observeEvent(input$save_latest_check,{
 last_force_save = reactiveVal(-1)
 observeEvent(c(autorefresh(),input$force_save),{
   req(input$choix_reg)
-  req(input$force_save)
+  req(!is.null(input$force_save))
   print(input$force_save)
-  if((((difftime(Sys.time(),timer(),units = "sec") > 20)|(input$force_save!=last_force_save()))&new_modifs()>0)){
+  if(((difftime(Sys.time(),timer(),units = "sec") > 20)|(input$force_save!=last_force_save()))&new_modifs()>0){
     print("Persistance")
     last_force_save(input$force_save)
     my_reg=input$choix_reg

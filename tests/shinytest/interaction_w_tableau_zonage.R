@@ -104,6 +104,7 @@ testthat::test_that("choose millesime or create one",{
 #   
 # })
 
+# ALSO NEED TESTS FOR GENERATION OF THE MAP, EXCEL FILE OF ZONAGE & ARRETE
 
 
 app$stop()
