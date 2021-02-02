@@ -1,3 +1,4 @@
+
 observeEvent(input$save_latest_check,{
   req(input$choix_reg)
   req(input$save_latest_check)
@@ -56,7 +57,7 @@ observeEvent(input$save_latest_check,{
       #### add justification
       if(!is.null(info_recap_reac())){
         if(nrow(info_recap_reac())>0){
-
+          
           filename_millesimed = paste0("justification_",input$choix_millesime,".csv")
           if(filename_millesimed%in%list.files("data")){
             save_justification = paste("en_vigueur","justification",input$choix_ps,input$choix_reg,sep="_")
@@ -85,6 +86,17 @@ observeEvent(input$save_latest_check,{
       message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
       slackr_setup(config_file = "www/slackr_config.txt",echo = F)
       slackr_bot(message)
+      email <- gm_mime() %>%
+        gm_to(c(correspondants_CNAM,correspondants_DGOS)) %>%
+        gm_cc(correspondants_dev_drees)%>%
+        gm_subject("[Message automatique] Validation d'un zonage par une ARS") %>%
+        gm_html_body(body = HTML("<p>Bonjour à tous,<br>",
+                                 sprintf("L'ARS de la région %s vient de valider son zonage sur l'<a href=\"https://drees.shinyapps.io/Zonage_ARS/\">application DREES</a> avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
+                                 "Bien cordialement,<br>",
+                                 "Blandine et Philéas<br>",
+                                 "PS : Merci de ne pas répondre, il s'agit d'un mail automatique.</p>"))
+      gm_send_message(email)
+      
     }
     
     removeModal()
@@ -94,9 +106,9 @@ observeEvent(input$save_latest_check,{
 last_force_save = reactiveVal(-1)
 observeEvent(c(autorefresh(),input$force_save),{
   req(input$choix_reg)
-  req(input$force_save)
+  req(!is.null(input$force_save))
   print(input$force_save)
-  if((((difftime(Sys.time(),timer(),units = "sec") > 20)|(input$force_save!=last_force_save()))&new_modifs()>0)){
+  if(((difftime(Sys.time(),timer(),units = "sec") > 20)|(input$force_save!=last_force_save()))&new_modifs()>0){
     print("Persistance")
     last_force_save(input$force_save)
     my_reg=input$choix_reg

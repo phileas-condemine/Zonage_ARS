@@ -48,8 +48,8 @@ IP <- reactive({ input$getIP })
 
 observeEvent(input$send_pwd,{
   req(input$my_auth)
-  path2auth = paste0("zonage/",params[name=="auth"]$file)
-  auth = get_auth(dropbox_folder(),path2auth)
+  # path2auth = paste0("zonage/",params[name=="auth"]$file)
+  auth = get_auth()
   auth = auth[key==input$my_auth & reg == input$choix_reg]
   if(nrow(auth)>0){
     # print("OK")
@@ -57,7 +57,7 @@ observeEvent(input$send_pwd,{
       "OK"
     })
     
-    if(grepl("phileas",auth$name)){
+    if(any(grepl("phileas",auth$name))){
       log_is_admin(T)
       key = "clef universelle"
     } else {
@@ -66,26 +66,31 @@ observeEvent(input$send_pwd,{
     }
     
     
-    email <- gm_mime() %>%
-      gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
-      # gm_cc("phileas.condemine@gmail.com")%>%
-      gm_subject("Envoi de mail via R") %>%
-      gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
-                               sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
-                               sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
-                               ifelse(is.null(IP()),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP()$city,IP()$region,IP()$country,IP()$org)),
-                               "A bientôt<br>",
-                               "Philéas</p>"))
-    gm_send_message(email)
+    
     
     
     reg = ifelse(!is.null(input$choix_reg),input$choix_reg,"XX")
     ps = ifelse(!is.null(input$choix_ps),input$choix_ps,"XX")
     mil = ifelse(!is.null(input$choix_millesime),input$choix_millesime,"XX")
+    
     if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       message=sprintf("App:ZonageARS\nEvent: Connexion de la région %s pour la profession %s avec le projet %s",reg,ps,mil)
       slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
       slackr_bot(message)
+      
+      
+      email <- gm_mime() %>%
+        gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+        # gm_cc("phileas.condemine@gmail.com")%>%
+        gm_subject("Envoi de mail via R") %>%
+        gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
+                                 sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
+                                 sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
+                                 ifelse(is.null(IP()),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP()$city,IP()$region,IP()$country,IP()$org)),
+                                 "A bientôt<br>",
+                                 "Philéas</p>"))
+      gm_send_message(email)
+      
     }
     
     has_logged_in(T)
@@ -105,8 +110,8 @@ observeEvent(input$send_pwd,{
 
 observeEvent(input$send_pwd2,{
   req(input$my_auth2)
-  path2auth = paste0("zonage/",params[name=="auth"]$file)
-  auth = get_auth(dropbox_folder(),path2auth)
+  # path2auth = paste0("zonage/",params[name=="auth"]$file)
+  auth = get_auth()
   auth = auth[key==input$my_auth2]
   if(nrow(auth)>0){
     # print("OK")
@@ -114,7 +119,7 @@ observeEvent(input$send_pwd2,{
     #   "OK"
     # })
     
-    if(grepl("phileas",auth$name)){
+    if(any(grepl("phileas",auth$name))){
       log_is_admin(T)
       key = "clef universelle"
     } else {
@@ -197,7 +202,7 @@ output$ui_millesime=renderUI({
   reg_name=regions_reac()[reg==my_reg]$libreg
   regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
   reg_files = drop_dir(dropbox_ps_folder())
-
+  
   if (!is.null(reg_files)){
     
     if(nrow(reg_files)>0){#premier filtre
@@ -220,8 +225,10 @@ output$ui_millesime=renderUI({
   print("millesimes") ; print(millesimes())
   
   # no_archive(nrow(reg_google_files)==0)
-  if(length(millesimes())==1 & millesimes()==""){
-    showNotification("Aucun projet en cours, merci de créer un \"nouveau projet de zonage\" en cliquant sur la disquette",type = "warning",duration = 10)
+  if(length(millesimes())==1 ){
+    if(millesimes()==""){
+      showNotification("Aucun projet en cours, merci de créer un \"nouveau projet de zonage\" en cliquant sur la disquette",type = "warning",duration = 10)
+    }
   }
   selectizeInput('choix_millesime',"",width="100%",
                  choices=millesimes(),selected=millesimes()[1],
@@ -304,7 +311,7 @@ observeEvent(c(input$feedback_send),{
     # slackr({message})
     if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       slackr_setup(config_file = "www/slackr_config.txt",echo = F)
-    
+      
       slackr_bot(message)
     }
     

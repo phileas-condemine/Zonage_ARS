@@ -1,16 +1,18 @@
-get_auth = function(dropbox_folder,filename){
+
+get_auth = function(){
   #created in utils/keygen.R
   print("get auth")
-  rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,local_path = "data")
+  if(!"auth.txt"%in%list.files("data")){
+    rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,local_path = "data")
+  }
   auth = fread("data/auth.txt")
-  # TESTS ICI
   
   auth
 }
 
 
 get_TVS = function(dropbox_folder,filename){
-# drop_upload(file = paste0("data/",filename),path = "zonage/",mode = "overwrite",autorename = F)
+  # drop_upload(file = paste0("data/",filename),path = "zonage/",mode = "overwrite",autorename = F)
   print("get TVS")
   if(!filename%in%list.files("data")){
     rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = "data")
@@ -49,7 +51,7 @@ get_BVCV = function(dropbox_folder,filename){
   }
   
   BVCV = fread(paste0("data/",filename)) #%>%
-    # select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
+  # select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
   BVCV=data.table(BVCV)
   setnames(BVCV,c('bvcv','libbvcv'),c('agr','libagr'))
   BVCV$agr = stringi::stri_pad_right(BVCV$agr,5,"_")
@@ -84,6 +86,8 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   print("get seuils")
   if(!seuils_filename%in%list.files("data"))
     drop_download(paste0(dropbox_folder,seuils_filename),local_path = "data/",overwrite = T)
+  
+  # browser()
   seuils_reg_mg=read_xlsx(paste0("data/",seuils_filename),sheet="mg")
   seuils_reg_sf=read_xlsx(paste0("data/",seuils_filename),sheet="sf")%>%rename(check_sf=check)
   seuils_reg_inf=read_xlsx(paste0("data/",seuils_filename),sheet="inf")%>%rename(check_inf=check)
@@ -97,6 +101,8 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   regions=merge(regions,
                 seuils_reg_inf %>% select(-libreg),
                 by="reg")
+  # validUTF8(regions$libreg)
+  regions[!validUTF8(libreg),libreg:=iconv(libreg,"latin1","UTF-8")]
   regions
 }
 

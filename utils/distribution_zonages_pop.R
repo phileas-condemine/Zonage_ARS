@@ -1,5 +1,8 @@
-output$dist_zonages = renderPlotly({
-  req(!is.null(vals_reac()))
+# distribution_zonages_pop = function(input,output,session){
+
+  
+  output$dist_zonages = renderPlotly({
+    req(!is.null(vals_reac()))
     infos=merge(tableau_reg()[,c("agr","population","is_majoritaire")],
                 vals_reac(),by="agr",all.x=T)
     
@@ -25,18 +28,18 @@ output$dist_zonages = renderPlotly({
                                                                          "ZV - majoritaire", "ZV - minoritaire",
                                                                          "ZAC - majoritaire","ZAC - minoritaire",
                                                                          "ZIP - majoritaire","ZIP - minoritaire"
-                                                                         ))]
+      ))]
       my_colors = data.table(zonage_majoritaire = c("NA - majoritaire","NA - minoritaire",
                                                     "HV - majoritaire","HV - minoritaire",
                                                     "ZV - majoritaire", "ZV - minoritaire",
                                                     "ZAC - majoritaire","ZAC - minoritaire",
                                                     "ZIP - majoritaire","ZIP - minoritaire"
-                                                    ),
-                             color = c('#A6CEE3','#95BDD2',
-                                       '#1F78B4','#0E67A3',
-                                       '#33A02C','#228F1B',
-                                       '#FB9A99','#EA8988',
-                                       '#E31A1C','#D2090B'))
+      ),
+      color = c('#A6CEE3','#95BDD2',
+                '#1F78B4','#0E67A3',
+                '#33A02C','#228F1B',
+                '#FB9A99','#EA8988',
+                '#E31A1C','#D2090B'))
     } else if (input$choix_ps%in%c("sf","inf")){
       zonage_pop[,zonage_majoritaire:=factor(zonage_majoritaire,levels=c("NA - minoritaire",
                                                                          "NA - majoritaire",
@@ -70,4 +73,6 @@ output$dist_zonages = renderPlotly({
       layout(title = 'Distribution par zone de la population de la région',
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-})
+  })
+  
+# }
