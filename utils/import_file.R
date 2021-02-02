@@ -1,35 +1,18 @@
-observe({
-  print("update mods zonage")
-  print(input$var_zonage)
-  req(input$var_zonage)
-  if (input$import_data_model=="melt") {
-    mods_choices = unique(importFile()[[input$var_zonage]])
-    if(input$choix_ps == "mg"){
-      
-      updateSelectInput(session,"mod_zip",selected = input$mod_zip,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_hv)))
-      updateSelectInput(session,"mod_zac",selected = input$mod_zac,choices = setdiff(mods_choices,c(input$mod_zip,input$mod_zv,input$mod_hv)))
-      updateSelectInput(session,"mod_zv" ,selected = input$mod_zv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zip,input$mod_hv)))
-      updateSelectInput(session,"mod_hv" ,selected = input$mod_hv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_zip)))
-      
-    } else if(input$choix_ps %in% c("sf","inf")){
-      updateSelectInput(session,"mod_tsd",selected = input$mod_tsd,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_td,input$mod_sud)))
-      updateSelectInput(session,"mod_sod",selected = input$mod_sod,choices = setdiff(mods_choices,c(input$mod_tsd,input$mod_int,input$mod_td,input$mod_sud)))
-      updateSelectInput(session,"mod_int",selected = input$mod_int,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_tsd,input$mod_td,input$mod_sud)))
-      updateSelectInput(session,"mod_td" ,selected = input$mod_td,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_tsd,input$mod_sud)))
-      updateSelectInput(session,"mod_sud",selected = input$mod_sud,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_td,input$mod_tsd)))
-      
-    }
-  }
-  
-})
 
 importFile = reactiveVal(NULL)
+
 observeEvent(input$from_file,{
   req(input$from_file)
   inFile <- input$from_file
   print(inFile$datapath)
   file_format = stringr::str_extract(inFile$datapath,"(csv$)|(xls$)|(xlsx$)")
   print(file_format)
+  if(is.null(input$choix_ps) | is.null(input$choix_reg)){
+    shinyalert(title="Merci d'indiquer la profession de santé et la région avant d'importer un fichier.")
+  }
+  req(input$choix_ps)
+  req(input$choix_reg)
+  
   if(file_format == "csv"){
     import_table = fread(inFile$datapath)
     importFile(import_table)
@@ -91,6 +74,33 @@ observeEvent(input$from_file,{
                           actionButton("parse_file","Soumettre",icon = shiny::icon("save")),
                           modalButton("Annuler",icon=shiny::icon("window-close"))
                         )))
+})
+
+
+
+observe({
+  print("update mods zonage")
+  print(input$var_zonage)
+  req(input$var_zonage)
+  if (input$import_data_model=="melt") {
+    mods_choices = unique(importFile()[[input$var_zonage]])
+    if(input$choix_ps == "mg"){
+      
+      updateSelectInput(session,"mod_zip",selected = input$mod_zip,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_hv)))
+      updateSelectInput(session,"mod_zac",selected = input$mod_zac,choices = setdiff(mods_choices,c(input$mod_zip,input$mod_zv,input$mod_hv)))
+      updateSelectInput(session,"mod_zv" ,selected = input$mod_zv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zip,input$mod_hv)))
+      updateSelectInput(session,"mod_hv" ,selected = input$mod_hv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_zip)))
+      
+    } else if(input$choix_ps %in% c("sf","inf")){
+      updateSelectInput(session,"mod_tsd",selected = input$mod_tsd,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_td,input$mod_sud)))
+      updateSelectInput(session,"mod_sod",selected = input$mod_sod,choices = setdiff(mods_choices,c(input$mod_tsd,input$mod_int,input$mod_td,input$mod_sud)))
+      updateSelectInput(session,"mod_int",selected = input$mod_int,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_tsd,input$mod_td,input$mod_sud)))
+      updateSelectInput(session,"mod_td" ,selected = input$mod_td,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_tsd,input$mod_sud)))
+      updateSelectInput(session,"mod_sud",selected = input$mod_sud,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_td,input$mod_tsd)))
+      
+    }
+  }
+  
 })
 
 observeEvent(input$parse_file,{

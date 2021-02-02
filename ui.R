@@ -1,7 +1,4 @@
 tagList(
-  
-  
-  
   dashboardPage(
     tags$header(class = "main-header", span(class = "logo",style="background: #1263b3;", "Zonage ARS"),
                 tags$nav(class = "navbar navbar-static-top",style="background: #0253a3;",
@@ -243,4 +240,3 @@ tagList(
   ),
   includeHTML("www/footer_accueil.html")
 )
-  

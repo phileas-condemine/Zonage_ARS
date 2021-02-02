@@ -16,7 +16,6 @@ files[,ps:=gsub("/","",ps)]
 ps_has_en_vigueur = unique(files$ps)
 
 context("DL zonage en vigueur in a Shiny App")
-my_reg = "11"
 
 
 test_dl_ps=function(ps){
@@ -43,19 +42,13 @@ print("Init the Shiny Driver...")
 app <- ShinyDriver$new(path_to_app)
 print("...Done !")
 
-# app$getAllValues()$input
-test_that("Can choose one reg",{
-  app$setInputs(go_params = "click")
-  app$setInputs(choix_reg = my_reg)
-  expect_equal(app$getAllValues()$input$choix_reg,my_reg,label = "The region picked should be visible in the input")
-})
+
 
 test_that("DL en_vigueur is blocked",{
   app$setInputs(sidebarItemExpanded = "Documents")
   expect_error(app$snapshotDownload("dl_zonage_en_vigueur_inf"),"Unable request data from server")
 })
 
-# app$setInputs(dl_zonage_en_vigueur_inf = "click")
 
 test_that("DL en_vigueur can be unlocked w. password",{
   expect_true(dir.exists(paste0(path_to_app,"tests/shinytest/snapshot-current/")),

@@ -1,3 +1,4 @@
+
 get_auth = function(){
   #created in utils/keygen.R
   print("get auth")
@@ -5,13 +6,13 @@ get_auth = function(){
     rdrop2::drop_download(path = paste0("zonage/auth.txt"),overwrite = T,local_path = "data")
   }
   auth = fread("data/auth.txt")
-
+  
   auth
 }
 
 
 get_TVS = function(dropbox_folder,filename){
-# drop_upload(file = paste0("data/",filename),path = "zonage/",mode = "overwrite",autorename = F)
+  # drop_upload(file = paste0("data/",filename),path = "zonage/",mode = "overwrite",autorename = F)
   print("get TVS")
   if(!filename%in%list.files("data")){
     rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = "data")
@@ -50,7 +51,7 @@ get_BVCV = function(dropbox_folder,filename){
   }
   
   BVCV = fread(paste0("data/",filename)) #%>%
-    # select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
+  # select(-type_zone,-taille_pole,-bv2012,-libbv,-cv,-libcv)
   BVCV=data.table(BVCV)
   setnames(BVCV,c('bvcv','libbvcv'),c('agr','libagr'))
   BVCV$agr = stringi::stri_pad_right(BVCV$agr,5,"_")

@@ -1,3 +1,4 @@
+
 observeEvent(input$save_latest_check,{
   req(input$choix_reg)
   req(input$save_latest_check)
@@ -56,7 +57,7 @@ observeEvent(input$save_latest_check,{
       #### add justification
       if(!is.null(info_recap_reac())){
         if(nrow(info_recap_reac())>0){
-
+          
           filename_millesimed = paste0("justification_",input$choix_millesime,".csv")
           if(filename_millesimed%in%list.files("data")){
             save_justification = paste("en_vigueur","justification",input$choix_ps,input$choix_reg,sep="_")

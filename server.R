@@ -1,7 +1,9 @@
 function(input, output,session) {
   drop_auth(rdstoken = "droptoken.rds")
   params = fread("params.csv",sep=":")
-  source("utils/load_files.R",encoding = "UTF-8")
+  source("utils/load_files.R",encoding = "UTF-8")#this is a script with functions
+  
+  
   log_is_admin = reactiveVal(F)
   
   
@@ -62,7 +64,7 @@ function(input, output,session) {
     )
   } else {
     print("construction du fichier des régions majoritaires par AGR from scratch")
-    source("utils/region_majoritaire.R",local=T,encoding="UTF-8")
+    source("utils/region_majoritaire.R",local=T,encoding="UTF-8")# this is a procedural script
   }
   load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
   setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
@@ -121,16 +123,13 @@ function(input, output,session) {
     } else NULL
   })
   
-  
-  
+  ###### IMPORT EXISTING ZONAGE CSV/XLSX ######
   source("utils/import_file.R",local=T,encoding = "UTF-8")
   
   ###### TABLEAU ######
-  
   source("utils/tableau_agr.R",local=T,encoding = "UTF-8")  
   
   ###### CARTE ######
-  
   source("utils/carte_agr.R",local=T,encoding = "UTF-8")  
   
   #### EXPORTS ####
@@ -139,7 +138,6 @@ function(input, output,session) {
   # #### Persistance ####
   
   source("utils/persistance.R",local=T,encoding = "UTF-8")
-  
   
   #### Jauges ####
   
@@ -624,3 +622,4 @@ function(input, output,session) {
   )
   
 }
+

@@ -67,7 +67,7 @@ observeEvent(input$send_pwd,{
     
     
     
-
+    
     
     reg = ifelse(!is.null(input$choix_reg),input$choix_reg,"XX")
     ps = ifelse(!is.null(input$choix_ps),input$choix_ps,"XX")
