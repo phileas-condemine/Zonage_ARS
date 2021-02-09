@@ -42,5 +42,12 @@ utils/prep_zonage_mg.R
 utils/prep_zonage_hors_mg.R
 utils/modele_word_arrete.docx
 utils/region_majoritaire.R
+utils/load_files.R
+utils/plots_func.R
+utils/maps_func.R
+utils/com_func.R
+utils/ui_func.R
+utils/handle_geo_data.R
+utils/tableau_agr.R
 .secrets/fbc5fe5f1b9501fb39a3686784bf63a1_drees.zonage.ars@gmail.com
 credentials.json

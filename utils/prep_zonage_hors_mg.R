@@ -1,66 +1,70 @@
-# input = list(choix_ps="sf",choix_reg=24)
-# input = list(choix_ps="inf",choix_reg=24)
-# load(sprintf("data/%s_preprocessed_BVCV.RData",input$choix_reg))
-# my_reg = input$choix_reg
+# my_ps = "sf";my_reg = 24
+# my_ps = "inf";my_reg = 24
+# load(sprintf("data/%s_preprocessed_BVCV.RData",my_reg))
 
-if(input$choix_ps=="sf"){
-  filename = params[file=="zonage_sf"]$name
-} else if (input$choix_ps =="inf"){
-  filename = params[file=="zonage_inf"]$name
-}
-drop_download(path = paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
 
-zonage_historique=sas7bdat::read.sas7bdat(paste0("data/cadre_nat_",input$choix_ps,".sas7bdat"))
-zonage_historique$zonage_nat=factor(zonage_historique$zonage_nat)
-
-# table(zonage_historique$ZE_UD)
-# table(zonage_historique$ZE_OD)
-
-levels(zonage_historique$zonage_nat) <- c("VUD","UD","Int","VD","OD")
-zonage_historique=zonage_historique%>%
-  mutate_if(is.factor,as.character)
-zonage_historique=data.table(zonage_historique)
-zonage_historique=unique(zonage_historique)
-
-if (input$choix_ps=="inf"){
-  zonage_historique[,ZE_UD:=gsub("-","0",ZE_UD)]
-  zonage_historique[,ZE_OD:=gsub("-","0",ZE_OD)]
+prep_zonage_hors_mg <- function(
+  my_reg,
+  my_ps,
+  dropbox_folder,
+  dropbox_ps_folder,
+  my_dropbox_files,
+  choix_mil,
+  params,
+  VZN_reac,
+  pop_femmes,
+  communes_AGR,
+  zonages_en_vigueur){
   
-  zonage_historique[,ZE_UD:=as.numeric(ZE_UD)]
-  zonage_historique[,ZE_OD:=as.numeric(ZE_OD)]
-}
-
-setnames(zonage_historique,"apl_2017_bvcv","apl")
-zonage_historique[,apl:=round(apl,1)]
-
-zonage_historique=zonage_historique[,c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
-setnames(zonage_historique,"zonage_nat","CN")
-zonage_historique=unique(zonage_historique)
-zonage_historique$bvcv = stringi::stri_pad_right(zonage_historique$bvcv,5,"_")
-CN = zonage_historique[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
-VZN = zonage_historique[,c("bvcv","CN")]
-
-# zonage_historique_reg=zonage_historique[reg==my_reg,
-#                                         c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
-# setnames(zonage_historique_reg,"zonage_nat","CN")
-# zonage_historique_reg=unique(zonage_historique_reg)
-# zonage_historique_reg$bvcv = stringi::stri_pad_right(zonage_historique_reg$bvcv,5,"_")
-# CN = zonage_historique_reg[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
-# VZN = zonage_historique_reg[,c("bvcv","CN")]
-
-
-prep_zonage <- function(cadre_national=CN,
-                        vals_zonage_historique=VZN,
-                        my_dropbox_files,choix_mil,env){
-  bvcv=data.table(communes_BVCV)
+  
+  if(my_ps=="sf"){
+    filename = params[file=="zonage_sf"]$name
+  } else if (my_ps =="inf"){
+    filename = params[file=="zonage_inf"]$name
+  }
+  drop_download(path = paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
+  
+  zonage_historique=sas7bdat::read.sas7bdat(paste0("data/cadre_nat_",my_ps,".sas7bdat"))
+  zonage_historique$zonage_nat=factor(zonage_historique$zonage_nat)
+  
+  # table(zonage_historique$ZE_UD)
+  # table(zonage_historique$ZE_OD)
+  
+  levels(zonage_historique$zonage_nat) <- c("VUD","UD","Int","VD","OD")
+  zonage_historique=zonage_historique%>%
+    mutate_if(is.factor,as.character)
+  zonage_historique=data.table(zonage_historique)
+  zonage_historique=unique(zonage_historique)
+  
+  if (my_ps=="inf"){
+    zonage_historique[,ZE_UD:=gsub("-","0",ZE_UD)]
+    zonage_historique[,ZE_OD:=gsub("-","0",ZE_OD)]
+    
+    zonage_historique[,ZE_UD:=as.numeric(ZE_UD)]
+    zonage_historique[,ZE_OD:=as.numeric(ZE_OD)]
+  }
+  
+  setnames(zonage_historique,"apl_2017_bvcv","apl")
+  zonage_historique[,apl:=round(apl,1)]
+  
+  zonage_historique=zonage_historique[,c("bvcv","zonage_nat","ZE_UD","ZE_OD","apl")]
+  setnames(zonage_historique,"zonage_nat","CN")
+  zonage_historique=unique(zonage_historique)
+  zonage_historique$bvcv = stringi::stri_pad_right(zonage_historique$bvcv,5,"_")
+  cadre_national = zonage_historique[,c("bvcv","CN","ZE_UD","ZE_OD","apl")]%>%unique
+  vals_zonage_historique = zonage_historique[,c("bvcv","CN")]
+  
+  
+  
+  bvcv=data.table(communes_AGR)
   # uniqueN(bvcv$agr)
   # fix à insérer dans le handle geo data parce que TVS : reg is numeric vs BVCV : reg is character de taille 2.
   bvcv[,reg:=as.numeric(reg)]
-  if(input$choix_ps == "sf"){
+  if(my_ps == "sf"){
     print("hack pop sf")
     bvcv[,population:=NULL]
-    print(paste0("merge OK: ",round(100*mean(bvcv$depcom %in% pop_femmes()$CODGEO)),"%"))
-    bvcv = merge(bvcv,pop_femmes(),by.x="depcom",by.y="CODGEO",all.x=T)
+    print(paste0("merge OK: ",round(100*mean(bvcv$depcom %in% pop_femmes$CODGEO)),"%"))
+    bvcv = merge(bvcv,pop_femmes,by.x="depcom",by.y="CODGEO",all.x=T)
   }
   bvcv[,"pop_bvcv_per_reg":=.(sum(population)),by=c("agr","reg")]
   setorder(bvcv,-pop_bvcv_per_reg)
@@ -120,7 +124,7 @@ prep_zonage <- function(cadre_national=CN,
     
     setorder(vals,agr)
     if(choix_mil==""){
-      filename=paste0(input$choix_ps,"_",input$choix_reg,"_cadre_national.csv")
+      filename=paste0(my_ps,"_",my_reg,"_cadre_national.csv")
       local_name=paste0("data/",filename)
     } else {
       filename=choix_mil
@@ -129,9 +133,9 @@ prep_zonage <- function(cadre_national=CN,
     }
     fwrite(unique(vals),file=local_name)
     
-    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
+    drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder)
     
-    assign("vals",vals,env)
+    # assign("vals",vals,env)
     
     
     
@@ -144,7 +148,7 @@ prep_zonage <- function(cadre_national=CN,
       print(paste("try read sheet in dropbox:",attempt))
       attempt <- attempt + 1
       try({
-        drop_download(paste0(dropbox_ps_folder(),choix_mil),local_path = "data/",overwrite = T,verbose = T)
+        drop_download(paste0(dropbox_ps_folder,choix_mil),local_path = "data/",overwrite = T,verbose = T)
         print(list.files("data/"))
         zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
       }
@@ -153,7 +157,8 @@ prep_zonage <- function(cadre_national=CN,
     zonage_saved = zonage_saved%>%
       mutate_all(as.character)%>%
       mutate(agr=stringi::stri_pad_right(agr,5,"_"))
-    assign("vals",zonage_saved,env)
+    # assign("vals",zonage_saved,env)
+    vals <- zonage_saved
     
     zonage_saved$value_set=T
     
@@ -179,10 +184,10 @@ prep_zonage <- function(cadre_national=CN,
   #Pour différencier le cas où la valeur a déjà été remplie (ancienne valeur) ou non.
   radio_buttons[,value_is_set:=sum(value_set)>0,by="agr"]
   
-  if (input$choix_ps == "sf"){
+  if (my_ps == "sf"){
     ps_ZE_UD = c("Int","UD")
     ps_ZE_OD = c("OD","VD")
-  } else if (input$choix_ps == "inf"){
+  } else if (my_ps == "inf"){
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
@@ -255,7 +260,8 @@ prep_zonage <- function(cadre_national=CN,
   setorder(bvcv,-proportion_pop)
   print("names bvcv")
   print(class(bvcv))
-  assign("bvcv",bvcv,env)
-  assign("radio_buttons",radio_buttons,env)
+  # assign("bvcv",bvcv,env)
+  # assign("radio_buttons",radio_buttons,env)
+  return(list(vals=vals,bvcv=bvcv,radio_buttons=radio_buttons))
   
 }

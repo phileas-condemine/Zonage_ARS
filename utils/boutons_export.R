@@ -475,7 +475,7 @@
         }else if(input$choix_ps=="inf"){g <- g + ggtitle(paste0("Zonage infirmier - ",reg_name))}
         # print(input$add_annexes)
         # Set up parameters to pass to Rmd document
-        params <- list(REGION_NAME = reg_name,
+        md_params <- list(REGION_NAME = reg_name,
                        DATE_NOMINATION_DG_ARS=input$DATE_DG_ELECTION%>%jour_nommois_annee,
                        DATE_DEBUT_DG_ARS=input$DATE_DG_EFFET%>%jour_nommois_annee,
                        NOM_DG_ARS = input$NOM_DG_ARS,
@@ -506,7 +506,7 @@
                        
         )
         rmarkdown::render(tempReport, output_file = file,
-                          params = params,
+                          params = md_params,
                           envir = new.env(parent = globalenv())
         )
       })

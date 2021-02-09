@@ -1,20 +1,59 @@
 function(input, output,session) {
   drop_auth(rdstoken = "droptoken.rds")
   params = fread("params.csv",sep=":")
-  source("utils/load_files.R",encoding = "UTF-8")#this is a script with functions
   
   
   log_is_admin = reactiveVal(F)
   
+  dropbox_folder = reactiveVal()
+  dropbox_ps_folder = reactiveVal()
+  TVS = reactiveVal()
+  dep_reac = reactiveVal()
+  mom_markers = reactiveVal()
+  hist_qpv = reactiveVal()
+  BVCV = reactiveVal()
+  pop_femmes = reactiveVal()
+  dep_contours = reactiveVal()
+  reg_cont = reactiveVal()
+  regions_reac = reactiveVal()
+  TA = reactiveVal()
+  IP <- reactiveVal()
+  VZN_reac = reactiveVal()
   
-  dropbox_folder = reactive({
-    req(session$clientData$url_pathname)
-    if(session$clientData$url_pathname=="/Zonage_ARS/"){
-      "zonage/"
-    } else {
-      "zonage_dev/"
-    }
+  observeEvent(input$getIP,{
+    IP(input$getIP)
   })
+  
+  
+  observeEvent(session$clientData$url_pathname,{
+    if(session$clientData$url_pathname=="/Zonage_ARS/"){
+      dropbox_folder("zonage/")
+    } else {
+      dropbox_folder("zonage_dev/")
+    }
+    
+    TVS(get_TVS(dropbox_folder(),params[file=="tvs"]$name))
+    dep_reac(unique(TVS()[,c("dep","reg","libdep")]))
+    mom_markers(get_QPV(dropbox_folder(),params[file=="qpv"]$name))
+    hist_qpv(get_hist_qpv(dropbox_folder(),params[file=="zonage_mg"]$name))
+    BVCV(get_BVCV(dropbox_folder(),params[file=="bvcv"]$name))
+    pop_femmes({get_pop_femmes(dropbox_folder(),params[file=="pop_femmes"]$name)})
+    dep_contours({get_dep_contours(dropbox_folder(),params[file=="contours_dep"]$name)})
+    reg_cont({get_reg_contours(dropbox_folder(),params[file=="contours_reg"]$name)})
+    regions_reac({get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())})
+    TA({get_TA(dropbox_folder(),params[file=="liste_tribunaux"]$name)})
+    
+  })
+  
+  
+  observeEvent(input$choix_ps,{
+    req(input$choix_ps)
+    req(dropbox_folder())
+    dropbox_ps_folder(
+      paste0(dropbox_folder(),input$choix_ps,"/")
+    )
+  })
+  
   
   observeEvent(session$clientData$url_pathname,{
     req(session$clientData$url_pathname)
@@ -25,30 +64,9 @@ function(input, output,session) {
     }
   })
   
-  dropbox_ps_folder = reactive({
-    req(input$choix_ps)
-    paste0(dropbox_folder(),input$choix_ps,"/")
-  })
   
-  TVS = reactive(get_TVS(dropbox_folder(),params[file=="tvs"]$name))
   
-  dep = reactive(unique(TVS()[,c("dep","reg","libdep")]))
   
-  mom_markers = reactive(get_QPV(dropbox_folder(),params[file=="qpv"]$name))
-  
-  hist_qpv = reactive(get_hist_qpv(dropbox_folder(),params[file=="zonage_mg"]$name))
-  
-  BVCV = reactive(get_BVCV(dropbox_folder(),params[file=="bvcv"]$name))
-  
-  pop_femmes = reactive({get_pop_femmes(dropbox_folder(),params[file=="pop_femmes"]$name)})
-  
-  dep_contours = reactive({get_dep_contours(dropbox_folder(),params[file=="contours_dep"]$name)})
-  
-  reg_cont = reactive({get_reg_contours(dropbox_folder(),params[file=="contours_reg"]$name)})
-  
-  regions_reac = reactive({get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())})
-  
-  TA = reactive({get_TA(dropbox_folder(),params[file=="liste_tribunaux"]$name)})
   
   
   
@@ -64,13 +82,13 @@ function(input, output,session) {
     )
   } else {
     print("construction du fichier des régions majoritaires par AGR from scratch")
-    source("utils/region_majoritaire.R",local=T,encoding="UTF-8")# this is a procedural script
+    create_and_upload_reg_majo_per_agr(regions=regions_reac(),dep=dep_reac(),dropbox_folder=dropbox_folder(),TVS=TVS(),BVCV=BVCV(),params=params)
   }
   load(local_name)#bvcv_reg_majoritaire & tvs_reg_majoritaire
   setnames(bvcv_reg_majoritaire,"reg_majoritaire","reg")
   setnames(tvs_reg_majoritaire,"reg_majoritaire","reg")
-  bvcv_reg_majoritaire
-  tvs_reg_majoritaire
+  # bvcv_reg_majoritaire
+  # tvs_reg_majoritaire
   
   
   
@@ -124,10 +142,67 @@ function(input, output,session) {
   })
   
   ###### IMPORT EXISTING ZONAGE CSV/XLSX ######
-  source("utils/import_file.R",local=T,encoding = "UTF-8")
+  importFile = reactiveVal(NULL)
+  observeEvent(input$from_file,{
+    file_import_modal_ui(input,output,session,importFile_reac = importFile)
+  })
+  observeEvent(c(input$var_zonage,
+                 input$import_data_model,
+                 input$choix_ps,
+                 input$mod_zip,input$mod_zac,input$mod_zv,input$mod_hv,
+                 input$mod_tsd,input$mod_sod,input$mod_int,input$mod_td,input$mod_sud),{
+                   file_import_form_dynamic_update(input,session,importFile)
+                 })
+  
+  observeEvent(input$parse_file,{
+    file_import_validate_join_update(input = input,
+                                     output = output,
+                                     session = session,
+                                     importFile_reac = importFile,
+                                     dropbox_ps_folder=dropbox_ps_folder(),
+                                     millesimes_reac = millesimes)
+  })
   
   ###### TABLEAU ######
-  source("utils/tableau_agr.R",local=T,encoding = "UTF-8")  
+  tableau_reg = reactive({
+    if (input$choix_ps == "mg"){
+      maj = tvs_reg_majoritaire
+    } else if (input$choix_ps %in% c("sf","inf")){
+      maj = bvcv_reg_majoritaire
+    }
+    tableau_reg_func(input = input,output=output,session = session,
+                     dropbox_folder = dropbox_folder(),
+                     dropbox_ps_folder = dropbox_ps_folder(),
+                     dropbox_files = dropbox_files(),
+                     regions=regions_reac(),dep = dep_reac(),
+                     has_logged_in = has_logged_in,
+                     fond_de_carte_reac = fond_de_carte,
+                     TVS_reac = TVS,BVCV_reac = BVCV,
+                     maj=maj,params=params
+                     ,VZN_reac=VZN_reac,
+                     pop_femmes=pop_femmes(),
+                     default_vals=default_vals,
+                     current_mapped_data=current_mapped_data)
+  })
+  
+  output$zonage_dt=DT::renderDataTable(server=F,{
+    zonage_dt_func(input,tableau_reg)
+  })
+  
+  observeEvent(input$last_forced_edition,{
+    req(input$last_forced_edition)
+    if(!last_arg_clicked()%in%edition_forced()){
+      edition_forced(c(edition_forced(),last_arg_clicked()))
+    }
+  })
+  
+  observeEvent(input$zonage_dt_cell_clicked,{
+    warning_zonage_clicked(input = input,
+                           tableau_reg = tableau_reg,
+                           edition_forced_reac = edition_forced,
+                           new_modifs_reac = new_modifs)
+  })
+  
   
   ###### CARTE ######
   source("utils/carte_agr.R",local=T,encoding = "UTF-8")  
@@ -166,7 +241,7 @@ function(input, output,session) {
       setnames(infos,"my_reg_TVS","dansMaRegion")
       infos = data.table(infos)
       
-      infos = merge(infos,VZN[,.SD[1],by="tvs"],by.x="agr",by.y="tvs",all.x=T)
+      infos = merge(infos,VZN_reac()[,.SD[1],by="tvs"],by.x="agr",by.y="tvs",all.x=T)
       infos = infos[(zonage_ars!=picked_zonage)&(is_majoritaire),.(population=sum(population)),by=c("libagr","agr","picked_zonage","CN")]
       
       #### QPV
@@ -290,6 +365,21 @@ function(input, output,session) {
   })
   
   source("utils/navigation.R",local=T,encoding = "UTF-8")
+  
+  output$ui_millesime=renderUI({
+    
+    get_millesimes(input,session,millesimes_reac = millesimes,
+                   info_region = regions_reac(),
+                   dropbox_ps_folder = dropbox_ps_folder())
+    
+    selectizeInput('choix_millesime',"",width="100%",
+                   choices=millesimes(),selected=millesimes()[1],
+                   options = list(placeholder = 'Dernier arrêté ou saisie en cours',
+                                  plugins= list('remove_button')))
+  })
+  
+  
+  
   
   output$nb_modif_unsaved = renderText({
     ifelse(new_modifs()==0,
@@ -484,9 +574,9 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",paste0(dropbox_folder(),"mg/"),"")
-        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"mg")
-        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"mg")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("mg",paste0(dropbox_folder(),"mg/"),"",maj=tvs_reg_majoritaire)
+        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"mg",maj=,tvs_reg_majoritaire)
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"mg",AGR=TVS())
         source("utils/get_qpv_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
         en_vigueur_qpv = dl_zonage_en_vigueur_qpv("mg",paste0(dropbox_folder(),"mg/"),"")
         
@@ -515,9 +605,9 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"")
-        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf")
-        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"sf")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("sf",paste0(dropbox_folder(),"sf/"),"",maj=bvcv_reg_majoritaire)
+        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"sf",maj=bvcv_reg_majoritaire)
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"sf",AGR=BVCV())
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("Zonage_en_vigueur_sf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)
@@ -541,10 +631,10 @@ function(input, output,session) {
     content = function(file) {
       if(enable_dl_zonage_en_vigueur()){
         source("utils/get_zonage_en_vigueur.R",local=T,encoding = "UTF-8")
-        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"inf/"),"")
+        en_vigueur_agr = dl_zonage_en_vigueur_agr("inf",paste0(dropbox_folder(),"inf/"),"",maj=bvcv_reg_majoritaire)
         print("dl done")
-        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf")
-        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"inf")
+        en_vigueur_agr = prepare_zonage_en_vigueur_for_export(en_vigueur_agr,"inf",maj=bvcv_reg_majoritaire)
+        en_vigueur_com = prepare_zonage_en_vigueur_com_for_export(en_vigueur_agr,"inf",AGR=BVCV())
         if(nrow(en_vigueur_agr)>0){
           if(!log_is_admin())
             slack_log("Zonage_en_vigueur_inf.xlsx",input$choix_reg,input$choix_ps,input$choix_millesime,session)

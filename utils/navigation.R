@@ -44,7 +44,8 @@ observeEvent(c(input$choix_reg,input$choix_ps,input$choix_millesime),{
 })
 
 
-IP <- reactive({ input$getIP })
+
+
 
 observeEvent(input$send_pwd,{
   req(input$my_auth)
@@ -75,21 +76,21 @@ observeEvent(input$send_pwd,{
     
     if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       message=sprintf("App:ZonageARS\nEvent: Connexion de la région %s pour la profession %s avec le projet %s",reg,ps,mil)
-      slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
-      slackr_bot(message)
-      
-      
-      email <- gm_mime() %>%
-        gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
-        # gm_cc("phileas.condemine@gmail.com")%>%
-        gm_subject("Envoi de mail via R") %>%
-        gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
-                                 sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
-                                 sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
-                                 ifelse(is.null(IP()),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP()$city,IP()$region,IP()$country,IP()$org)),
-                                 "A bientôt<br>",
-                                 "Philéas</p>"))
-      gm_send_message(email)
+      try({
+        slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
+        slackr_bot(message)
+      })
+      send_mail_user_login(my_reg = reg,my_ps = ps)
+      # email <- gm_mime() %>%
+      #   gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+      #   gm_subject("Envoi de mail via R") %>%
+      #   gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
+      #                            sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
+      #                            sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
+      #                            ifelse(is.null(IP()),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP()$city,IP()$region,IP()$country,IP()$org)),
+      #                            "A bientôt<br>",
+      #                            "Philéas</p>"))
+      # gm_send_message(email)
       
     }
     
@@ -167,89 +168,52 @@ output$choix_reg_map=renderLeaflet({
     fitBounds(bbox_reg[1]-1,bbox_reg[2],bbox_reg[3],bbox_reg[4])
 })
 
-dropbox_files = reactive({
+dropbox_files = reactiveVal()
+
+observeEvent(c(input$choix_reg,input$choix_ps),{
   req(input$choix_reg)
   req(input$choix_ps)
-  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_files = drop_dir(dropbox_ps_folder())
-  reg_files = data.table(reg_files)
-  if(nrow(reg_files)>0){#premier filtre
-    reg_files = reg_files[grepl(regex,name)]
-    reg_files = reg_files[!grepl("qpv_",name)]
-  }
-  if(input$choix_ps == "mg"){
-    regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
-    qpv_files = drop_dir(dropbox_ps_folder())
-    qpv_files = data.table(qpv_files)
-    if(nrow(qpv_files)>0){#premier filtre
-      qpv_files = qpv_files[grepl(regex,name)]
-    }
-    
-    reg_files <- rbind(reg_files,qpv_files)
-  }
   
-  if(nrow(reg_files)>0){#s'il en reste
-    print("found google files !")
-    reg_files
-  } else NULL
+  dropbox_files(get_dropbox_files(input,dropbox_ps_folder = dropbox_ps_folder()))
+  
 })
 
-output$ui_millesime=renderUI({
-  req(input$choix_reg)
-  req(input$choix_ps)
-  input$refresh_millesime
-  my_reg=input$choix_reg
-  reg_name=regions_reac()[reg==my_reg]$libreg
-  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
-  reg_files = drop_dir(dropbox_ps_folder())
-  
-  if (!is.null(reg_files)){
-    
-    if(nrow(reg_files)>0){#premier filtre
-      reg_files = data.table(reg_files)
-      reg_files = reg_files[grepl(regex,name)]
-      reg_files = reg_files[!grepl("en_vigueur",name)]
-      reg_files = reg_files[!grepl("qpv_",name)]
-      print(head(reg_files))
-    }
-    
-    if(nrow(reg_files)>0){#s'il en reste encore
-      millesimes(setNames(reg_files$name,
-                          reg_files$name%>%
-                            gsub(pattern = paste0(input$choix_ps,"_",input$choix_reg,"_"),replacement = "")%>%
-                            gsub(pattern = "_+",replacement = "_")%>%
-                            gsub(pattern = ".csv$",replacement = "")%>%
-                            gsub(pattern = "(^_)|(_$)",replacement = "")))
-    } else  {millesimes("")}
-  } else {millesimes("")}
-  print("millesimes") ; print(millesimes())
-  
-  # no_archive(nrow(reg_google_files)==0)
-  if(length(millesimes())==1 ){
-    if(millesimes()==""){
-      showNotification("Aucun projet en cours, merci de créer un \"nouveau projet de zonage\" en cliquant sur la disquette",type = "warning",duration = 10)
-    }
-  }
-  selectizeInput('choix_millesime',"",width="100%",
-                 choices=millesimes(),selected=millesimes()[1],
-                 options = list(placeholder = 'Dernier arrêté ou saisie en cours',
-                                plugins= list('remove_button')))
-})
+# dropbox_files = reactive({
+  # regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
+  # reg_files = drop_dir(dropbox_ps_folder())
+  # reg_files = data.table(reg_files)
+  # if(nrow(reg_files)>0){#premier filtre
+  #   reg_files = reg_files[grepl(regex,name)]
+  #   reg_files = reg_files[!grepl("qpv_",name)]
+  # }
+  # if(input$choix_ps == "mg"){
+  #   regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
+  #   qpv_files = drop_dir(dropbox_ps_folder())
+  #   qpv_files = data.table(qpv_files)
+  #   if(nrow(qpv_files)>0){
+  #     qpv_files = qpv_files[grepl(regex,name)]
+  #   }
+  #   
+  #   reg_files <- rbind(reg_files,qpv_files)
+  # }
+  # 
+  # if(nrow(reg_files)>0){#s'il en reste
+  #   print("found google files !")
+  #   reg_files
+  # } else NULL
+# })
+
+
 
 output$ui_params = renderUI({
   req(input$choix_ps)
   tagList(
-    # selectInput(inputId="vars_to_show",label="Variables à afficher",
-    #           selected = vars_to_show_list[[input$choix_ps]],
-    #           choices = vars_to_choose_from[[input$choix_ps]],
-    #           multiple=T),
     sliderInput("table_width","Ajuster la table",min=0,max=12,value=8),
     shinyWidgets::switchInput(inputId = "remove_alerte_jauge",
                               label = "Alertes Jauges",
                               value = F,
                               onLabel = "Désactivée",offLabel = "Activées",
                               labelWidth = "200",handleWidth = "100",
-                              # onStatus = "#0f0",offStatus = "#00f",
                               size = "normal",inline = T
     )
   )
@@ -288,40 +252,6 @@ observeEvent(input$table_width,{
 
 observeEvent(c(input$feedback_send),{
   req(input$feedback_send)
-  text_to_send=input$feedback_content
-  print("comment to send to slack")
-  print(text_to_send)
-  if(text_to_send!=""){
-    adresse_mail=ifelse(is.null(input$adresse_mail),"",input$adresse_mail)
-    name_sender=ifelse(is.null(input$name_sender),"",input$name_sender)
-    updateTextAreaInput(session,"feedback_content",value = "")
-    
-    message=paste0("App:ZonageARS\n",
-                   "Mail: ",adresse_mail,
-                   "\nNom: ",name_sender,
-                   "\nContenu: ",text_to_send)
-    message=gsub("\"","*",message)
-    
-    
-    # sendEmail(to = adresse_mail, 
-    #           mail_message = sprintf("Bonjour %s,\n Merci pour votre contribution, nous allons prendre en compte vos suggestions.\n %s",
-    #                                  name_sender,text_to_send))
-    
-    
-    # slackr({message})
-    if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
-      slackr_setup(config_file = "www/slackr_config.txt",echo = F)
-      
-      slackr_bot(message)
-    }
-    
-    showModal(modalDialog(title="Merci pour votre commentaire !",size="s",
-                          footer=NULL,easyClose = T,"Cliquer dans la zone grisée pour revenir à la liste des indicateurs de santé."))
-    showNotification(ui="Merci pour votre commentaire !",duration = 5)
-    shinyjs::runjs("$('.sidebar-menu > li:nth-child(5) > a').trigger('click');")
-    
-  } else if (text_to_send==""){
-    showNotification(ui="Commentaire vide. Ecrivez quelque-chose, toute remarque est bonne à prendre !",duration = 5)
-    
-  }
+  send_mail_and_slack_user_feedback(input,session)
+
 })

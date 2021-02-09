@@ -1,4 +1,3 @@
-# jauges = function(input,output,session){
   
   
   zonage_pop_reac=reactive({
@@ -184,4 +183,3 @@
                                                              danger=c(min_val+.95*(max_val-min_val),max_val)))
   })
   
-# }

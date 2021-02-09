@@ -1,15 +1,21 @@
 # devtools::install_github("rstudio/DT")
-download.file(url = "https://api64.ipify.org/",mode = "wb",
-              destfile = "current_ip.txt")
-server_ip=readLines("current_ip.txt")
-if(server_ip %in% c("54.204.34.9","164.131.131.193","54.204.36.75","54.204.37.78",
-                    "34.203.76.245","3.217.214.132","34.197.152.155")){
-  options(encoding = 'UTF-8')
-} else {
-  # options(shiny.fullstacktrace = TRUE)
-  # options(shiny.trace = TRUE)
-  options(shiny.error = browser)
-}
+try({
+  download.file(url = "https://api64.ipify.org/",mode = "wb",
+                destfile = "current_ip.txt")
+  
+  server_ip=readLines("current_ip.txt")
+  
+  
+  if(server_ip %in% c("54.204.34.9","164.131.131.193","54.204.36.75","54.204.37.78",
+                      "34.203.76.245","3.217.214.132","34.197.152.155")){
+    options(encoding = 'UTF-8')
+  } else {
+    # options(shiny.fullstacktrace = TRUE)
+    # options(shiny.trace = TRUE)
+    options(shiny.error = browser)
+  }
+  
+})
 
 library(shiny)
 library(data.table)
@@ -40,9 +46,12 @@ library(ggsn)
 library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
+# devtools::install_github("mrkaye97/slackr")
 library(slackr)
 library(shinyjs)
 library(gmailr)
+library(purrr)
+library(assertthat)
 gm_auth_configure(path = "credentials.json")
 gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche ! il fallait suivre les instructions de récup des credentials pour Python "quickstart.py"
 
@@ -50,17 +59,18 @@ gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche !
 # Then pass the token to each drop_ function
 drop_auth(rdstoken = "droptoken.rds")
 
-drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/",message=NULL){
-  local_name = paste0(local_path,filename)
-  drop_name = paste0(drop_path,filename)
-  # if(rdrop2::drop_exists(drop_name)){
-  #   if(!is.null(message)){
-  #     print(message)
-  #   }
-  #   rdrop2::drop_delete(path = drop_name)
-  # }
-  rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
-}
+source("utils/load_files.R",encoding = "UTF-8")#this is a script with functions
+source("utils/plots_func.R",encoding = "UTF-8")
+source("utils/maps_func.R",encoding = "UTF-8")
+source("utils/com_func.R",encoding = "UTF-8")
+source("utils/ui_func.R",encoding = "UTF-8")
+source("utils/handle_geo_data.R",encoding = "UTF-8")
+source("utils/tableau_agr.R",encoding = "UTF-8")  
+source("utils/get_zonage_en_vigueur.R",encoding = "UTF-8")
+source("utils/prep_zonage_mg.R",encoding = "UTF-8")
+source("utils/prep_zonage_hors_mg.R",encoding = "UTF-8")
+
+
 
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                   "Liste des départements"="departements",
@@ -135,20 +145,6 @@ vswitch_zonage_mg = function(v){
 
 
 
-
-slack_log = function(filename,my_reg,my_ps,my_mil,session){
-  filename = filename
-  reg = ifelse(is.null(my_reg),"XX",my_reg)
-  ps = ifelse(is.null(my_ps),"XX",my_ps)
-  mil = ifelse(is.null(my_mil),"XX",my_mil)
-  if(session$clientData$url_pathname=="/Zonage_ARS/"){
-    message=sprintf("App:ZonageARS\nEvent: Téléchargement du fichier %s par la région %s pour la profession %s avec le projet %s",filename,reg,ps,mil)
-    slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
-    slackr_bot(message)
-  }
-}
-
-
 correspondants_CNAM = c(
   "EMIN.AGAMALIYEV@assurance-maladie.fr",
   "anne.du-castel@assurance-maladie.fr",
@@ -168,6 +164,12 @@ correspondants_dev_drees = c(
   "phileas.condemine@sante.gouv.fr",
   "blandine.legendre@sante.gouv.fr"
 )
+
+
+
+
+
+
 
 
 

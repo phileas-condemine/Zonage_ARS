@@ -1,7 +1,74 @@
+get_millesimes = function(input,session,millesimes_reac,info_region,dropbox_ps_folder){
+  req(input$choix_reg)
+  req(input$choix_ps)
+  input$refresh_millesime
+  my_reg=input$choix_reg
+  reg_name=info_region[reg==my_reg]$libreg
+  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
+  reg_files = drop_dir(dropbox_ps_folder)
+  
+  if (!is.null(reg_files)){
+    
+    if(nrow(reg_files)>0){#premier filtre
+      reg_files = data.table(reg_files)
+      reg_files = reg_files[grepl(regex,name)]
+      reg_files = reg_files[!grepl("en_vigueur",name)]
+      reg_files = reg_files[!grepl("qpv_",name)]
+      print(head(reg_files))
+    }
+    
+    if(nrow(reg_files)>0){#s'il en reste encore
+      millesimes_reac(setNames(reg_files$name,
+                          reg_files$name%>%
+                            gsub(pattern = paste0(input$choix_ps,"_",input$choix_reg,"_"),replacement = "")%>%
+                            gsub(pattern = "_+",replacement = "_")%>%
+                            gsub(pattern = ".csv$",replacement = "")%>%
+                            gsub(pattern = "(^_)|(_$)",replacement = "")))
+    } else  {millesimes_reac("")}
+  } else {millesimes_reac("")}
+  print("millesimes_reac") ; print(millesimes_reac())
+  
+  if(length(millesimes_reac())==1 ){
+    if(millesimes_reac()==""){
+      showNotification("Aucun projet en cours, merci de créer un \"nouveau projet de zonage\" en cliquant sur la disquette",
+                       type = "warning",duration = 10,session = session)
+    }
+  }
+}
 
-importFile = reactiveVal(NULL)
 
-observeEvent(input$from_file,{
+
+get_dropbox_files = function(input,dropbox_ps_folder){
+  
+  regex = paste0(input$choix_ps,'_',input$choix_reg,'_')
+  reg_files = drop_dir(dropbox_ps_folder)
+  reg_files = data.table(reg_files)
+  if(nrow(reg_files)>0){#premier filtre
+    reg_files = reg_files[grepl(regex,name)]
+    reg_files = reg_files[!grepl("qpv_",name)]
+  }
+  if(input$choix_ps == "mg"){
+    regex = paste0("qpv_",input$choix_ps,'_',input$choix_reg,'_')
+    qpv_files = drop_dir(dropbox_ps_folder)
+    qpv_files = data.table(qpv_files)
+    if(nrow(qpv_files)>0){
+      qpv_files = qpv_files[grepl(regex,name)]
+    }
+    
+    reg_files <- rbind(reg_files,qpv_files)
+  }
+  
+  if(nrow(reg_files)>0){#s'il en reste
+    print("found google files !")
+    reg_files
+  } else NULL
+}
+
+
+
+###### IMPORT FILES FROM EXISTING ZONAGE ######
+
+file_import_modal_ui = function(input,output,session,importFile_reac){
   req(input$from_file)
   inFile <- input$from_file
   print(inFile$datapath)
@@ -15,15 +82,17 @@ observeEvent(input$from_file,{
   
   if(file_format == "csv"){
     import_table = fread(inFile$datapath)
-    importFile(import_table)
+    importFile_reac(import_table)
   } else if(file_format %in% c("xls","xlsx")){
     import_table = readxl::read_excel(inFile$datapath)%>%data.table()
-    importFile(import_table)
+    importFile_reac(import_table)
     
   } else {
     shinyalert(title="Mauvais format")
   }
+  
   output$import_table_overview = renderDataTable(import_table,options=list(dom = "t"))
+  
   print(input$import_data_model)
   if(input$import_data_model=="cast"){
     if(input$choix_ps == "mg"){
@@ -73,17 +142,17 @@ observeEvent(input$from_file,{
                         footer = tagList(
                           actionButton("parse_file","Soumettre",icon = shiny::icon("save")),
                           modalButton("Annuler",icon=shiny::icon("window-close"))
-                        )))
-})
+                        )),session=session)
+  
+}
 
 
-
-observe({
+file_import_form_dynamic_update = function(input,session,importFile_reac){
   print("update mods zonage")
   print(input$var_zonage)
   req(input$var_zonage)
   if (input$import_data_model=="melt") {
-    mods_choices = unique(importFile()[[input$var_zonage]])
+    mods_choices = unique(importFile_reac()[[input$var_zonage]])
     if(input$choix_ps == "mg"){
       
       updateSelectInput(session,"mod_zip",selected = input$mod_zip,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_hv)))
@@ -100,12 +169,11 @@ observe({
       
     }
   }
-  
-})
+}
 
-observeEvent(input$parse_file,{
-  # MAINTENANT IL FAUT NORMALISER LE FICHIER ET VERIFIER LA JOINTURE
-  my_data = importFile()
+file_import_validate_join_update = function(input,output,session,importFile_reac,dropbox_ps_folder,millesimes_reac){
+  
+  my_data = importFile_reac()
   req(my_data)
   insertUI(session=session,selector = "#parse_file",where = "beforeBegin",immediate = T,ui = tags$div(id="loading"))
   removeUI(session = session,selector = "#parse_file",immediate = T)
@@ -149,13 +217,13 @@ observeEvent(input$parse_file,{
   local_filenm = paste0("data/",filename)
   fwrite(unique(my_data),local_filenm)
   
-  drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
+  drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder)
   
   updateSelectizeInput(session,'choix_millesime',
-                       choices=c(millesimes(),setNames(drop_filenm,filenm_no_extension)),
-                       selected=drop_filenm)
-  importFile(my_data)
+                       choices=c(millesimes_reac(),setNames(filename,filenm_no_extension)),
+                       selected=filename)
+  importFile_reac(my_data)
   shinyjs::runjs("$('#file_import_box button.btn-box-tool').trigger('click');")
   shinyjs::runjs("$('button#go_zonage').addClass('pulse');")
-  removeModal()
-})
+  removeModal(session = session)
+}

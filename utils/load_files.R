@@ -107,7 +107,6 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
 }
 
 get_TA = function(dropbox_folder,filename){
-  # source("utils/prep_liste_TribunauxAdministratifs.R",echo = T)
   # get_TA()
   # filename = "liste_tribunaux_administratifs.RData"
   # rdrop2::drop_upload(file=paste0("data/",filename),path="zonage_dev/",autorename = F,mode = "overwrite")
@@ -120,7 +119,6 @@ get_TA = function(dropbox_folder,filename){
 }
 
 get_pop_femmes = function(dropbox_folder,filename){
-  # source("utils/handle_insee_pop.R")
   print("get pop femmes")
   if(!filename%in%list.files("data"))
     drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)

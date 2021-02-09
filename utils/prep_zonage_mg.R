@@ -1,53 +1,63 @@
 ###### LOAD HIST TVS
 # readxl::excel_sheets("data/Zonage_medecin_20191231.xlsx")
 
-
-filename = params[file=="zonage_mg"]$name
-if(!filename%in%list.files("data/")){
-  drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
-}
-
-if(my_reg!="4"){
-  zonage_historique=readxl::read_xlsx(paste0("data/",filename),
-                                      sheet="Zonage_TVS")[,c(2,5,7,8)]
-} else if (my_reg=="4"){
-  zonage_historique=readxl::read_xlsx(paste0("data/",filename),
-                                      sheet="Zonage_TVS")[,c(2,1,7,8)]
-}
-zonage_historique=data.table(zonage_historique)
-names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars")
-table(zonage_historique$zonage_ars)
-zonage_historique[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
-zonage_historique[zonage_ars=="Hors vivier",zonage_ars:="HV"]
-zonage_historique=zonage_historique%>%
-  mutate_if(is.factor,as.character)%>%
-  select(reg,tvs,zonage_ars,zonage_nat)%>% 
-  data.table %>% 
-  unique
-
-if (my_reg=="4"){
-  zonage_historique[,tvs:=substr(tvs,7,13)]
-}
-
-zonage_historique_reg=zonage_historique[reg==my_reg,c("tvs","zonage_ars","zonage_nat")]
-setnames(zonage_historique_reg,"zonage_nat","CN")
-zonage_historique_reg=unique(zonage_historique_reg)
-# zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
-if (my_reg!="4"){
-  zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
-}
-
-
-CN = zonage_historique_reg[,c("tvs","CN")]%>%unique
-VZN = zonage_historique_reg[,c("tvs","zonage_ars")]
-VZN$check_historique=T
-VZN <<- VZN
-
-
-
-
-prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zonage_historique = qpv_VZN,my_dropbox_files,choix_mil,env){
-  tvs=data.table(communes_TVS)
+prep_zonage_mg <- function(
+  my_reg,
+  my_ps,
+  dropbox_folder,
+  dropbox_ps_folder,
+  my_dropbox_files,
+  choix_mil,
+  params,
+  VZN_reac,
+  communes_AGR,
+  zonages_en_vigueur){
+  
+  
+  filename = params[file=="zonage_mg"]$name
+  if(!filename%in%list.files("data/")){
+    drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
+  }
+  
+  if(my_reg!="4"){
+    zonage_historique=readxl::read_xlsx(paste0("data/",filename),
+                                        sheet="Zonage_TVS")[,c(2,5,7,8)]
+  } else if (my_reg=="4"){
+    zonage_historique=readxl::read_xlsx(paste0("data/",filename),
+                                        sheet="Zonage_TVS")[,c(2,1,7,8)]
+  }
+  zonage_historique=data.table(zonage_historique)
+  names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars")
+  table(zonage_historique$zonage_ars)
+  zonage_historique[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
+  zonage_historique[zonage_ars=="Hors vivier",zonage_ars:="HV"]
+  zonage_historique=zonage_historique%>%
+    mutate_if(is.factor,as.character)%>%
+    select(reg,tvs,zonage_ars,zonage_nat)%>% 
+    data.table %>% 
+    unique
+  
+  if (my_reg=="4"){
+    zonage_historique[,tvs:=substr(tvs,7,13)]
+  }
+  
+  zonage_historique_reg=zonage_historique[reg==my_reg,c("tvs","zonage_ars","zonage_nat")]
+  setnames(zonage_historique_reg,"zonage_nat","CN")
+  zonage_historique_reg=unique(zonage_historique_reg)
+  # zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
+  if (my_reg!="4"){
+    zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
+  }
+  
+  
+  cadre_national = zonage_historique_reg[,c("tvs","CN")]%>%unique
+  vals_zonage_historique = zonage_historique_reg[,c("tvs","zonage_ars")]
+  vals_zonage_historique$check_historique=T
+  
+  #export vals_zonage_historique
+  VZN_reac(vals_zonage_historique)
+  
+  tvs=data.table(communes_AGR)
   tvs[,"pop_tvs_per_reg":=.(sum(population)),by=c("agr","reg")]
   tvs[,reg:=gsub("^0","",reg)]
   setorder(tvs,-pop_tvs_per_reg)
@@ -96,14 +106,14 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
     
     setorder(vals,agr)
     if(choix_mil==""){
-      choix_mil = paste0("mg_",input$choix_reg,"_cadre_national.csv")
+      choix_mil = paste0("mg_",my_reg,"_cadre_national.csv")
     }
-    drop_name=paste0(dropbox_ps_folder(),choix_mil)
+    drop_name=paste0(dropbox_ps_folder,choix_mil)
     local_name=paste0("data/",choix_mil)
     fwrite(unique(vals),file=local_name)
-    drop_clean_upload(filename = choix_mil,drop_path = dropbox_ps_folder())
+    drop_clean_upload(filename = choix_mil,drop_path = dropbox_ps_folder)
     
-    assign("vals",vals,env)
+    # assign("vals",vals,env)
   } else {
     req(choix_mil%in%my_dropbox_files$name)
     print("using historical data")
@@ -115,7 +125,7 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
       attempt <- attempt + 1
       try(
         {
-          drop_download(paste0(dropbox_ps_folder(),choix_mil),local_path = "data/",overwrite = T,verbose = T)
+          drop_download(paste0(dropbox_ps_folder,choix_mil),local_path = "data/",overwrite = T,verbose = T)
           print(list.files("data/"))
           zonage_saved <- fread(paste0("data/",choix_mil),colClasses = "character")%>%as.data.frame()
         }
@@ -126,11 +136,12 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
       mutate_all(as.character)%>%
       # mutate(agr=stringi::stri_pad_left(agr,5,"0"))
       mutate(agr=stringi::stri_pad_right(agr,5,"_"))
-
-    assign("vals",zonage_saved,env)
+    
+    # assign("vals",zonage_saved,env)
+    vals <- zonage_saved
     
     zonage_saved$value_set=T
-
+    
     
     radio_buttons=merge(radio_buttons,zonage_saved,
                         by.x=c("agr","statut"),
@@ -163,12 +174,14 @@ prep_zonage <- function(cadre_national=CN,vals_zonage_historique=VZN,vals_qpv_zo
   
   radio_buttons=dcast(radio_buttons,agr~statut,value.var="html")
   tvs=merge(tvs,radio_buttons,by="agr")
-
+  
   setorder(tvs,-proportion_pop)
   print("names tvs")
   print(class(tvs))
-  assign("tvs",tvs,env)
-  assign("radio_buttons",radio_buttons,env)
+  # assign("tvs",tvs,env)
+  # assign("radio_buttons",radio_buttons,env)
+  
+  return(list(vals=vals,tvs=tvs,radio_buttons=radio_buttons))
 }
 
 

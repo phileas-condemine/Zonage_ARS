@@ -3,7 +3,7 @@
 
 
 
-dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
+dl_zonage_en_vigueur_agr = function(ps,path,curr_reg,maj){
   print(path)
   my_files = drop_dir(path)
   my_files = data.table(my_files)
@@ -40,11 +40,11 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
   }
   # rm(files)
   # message("il faudrait vérifier la région majoritaire pour bien choisir celle \"en vigueur\" à sélectionner, pour l'instant on prend arbitrairement la 1ère du fichier.")
-  if (ps == "mg"){
-    maj = tvs_reg_majoritaire
-  } else if (ps %in% c("sf","inf")){
-    maj = bvcv_reg_majoritaire
-  }
+  # if (ps == "mg"){
+  #   maj = tvs_reg_majoritaire
+  # } else if (ps %in% c("sf","inf")){
+  #   maj = bvcv_reg_majoritaire
+  # }
   base::message("s'il y a plusieurs zonages en vigueur pour un même agr, on privilégie celui de la région majoritaire, sinon arbitraire")
   if(nrow(zonages_en_vigueur)>0){
     zonages_en_vigueur[maj,majoritaire:=1,on=c("agr","reg")]
@@ -56,16 +56,16 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg){
 }
 
 
-prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
+prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps,maj){
   
   if(nrow(en_vigueur)>0){
     en_vigueur$majoritaire=NULL
     
-    if (ps == "mg"){
-      maj = tvs_reg_majoritaire
-    } else if (ps %in% c("sf","inf")){
-      maj = bvcv_reg_majoritaire
-    }
+    # if (ps == "mg"){
+    #   maj = tvs_reg_majoritaire
+    # } else if (ps %in% c("sf","inf")){
+    #   maj = bvcv_reg_majoritaire
+    # }
     
     en_vigueur[maj,majoritaire:="oui",on=c("agr","reg")]
     en_vigueur[is.na(majoritaire),majoritaire:="non"]
@@ -125,18 +125,18 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps){
 }
 
 
-prepare_zonage_en_vigueur_com_for_export = function(en_vigueur,ps){
+prepare_zonage_en_vigueur_com_for_export = function(en_vigueur,ps,AGR){
  
   if(nrow(en_vigueur)>0){
 
     if (ps == "mg"){
-      tvs = TVS()[,.(agr,depcom,libcom)]
+      tvs = AGR[,.(agr,depcom,libcom)]
       setnames(tvs, "agr", "TVS")
       en_vigueur <- merge(en_vigueur, tvs, by = "TVS")
       en_vigueur <- en_vigueur[, c("depcom","libcom","region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
 
     } else if (ps %in% c("sf","inf")){
-      bvcv = BVCV()[,.(agr,depcom,libcom)]
+      bvcv = AGR[,.(agr,depcom,libcom)]
       setnames(bvcv, "agr", "BVCV")
       en_vigueur$BVCV = stringi::stri_pad_right(en_vigueur$BVCV,5,"_")
       en_vigueur <- merge(en_vigueur, bvcv, by = "BVCV")

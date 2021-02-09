@@ -22,7 +22,7 @@ dl_zonage_en_vigueur_qpv = function(ps,path,curr_reg){
           cbind(fread(local_path,colClasses = c("cod"="character")),reg=reg)
         })
         qpv_zonages_en_vigueur = rbindlist(files)
-        print("fichier de zonages en vigueur");print(head(qpv_zonages_en_vigueur))
+        print("fichier qpv de zonages en vigueur");print(head(qpv_zonages_en_vigueur))
         if (nrow(qpv_zonages_en_vigueur)>0){
           qpv_zonages_en_vigueur = qpv_zonages_en_vigueur[reg!=curr_reg]
           qpv_zonages_en_vigueur[,reg:=as.numeric(reg)]

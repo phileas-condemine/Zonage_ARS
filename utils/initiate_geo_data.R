@@ -9,40 +9,42 @@ todo = setdiff(regions_reac()$reg,6)#no mayotte
 todo = 11
 drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
-dropbox_folder = function(){
-  "zonage_dev/"
-}
 
-TVS = function(){
-  get_TVS(dropbox_folder(),params[file=="tvs"]$name)
-}
+dropbox_folder =  "zonage/" # "zonage_dev/"
+TVS = get_TVS(dropbox_folder,params[file=="tvs"]$name)
+dep = unique(TVS[,c("dep","reg","libdep")])
+regions = get_regions_seuils(dropbox_folder,params[file=="seuils_arretes"]$name,TVS)
+BVCV = get_BVCV(dropbox_folder,params[file=="bvcv"]$name)
 
-dep = function(){
-  unique(TVS()[,c("dep","reg","libdep")])
-}
-
-regions_reac = function(){
-  get_regions_seuils(dropbox_folder(),params[file=="seuils_arretes"]$name,TVS())
-}
-
-BVCV = function(){get_BVCV(dropbox_folder(),params[file=="bvcv"]$name)}
-
-
+  
 for (my_reg in todo){
   print(my_reg)
-  reg_name=regions_reac()[reg==my_reg]$libreg
-  my_deps=dep()[reg==my_reg]$dep
-  source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
-  prep_geo_data_from_scratch(my_reg)
+  reg_name=regions[reg==my_reg]$libreg
+  my_deps=dep[reg==my_reg]$dep
+  # prep_geo_data_from_scratch(my_reg)
+  prep_geo_data_from_scratch(my_reg = my_reg,
+                             regions = regions,
+                             dep = dep,
+                             dropbox_folder = dropbox_folder,
+                             TVS = TVS,
+                             BVCV = BVCV)
 }
 
 
 my_reg = 6
 reg_name=regions_reac()[reg==my_reg]$libreg
-my_deps=dep()[reg==my_reg]$dep
+my_deps=dep_reac()[reg==my_reg]$dep
 source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
-prep_geo_data_from_scratch(my_reg,mailles_geo=c("TVS"))
-
+# prep_geo_data_from_scratch(my_reg,mailles_geo=c("TVS"))
+print(my_reg)
+prep_geo_data_from_scratch(my_reg = my_reg,
+                           regions = regions_reac(),
+                           dep = dep_reac(),
+                           dropbox_folder = dropbox_folder(),
+                           TVS = TVS(),
+                           BVCV = BVCV(),
+                           mailles_geo=c("TVS"),params=params
+                           )
 
 
 

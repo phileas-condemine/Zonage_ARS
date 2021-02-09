@@ -65,10 +65,7 @@ observeEvent(input$save_latest_check,{
             local_justification = paste0("data/",filename)
             file.copy(paste0("data/",filename_millesimed),local_justification,overwrite = T)
             drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder())
-            # } else {
-            #   showModal(modalDialog(title="Merci de vérifier le contenu du champ \"justification du zonage pris\" avant de valider votre zonage.",
-            #                         "Le zonage n'a pas été sauvegardé, il pourra l'être une fois que vous aurez ajouté/relu le champ \"justification du zonage pris\" en cliquant sur le bouton éponyme situé au dessus du tableau de zonage."))
-            # }
+
           }
         }
       }
@@ -84,18 +81,12 @@ observeEvent(input$save_latest_check,{
     
     if(session$clientData$url_pathname=="/Zonage_ARS/" & !log_is_admin()){
       message=sprintf("App:ZonageARS\nEvent: la région %s vient de valider une zonage *en vigueur* pour les %s !",input$choix_reg,input$choix_ps)
-      slackr_setup(config_file = "www/slackr_config.txt",echo = F)
-      slackr_bot(message)
-      email <- gm_mime() %>%
-        gm_to(c(correspondants_CNAM,correspondants_DGOS)) %>%
-        gm_cc(correspondants_dev_drees)%>%
-        gm_subject("[Message automatique] Validation d'un zonage par une ARS") %>%
-        gm_html_body(body = HTML("<p>Bonjour à tous,<br>",
-                                 sprintf("L'ARS de la région %s vient de valider son zonage sur l'<a href=\"https://drees.shinyapps.io/Zonage_ARS/\">application DREES</a> avec la profession %s.<br>",regions_reac()[reg==input$choix_reg]$libreg,names(list_PS)[list_PS==input$choix_ps]),
-                                 "Bien cordialement,<br>",
-                                 "Blandine et Philéas<br>",
-                                 "PS : Merci de ne pas répondre, il s'agit d'un mail automatique.</p>"))
-      gm_send_message(email)
+      try({
+        slackr_setup(config_file = "www/slackr_config.txt",echo = F)
+        slackr_bot(message)
+      })
+      
+      send_mail_user_validate_zonage()
       
     }
     

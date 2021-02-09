@@ -9,9 +9,15 @@
 # token <- readRDS("droptoken.rds")
 # drop_acc(dtoken = token)
 
-prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = c("TVS","BVCV")){
-  reg_name=regions_reac()[reg==my_reg]$libreg
-  my_deps=dep()[reg==my_reg]$dep
+prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep_reac(),
+                                       dropbox_folder = dropbox_folder(),
+                                       refresh_geojson = F,mailles_geo = c("TVS","BVCV")
+                                       ,TVS = NULL#TVS()
+                                       ,BVCV= NULL#BVCV()
+                                       ,params
+                                       ){
+  reg_name=regions[reg==my_reg]$libreg
+  my_deps=dep[reg==my_reg]$dep
   nb_deps=length(my_deps)
   communes=lapply(my_deps,function(my_dep){
     if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
@@ -34,13 +40,13 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   if(my_reg %in% c(11,84,93)){
     filename = params[file=="polygones_arrondissements_PLM"]$name
     if(!filename%in%list.files("data/")){
-      drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
     }
     load(paste0("data/",filename))
     
     filename = params[file=="pop_plm"]$name
     if(!filename%in%list.files("data/")){
-      drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+      drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
     }
     load(paste0("data/",filename))
     z_pop <- pop_plm
@@ -83,7 +89,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   
   other_deps <- c()
   for(a in mailles_geo){
-    AGR <- get(a)()
+    AGR <- get(a)#()
     AGR_pertinents=AGR[agr%in%unique(AGR[depcom%in%communes$depcom]$agr)]
     other_deps_one=unique(AGR_pertinents$dep)
     other_deps_one=other_deps_one[!other_deps_one%in%my_deps]
@@ -118,7 +124,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     communes_pertinentes_TVS = ""#init
     communes_pertinentes_BVCV = ""#init
     for(a in mailles_geo){
-      AGR <- get(a)()
+      AGR <- get(a)#()
       communes_pertinentes <- AGR_pertinents$depcom
       assign(paste("communes_pertinentes",a,sep="_"),communes_pertinentes)
     }
@@ -136,7 +142,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
   communes2 <- communes
   
   for(a in mailles_geo){
-    AGR <- get(a)()
+    AGR <- get(a)#()
     
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
@@ -145,12 +151,12 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
       
       filename = params[file=="polygones_grands_quartiers_reunion"]$name
       if(!filename%in%list.files("data/")){
-        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+        drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
       }
       load(paste0("data/",filename))
       filename = params[file=="zonage_mg"]$name
       if(!filename%in%list.files("data/")){
-        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+        drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
       }
       z_pop = readxl::read_xlsx(paste0("data/",filename),
                                 sheet="Zonage_TVS")[,c(2,1,11)]
@@ -162,7 +168,23 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
       grdquart_reu$my_reg_BVCV=T
       names(grdquart_reu@data)
       grdquart_reu@data = merge(grdquart_reu@data,z_pop,by.x="depcom",by.y="agr")
-      communes = grdquart_reu%>% sf::st_as_sf() %>% select(depcom = depcom,libcom = libcom,population,my_reg_TVS,my_reg_BVCV,agr=depcom,libagr=libcom,reg,dep,libdep,libreg,geometry)
+      
+      communes = grdquart_reu%>% 
+        sf::st_as_sf() %>% 
+        select(depcom = depcom,
+               libcom = libcom,
+               population,
+               my_reg_TVS,
+               my_reg_BVCV,
+               reg,
+               dep,
+               libdep,
+               libreg,
+               geometry)%>%
+        mutate(
+          agr=depcom,
+          libagr=libcom
+        )
       
       
       # carte <- rbind(carte[-which(substr(carte$agr,1,3)=="974"),],
@@ -174,7 +196,7 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
       
       filename = params[file=="zonage_mg"]$name
       if(!filename%in%list.files("data/")){
-        drop_download(paste0(dropbox_folder(),filename),local_path = "data/",overwrite = T)
+        drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
       }
       z_pop = readxl::read_xlsx(paste0("data/",filename),
                                 sheet="Zonage_TVS")[,c(2,5,11)]
@@ -251,14 +273,14 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
     
     file = paste0(my_reg,"_preprocessed_TVS.RData")
     
-    drop_clean_upload(filename = file,message="rm tvs",drop_path=dropbox_folder())
+    drop_clean_upload(filename = file,message="rm tvs",drop_path=dropbox_folder)
     
   }
   
   if("BVCV"%in%mailles_geo){
     
     file = paste0(my_reg,"_preprocessed_BVCV.RData")
-    drop_clean_upload(filename = file,message="rm bvcv",drop_path=dropbox_folder())
+    drop_clean_upload(filename = file,message="rm bvcv",drop_path=dropbox_folder)
   }
 }
 
@@ -266,8 +288,8 @@ prep_geo_data_from_scratch <- function(my_reg,refresh_geojson = F,mailles_geo = 
 #SELON SI LES DONNEES SONT DEJA PRE-PROCESSED OU NON#
 #####################################################
 
-
-get_geo_data <- function(my_reg,path,env,my_ps){
+#' @param ... les paramètres à transmettre à la fonction prep_geo_data_from_scratch
+get_geo_data <- function(my_reg,path,env,my_ps,nom_fichier_dropbox,...){
   print("ask update contours ?")
   if (!paste0(my_reg,nom_fichier_dropbox)%in%list.files("data/")){
     if(rdrop2::drop_exists(paste0(path,my_reg,nom_fichier_dropbox))){
@@ -280,7 +302,7 @@ get_geo_data <- function(my_reg,path,env,my_ps){
       } else {
         mailles_geo = "BVCV"
       }
-      prep_geo_data_from_scratch(my_reg,mailles_geo=mailles_geo)
+      prep_geo_data_from_scratch(my_reg = my_reg,mailles_geo=mailles_geo,...)
     }
   } else {
     print("fichier fonds géo déjà présent")
@@ -291,4 +313,82 @@ get_geo_data <- function(my_reg,path,env,my_ps){
 
 
 
+
+
+create_and_upload_reg_majo_per_agr = function(regions=regions_reac(),dep=dep_reac(),
+                                              dropbox_folder=dropbox_folder(),TVS=TVS(),BVCV=BVCV(),params=params){
+  #### TVS        
+  
+  all_com_tvs = rbindlist(use.names = T,lapply(regions$reg,function(my_reg){
+    file = paste0(my_reg,"_preprocessed_TVS.RData")
+    if(!file%in%list.files("data/")){
+      rdrop2::drop_download(path = paste0(dropbox_folder,my_reg,"_preprocessed_TVS.RData"),overwrite = T,local_path = "data")
+    }
+    load(paste0("data/",file))
+    communes_TVS
+  }))
+  
+  tvs=data.table(all_com_tvs)
+  tvs = tvs[,.("pop_tvs_per_reg"=sum(population)),by=c("agr","reg","libagr")]
+  tvs[,reg:=gsub("^0","",reg)]
+  setorder(tvs,-pop_tvs_per_reg)
+  tvs_reg_majoritaire=tvs[,list(reg_majoritaire=reg[1],
+                                prop_pop_pct = round(100*pop_tvs_per_reg[1]/sum(pop_tvs_per_reg),1),
+                                distr = paste(paste0("reg ",reg," (",round(100*pop_tvs_per_reg/sum(pop_tvs_per_reg),1),"%)"),collapse = ", ")),
+                          by=c("agr","libagr")]
+  
+  # uniqueN(TVS[reg!="4"]$agr) == nrow(tvs_reg_majoritaire[reg_majoritaire!="4"])
+  # sum(TVS$agr%in%tvs_reg_majoritaire$agr)
+  # unique(TVS[!agr%in%tvs_reg_majoritaire$agr,c("agr","libagr","reg")])
+  # unique(tvs_reg_majoritaire[!agr%in%TVS$agr])
+  # les fichiers diffèrent pour la Réunion où on utilise les GQ et non les TVS
+  
+  
+  #### BVCV
+  
+  
+  
+  all_com_bvcv = rbindlist(use.names = T,lapply(setdiff(regions$reg,"6"),function(my_reg){
+    print(my_reg)
+    file = paste0(my_reg,"_preprocessed_BVCV.RData")
+    nom_fichier_dropbox ="_preprocessed_BVCV.RData"
+    if(!file%in%list.files("data/")){
+      
+      if(rdrop2::drop_exists(paste0(dropbox_folder,my_reg,nom_fichier_dropbox))){
+        print("récupération de l'historique dropbox")
+        rdrop2::drop_download(path = paste0(dropbox_folder,my_reg,nom_fichier_dropbox),overwrite = T,local_path = "data")
+      } else {
+        print("construction fonds géo from scratch")
+        prep_geo_data_from_scratch(my_reg = my_reg,
+                                   regions = regions,
+                                   dep = dep,
+                                   dropbox_folder = dropbox_folder,
+                                   TVS = TVS,
+                                   BVCV = BVCV,params=params)
+      }
+    }
+    load(paste0("data/",file))
+    communes_BVCV
+  }))
+  
+  bvcv=data.table(all_com_bvcv)
+  bvcv = bvcv[,.("pop_bvcv_per_reg"=sum(population)),by=c("agr","reg","libagr")]
+  bvcv[,reg:=gsub("^0","",reg)]
+  setorder(bvcv,-pop_bvcv_per_reg)
+  bvcv_reg_majoritaire=bvcv[,list(reg_majoritaire=reg[1],
+                                  prop_pop_pct = round(100*pop_bvcv_per_reg[1]/sum(pop_bvcv_per_reg),1),
+                                  distr = paste(paste0("reg ",reg," (",round(100*pop_bvcv_per_reg/sum(pop_bvcv_per_reg),1),"%)"),collapse = ", ")),
+                            by=c("agr","libagr")]
+  
+  uniqueN(BVCV$agr) == nrow(bvcv_reg_majoritaire)
+  
+  filename = "agr_reg_majoritaire.RData"
+  local_name = paste0("data/",filename)
+  
+  tvs_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
+  bvcv_reg_majoritaire[,reg_majoritaire:=as.numeric(reg_majoritaire)]
+  save(bvcv_reg_majoritaire,tvs_reg_majoritaire,file = local_name)
+  
+  drop_clean_upload(filename = filename,drop_path=dropbox_folder)
+}
 

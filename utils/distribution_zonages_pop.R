@@ -1,4 +1,3 @@
-# distribution_zonages_pop = function(input,output,session){
 
   
   output$dist_zonages = renderPlotly({
@@ -75,4 +74,3 @@
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
-# }

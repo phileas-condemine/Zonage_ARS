@@ -1,11 +1,10 @@
-# carte_agr = function(input,output,session){
   
   coord_qpv = reactive({
     
     req(input$choix_reg)
     my_reg=input$choix_reg
     reg_name=regions_reac()[reg==my_reg]$libreg
-    my_deps=dep()[reg==my_reg]$dep
+    my_deps=dep_reac()[reg==my_reg]$dep
     my_qpv <- mom_markers()
     my_qpv$dep = gsub("^0","",substr(my_qpv$CODE_QP,3,5))
     my_qpv = my_qpv[my_qpv$dep%in%my_deps,]
@@ -311,7 +310,7 @@
       if(input$update_contours){
         my_reg=input$choix_reg
         reg_name=regions_reac()[reg==my_reg]$libreg
-        my_deps=dep()[reg==my_reg]$dep
+        my_deps=dep_reac()[reg==my_reg]$dep
         source("utils/handle_geo_data.R",local=T,encoding = "UTF-8")
         showNotification("Une fois les données mises à jour, l'application va redémarrer et vous devrez vous reconnecter.",type = "message",duration = NULL)
         my_ps = input$choix_ps
@@ -321,10 +320,19 @@
           mailles_geo = "BVCV"
         }
         
-        prep_geo_data_from_scratch(my_reg,refresh_geojson=T,mailles_geo=mailles_geo)
+        # prep_geo_data_from_scratch(my_reg,refresh_geojson=T,mailles_geo=mailles_geo)
+        
+        prep_geo_data_from_scratch(my_reg = my_reg,
+                                   regions = regions_reac(),
+                                   dep = dep_reac(),
+                                   dropbox_folder = dropbox_folder(),
+                                   TVS = TVS(),
+                                   BVCV = BVCV(),
+                                   refresh_geojson=T,
+                                   mailles_geo=mailles_geo,
+                                   params=params)
         session$reload()
         
       }
     }
   })
-# }

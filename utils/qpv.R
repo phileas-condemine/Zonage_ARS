@@ -1,4 +1,3 @@
-# qpv = function(input,output,session){
   
   
   output$ui_toggle_qpv = renderUI({
@@ -175,4 +174,3 @@
     
   })
   
-# }
