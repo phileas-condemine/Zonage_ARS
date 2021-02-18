@@ -1,5 +1,6 @@
 
 login_app = function(path_to_app,my_reg,my_ps,auth){
+  message("func : login_app")
   
   #### Start the app ####
   print("Init the Shiny Driver...")

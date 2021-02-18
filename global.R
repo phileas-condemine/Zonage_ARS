@@ -13,6 +13,7 @@ try({
     # options(shiny.fullstacktrace = TRUE)
     # options(shiny.trace = TRUE)
     options(shiny.error = browser)
+    # options(shiny.error = recover)
   }
   
 })
@@ -49,7 +50,7 @@ library(plotly)
 # devtools::install_github("mrkaye97/slackr")
 library(slackr)
 library(shinyjs)
-library(gmailr)
+library(gmailr,exclude = "message")
 library(purrr)
 library(assertthat)
 gm_auth_configure(path = "credentials.json")
@@ -58,19 +59,26 @@ gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche !
 
 # Then pass the token to each drop_ function
 drop_auth(rdstoken = "droptoken.rds")
-
-source("utils/load_files.R",encoding = "UTF-8")#this is a script with functions
-source("utils/plots_func.R",encoding = "UTF-8")
-source("utils/maps_func.R",encoding = "UTF-8")
-source("utils/com_func.R",encoding = "UTF-8")
-source("utils/ui_func.R",encoding = "UTF-8")
-source("utils/handle_geo_data.R",encoding = "UTF-8")
-source("utils/tableau_agr.R",encoding = "UTF-8")  
-source("utils/get_zonage_en_vigueur.R",encoding = "UTF-8")
-source("utils/prep_zonage_mg.R",encoding = "UTF-8")
-source("utils/prep_zonage_hors_mg.R",encoding = "UTF-8")
-
-
+### LOAD FUNCTIONS ###
+source("R/misc.R",encoding = "UTF-8")
+source("R/load_files.R",encoding = "UTF-8")
+source("R/plots_func.R",encoding = "UTF-8")
+source("R/maps_func.R",encoding = "UTF-8")
+source("R/com_func.R",encoding = "UTF-8")
+source("R/ui_func.R",encoding = "UTF-8")
+source("R/handle_geo_data.R",encoding = "UTF-8")
+source("R/tableau_agr_func.R",encoding = "UTF-8")  
+source("R/table_recap.R",encoding = "UTF-8")  
+source("R/get_zonage_en_vigueur.R",encoding = "UTF-8")
+source("R/get_qpv_zonage_en_vigueur.R",encoding = "UTF-8")
+source("R/prep_zonage_mg.R",encoding = "UTF-8")
+source("R/prep_zonage_hors_mg.R",encoding = "UTF-8")
+source("R/export_dl_func.R",encoding = "UTF-8")
+source("R/persistance_func.R",encoding = "UTF-8")
+source("R/jauges_func.R",encoding = "UTF-8")
+source("R/qpv_func.R",encoding = "UTF-8")
+source("R/justification_func.R",encoding = "UTF-8")
+source("R/auth_func.R",encoding = "UTF-8")
 
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                   "Liste des départements"="departements",

@@ -78,11 +78,24 @@ tagList(
                      # ,tags$img(src="Logo_Drees.jpg")
     ),
     dashboardBody(
-      
-      tabItems(
+      includeCSS("www/bootstrap-tour-standalone.min.css")
+      ,includeScript("www/bootstrap-tour-standalone.min.js")
+      ,includeScript("www/integration_bootstrap_tour.js")
+      ,tabItems(
         tabItem(tabName = "accueil",
                 includeHTML("www/accueil_1.html"),
-                fluidRow(div(style="margin-left:40px",actionButton("go_params","Choix de la région, de la profession de santé"))),
+                fluidRow(div(style="margin-left:40px",
+                             # actionButton("go_params","Choix de la région, de la profession de santé")
+                             actionBttn(
+                               "go_params",
+                               "Accéder à la page suivante : choix de la région, de la profession de santé",
+                               style = "material-flat",
+                               color = "primary",
+                               size = "md",
+                               block = T,          
+                               icon = icon("door-open")
+                             )
+                )),
                 tags$br(),
                 includeHTML("www/accueil_2.html"),
                 tags$br(),
@@ -94,25 +107,34 @@ tagList(
                 # ,includeHTML("www/footer_accueil.html")
         ),
         tabItem(tabName = "my_params",
-                fluidRow(id="choix_region_millesime",
-                         div(class="col-sm-12 inbody_selector",
-                             uiOutput("ui_choix_reg")
-                         )),
                 fluidRow(
-                  conditionalPanel("input.choix_reg === null",
-                                   column(12,shinycssloaders::withSpinner(
-                                     leafletOutput("choix_reg_map",height="600px"),type=5,size = 1))
+                  actionBttn(
+                    "tuto_params",
+                    "Lancer la viste guidée",
+                    style = "pill",
+                    color = "default",
+                    size = "md",
+                    block = T,
+                    icon = icon("help")
+                    
+                  )
+                ),
+                fluidRow(
+                  column(width = 12,
+                         uiOutput("ui_choix_reg")
                   )),
-                fluidRow(id="choix_profession_sante",
-                         div(class="col-sm-12 inbody_selector",
-                             selectizeInput('choix_ps','Sélectionner une profession de santé',width = "100%",
-                                            choices=list_PS,multiple=T,selected="",
-                                            options = list(plugins= list('remove_button')
-                                                           ,placeholder = 'Une profession de santé'
-                                                           ,maxItems=1))%>%shinyInput_label_embed(
-                                                             icon("question-circle") %>%
-                                                               bs_embed_tooltip(title = "Choisissez la profession de santé dont vous souhaitez renseigner le zonage.")
-                                                           ))),
+                fluidRow(
+                  uiOutput("ui_choix_reg_map")),
+                fluidRow(id = "row_choix_ps",
+                         column(width = 12,
+                                selectizeInput('choix_ps','Sélectionner une profession de santé',width = "100%",
+                                               choices=list_PS,multiple=T,selected="",
+                                               options = list(plugins= list('remove_button')
+                                                              ,placeholder = 'Une profession de santé'
+                                                              ,maxItems=1))%>%shinyInput_label_embed(
+                                                                icon("question-circle") %>%
+                                                                  bs_embed_tooltip(title = "Choisissez la profession de santé dont vous souhaitez renseigner le zonage.")
+                                                              ))),
                 # conditionalPanel("input.choix_ps !== null",
                 #                  fluidRow(
                 #                    div(style="margin-left:15px",
@@ -120,87 +142,103 @@ tagList(
                 #                    
                 #                  )
                 # ),
-                conditionalPanel("input.choix_reg !== null",
-                                 box(width = 3,title = "Charger un projet de zonage existant",
-                                     column(11,uiOutput("ui_millesime")),
-                                     actionButton("refresh_millesime","",shiny::icon("redo"))),
-                                 box(width = 3,title = "Nouveau projet de zonage",
-                                     actionButton('modal_save_current',"",icon=icon("save"))),
-                                 div(id = "file_import_box",box(width = 6, 
-                                                                title = "Importer un projet de zonage local", 
-                                                                collapsible = T, collapsed = T, 
-                                                                conditionalPanel("input.choix_ps !== null",
-                                                                                 
-                                                                                 conditionalPanel("(typeof input.import_data_model !== 'undefined' && input.import_data_model.length > 0)",
-                                                                                                  fileInput("from_file","",buttonLabel = "Parcourir...",
-                                                                                                            placeholder = "Fichier de zonage déjà rempli",accept = c(".xls",".xlsx",".csv"))),
-                                                                                 tags$div(HTML('
-                                                                                              <div id="import_data_model" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline">
-                                                                                                <label class="control-label" for="import_data_model">Format des données</label>
-                                                                                                <div class="shiny-options-group">
-                                                                                                  <label class="radio-inline">
-                                                                                                    <input type="radio" name="import_data_model" value="cast"/>
-                                                                                                    <span><img src="https://gitlab.com/DREES_code/public/charte_drees/raw/master/img/data_cast2.PNG" alt="zones en colonnes avec 0-1" height="200px"/></span>
-                                                                                                  </label>
-                                                                                                  <label class="radio-inline">
-                                                                                                    <input type="radio" name="import_data_model" value="melt"/>
-                                                                                                    <span><img src="https://gitlab.com/DREES_code/public/charte_drees/raw/master/img/data_melt.PNG" alt="zones comme variable sur une colonne" height="200px"/></span>
-                                                                                                  </label>
-                                                                                                </div>
-                                                                                              </div> '))
-                                                                ),
-                                                                conditionalPanel("!(input.choix_ps !== null)",
-                                                                                 tags$h3("Vous devez d'abord sélectionner une profession de santé"))
-                                 )),
-                                 uiOutput("ui_go_zonage")
-                                 # conditionalPanel("input.choix_millesime !== null",
-                                 #                  box(width = 12, 
-                                 #                      actionBttn(
-                                 #                        inputId = "go_zonage",
-                                 #                        label = "Accéder au formulaire de zonage",
-                                 #                        color = "success",size = "lg",
-                                 #                        style = "material-flat",
-                                 #                        icon = icon("door-open"),
-                                 #                        block = TRUE
-                                 #                      ))
-                                 #                  )
-                                 # actionButton("go_zonage","Accéder au formulaire de zonage",icon=shiny::icon("door-open")))
-                                 
-                                 
+                # conditionalPanel("input.choix_reg !== null",
+                fluidRow(
+                  div(id="load_existing_proj",box(width = 3,title = "Charger un projet de zonage existant",height = "600px",
+                                                  column(11,uiOutput("ui_millesime"),
+                                                         # actionButton("refresh_millesime","",icon("redo"))),
+                                                         actionBttn(
+                                                           inputId = "refresh_millesime",
+                                                           label = "Rafraîchir la liste",
+                                                           icon = icon("redo"),
+                                                           size = "sm",
+                                                           block = T
+                                                         )))),
+                  div(id="create_new_proj",box(width = 3,title = "Nouveau projet de zonage",height = "600px",
+                                               actionBttn(
+                                                 inputId = "modal_save_current",
+                                                 label = "Créer un nouveau projet",
+                                                 icon = icon("save"),
+                                                 size = "sm",
+                                                 block = T
+                                               ))),
+                  
+                  div(id = "file_import_box",box(width = 6,height = "600px",
+                                                 title = "Importer un projet de zonage local", 
+                                                 collapsible = T, collapsed = F, 
+                                                 uiOutput("ui_import_data_model")
+                                                 
+                  )),
+                  
+                  
+                  
                 ),
-                tags$br(),
-                tags$br()
+                fluidRow(
+                  column(12,
+                         div(id="box_go_zonage",
+                             box(width=12,
+                                 uiOutput("ui_go_zonage")
+                                 
+                             ))
+                  )
+                ),
+                br(),
+                br(),
+                br()
                 
                 # ,includeHTML("www/footer_catalogue.html")
         ),
         tabItem(tabName = "zonage",
+                conditionalPanel(condition="output.auth=='KO'",
+                                 fluidRow(box(width=12,title="Connexion nécessaire",
+                                              "<p>Merci de retourner sur l'onglet \"Choix de la profession\" pour vous identifier.</p>",
+                                              "<p>Si le chargement du zonage est en cours (notification en bas à droite de la page) vous pouvez ignorer ce message, le tableau apparaîtra bientôt sur l'écran.</p>"))),
                 conditionalPanel(condition="output.auth=='OK'",
                                  fluidRow(
                                    # uiOutput("box_tableau"),
                                    # uiOutput("box_carte_jauges")
-                                   div(id="box_tableau",box(width = 8,
-                                                            uiOutput("rappel_ps"),
-                                                            uiOutput("ui_toggle_qpv"),
-                                                            uiOutput("ui_search_qpv"),
-                                                            uiOutput("ui_open_form_justification"),
-                                                            # uiOutput("ui_zonage_dt"),
-                                                            DTOutput("zonage_dt"),
-                                                            tags$br(),
-                                                            fluidRow(
-                                                              column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
-                                                              column(6,textOutput("nb_modif_unsaved")),
-                                                              column(4,tags$div(id="loading"))),
-                                                            actionBttn(
-                                                              inputId = "save_latest",
-                                                              label = "Valider ce zonage",
-                                                              color = "success",size = "lg",
-                                                              style = "material-flat",
-                                                              icon = icon("check"),
-                                                              block = TRUE
-                                                            ),
-                                                            tags$br(),
-                                                            DTOutput("recap_dt")
-                                   )),
+                                   div(id="box_tableau",
+                                       box(width = 8,
+                                           fluidRow(
+                                           column(7,uiOutput("rappel_ps")),
+                                           column(5,br(),actionBttn(
+                                             "tuto_zonage",
+                                             "Lancer la viste guidée",
+                                             style = "pill",
+                                             color = "default",
+                                             size = "md",
+                                             block = T,
+                                             icon = icon("help")
+                                             
+                                           ))),  
+                                           fluidRow(column(12,
+                                             
+                                           uiOutput("ui_toggle_qpv"))),
+                                           fluidRow(column(12,
+                                             uiOutput("ui_search_qpv"))),
+                                           fluidRow(column(12,
+                                             uiOutput("ui_open_form_justification"))),
+                                           # uiOutput("ui_zonage_dt"),
+                                           fluidRow(column(12,
+                                             DTOutput("zonage_dt"))),
+                                           tags$br(),
+                                           fluidRow(column(12,
+                                             column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
+                                             column(6,textOutput("nb_modif_unsaved")),
+                                             column(4,tags$div(id="loading")))),
+                                           fluidRow(column(12,
+                                             actionBttn(
+                                             inputId = "save_envigueur",
+                                             label = "Valider ce zonage",
+                                             color = "success",size = "lg",
+                                             style = "material-flat",
+                                             icon = icon("check"),
+                                             block = TRUE
+                                           ))),
+                                           tags$br(),
+                                           fluidRow(column(12,
+                                             DTOutput("recap_dt")))
+                                       )),
                                    div(id="box_carte_jauges",box(width = 4,
                                                                  conditionalPanel("input.choix_reg !== null",
                                                                                   fluidRow(

@@ -1,5 +1,5 @@
 
-path = "server.R"
+path = "server_old.R"
 code = readLines(path)
 sources_loc = grep("source\\(",code)
 has_source = (length(sources_loc)>0)
@@ -25,6 +25,9 @@ while(has_source){
   has_source = (length(sources_loc)>0)
   i=i+1
 }
+
+writeLines(code,"server.R")
+
 
 code = c(readLines("global.R"),"ui<-",readLines("ui.R"),"server<-",code,"shiny::shinyApp(ui,server)")
   

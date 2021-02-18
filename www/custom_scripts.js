@@ -48,10 +48,10 @@ function checkifrunning() {
       var is_running = $("html").attr("class").includes("shiny-busy");
       if (is_running){
         $("#loading").show()
-        $("#save_latest").hide()
+        $("#save_envigueur").hide()
       } else {
         $("#loading").hide()
-        $("#save_latest").show()
+        $("#save_envigueur").show()
 
       }
     }; 

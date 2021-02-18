@@ -39,3 +39,5 @@ quickstart.py
 token.pickle
 tests/shinytest/snapshot-current/*.xlsx
 app.R
+server_old.R
+utils/old/
