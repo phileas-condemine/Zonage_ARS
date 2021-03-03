@@ -777,7 +777,8 @@ function(input, output,session) {
       log_is_admin,
       has_logged_in,
       enable_dl_zonage_en_vigueur,
-      get_auth()
+      get_auth(),
+      IP=IP(),info_region = regions_reac()
     ) 
     
     
@@ -851,16 +852,26 @@ function(input, output,session) {
   observeEvent(input$save_current_view,{
     req(input$save_current_view)
     my_reg=input$choix_reg
+    removeUI(selector = "#forbidden_name",immediate = T,session=session)
     
-    if (sum(grepl("(vigueur)|(justification)",))==0){
-      nm = ifelse(input$millesime_name=="",paste0("zonage",year(Sys.Date())),input$millesime_name)
-      new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_',nm)
-      updateSelectizeInput(session,'choix_millesime',
-                           choices=c(millesimes(),setNames(new_mil,nm)),
-                           selected=new_mil)
-      removeModal()
+    if (sum(grepl("(vigueur)|(justification)",input$millesime_name))==0){
+      
+      if(input$millesime_name == ""){
+        insertUI(selector = "#millesime_name",where = "beforeBegin",session = session,immediate = T,
+                 ui=tags$div(id="forbidden_name",
+                             tags$p(style="color:#f00;",
+                                    tags$b("Merci d'indiquer un nouveau nom à donner au projet de zonage sélectionné."))))
+        
+      } else {
+        
+        nm = input$millesime_name
+        new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_',nm)
+        updateSelectizeInput(session,'choix_millesime',
+                             choices=c(millesimes(),setNames(new_mil,nm)),
+                             selected=new_mil)
+        removeModal()
+      }
     } else {
-      removeUI(selector = "#forbidden_name",immediate = T,session=session)
       insertUI(selector = "#millesime_name",where = "beforeBegin",session = session,immediate = T,
                ui=tags$div(id="forbidden_name",tags$p(style="color:#f00;",tags$b('Merci de choisir un autre nom, les mots clefs "en vigueur" et "justification" sont réservés.'))))
     }
@@ -883,17 +894,136 @@ function(input, output,session) {
                    dropbox_ps_folder = dropbox_ps_folder())
     
     if(length(millesimes())>0){
-      selectizeInput('choix_millesime',"",width="100%",
-                     choices=millesimes(),selected=millesimes()[1],
-                     options = list(placeholder = 'Dernier arrêté ou saisie en cours',
-                                    plugins= list('remove_button')))
+      tagList(selectizeInput('choix_millesime',"",width="100%",
+                             choices=millesimes(),selected=millesimes()[1],
+                             options = list(placeholder = 'Dernier arrêté ou saisie en cours',
+                                            plugins= list('remove_button'))),
+              actionBttn("rename_millesime","Renommer le projet",icon = icon("edit"),size = "sm",block=T,
+                         style = "pill",color = "warning"))
     } else {
       HTML("<p>Aucun projet n'a été trouvé.</p>",
            "<p>Merci de créer un projet en utilisant le menu situé à droite.</p>")
     }
   })
   
+  observeEvent(input$rename_millesime,{
+    req(input$rename_millesime)
+    mil_list = millesimes()
+    mil_name = names(mil_list[mil_list==input$choix_millesime])
+    showModal(modalDialog(title="Renommer le projet sélectionner",
+                          HTML(sprintf("<p>Le nom actuel du projet est %s.</p>",mil_name)),
+                          textInput("new_name_millesime","Nouveau nom",value = "",placeholder =  mil_name),
+                          passwordInput("key_to_validate_rename_millesime",label = "Identification requise",placeholder = "Clef d'identification"),
+                          footer = tagList(modalButton("Annuler"),
+                                           actionButton("validate_rename_millesime","Valider",icon=icon("check")))),
+              session=session)
+    
+  })
   
+  
+  observeEvent(input$validate_rename_millesime,{
+    req(input$validate_rename_millesime)
+    auth = get_auth()
+    auth = auth[key==input$key_to_validate_rename_millesime & reg == input$choix_reg]
+    
+    if(nrow(auth)==0){
+      if(input$key_to_validate_rename_millesime == ""){
+        removeUI(selector = "#invalid_key",immediate = T,session=session)
+        insertUI(selector = "#key_to_validate_rename_millesime",
+                 where = "beforeBegin",session = session,immediate = T,
+                 ui=tags$div(id="invalid_key",
+                             tags$p(style="color:#f00;",
+                                    tags$b(
+                                      "Merci d'entrer la clef d'identification de votre région pour valider l'action"))))
+        
+        
+      } else {
+        removeUI(selector = "#invalid_key",immediate = T,session=session)
+        insertUI(selector = "#key_to_validate_rename_millesime",
+                 where = "beforeBegin",session = session,immediate = T,
+                 ui=tags$div(id="invalid_key",
+                             tags$p(style="color:#f00;",
+                                    tags$b(sprintf(
+                                      "Clef d'identification erronée, vous avez écrit \"%s\".",
+                                      input$key_to_validate_rename_millesime)))))
+        
+        
+      }
+    } else {
+      removeUI(selector = "#invalid_key",immediate = T,session=session)
+      removeUI(selector = "#forbidden_name",immediate = T,session=session)
+      
+      old_mil = input$choix_millesime
+      mil_list = millesimes()
+      old_mil_name = names(mil_list[mil_list==old_mil])
+      dropbox_files = drop_dir(dropbox_ps_folder())
+      dropbox_files = data.table(dropbox_files)
+      reg_ps = paste0("^",input$choix_ps,"_",input$choix_reg,"_")
+      proj_in_reg_ps = dropbox_files[grep(reg_ps,name)]$name
+      proj_in_reg_ps = gsub(reg_ps,"",proj_in_reg_ps)
+      
+      if (sum(grepl("(vigueur)|(justification)",input$new_name_millesime))==0){
+        if(input$new_name_millesime == ""){
+          insertUI(selector = "#new_name_millesime",where = "beforeBegin",session = session,immediate = T,
+                   ui=tags$div(id="forbidden_name",tags$p(style="color:#f00;",tags$b("Merci d'indiquer un nouveau nom à donner au projet de zonage sélectionné."))))
+          
+        } else if (input$new_name_millesime == old_mil_name) {
+          insertUI(selector = "#new_name_millesime",where = "beforeBegin",session = session,immediate = T,
+                   ui=tags$div(id="forbidden_name",tags$p(style="color:#f00;",tags$b("Merci d'indiquer un nom différent du nom actuel du projet sélectionné."))))
+        } else if (input$new_name_millesime %in% proj_in_reg_ps){
+          
+          insertUI(selector = "#new_name_millesime",where = "beforeBegin",session = session,immediate = T,
+                   ui=tags$div(id="forbidden_name",tags$p(style="color:#f00;",tags$b("Un projet portant ce nom existe déjà. Merci de choisir un autre nom."))))
+          
+          
+        } else {
+          
+          nm = input$new_name_millesime
+          new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_',nm)
+          
+
+          
+          
+
+          to_rename = dropbox_files[grepl(sprintf("(%s$)|(%s.csv$)",old_mil,old_mil),name)]$name
+          start_warning = Sys.time()
+          insertUI(selector = ".modal-body",where = "beforeEnd",session = session,immediate = T,
+                   ui=tags$div(id="rename_and_reload",
+                               tags$p(style="color:#f00;",
+                                      tags$b(sprintf(
+                                        "Les fichiers [%s] vont être renommés puis l'application sera relancée afin que vous puissiez charger le projet sous son nouveau nom.",paste(to_rename,collapse=", "))))))
+          
+          for (old_file_name in to_rename){
+            
+            new_file_name = gsub(old_mil,new_mil,old_file_name)
+            new_file_name = gsub(" ","_",new_file_name)
+            path = dropbox_ps_folder()
+            drop_move(from_path = paste0(path,old_file_name),to_path = paste0(path,new_file_name))
+            
+          }
+          
+          end_time = difftime(Sys.time(),start_warning,units = "secs")
+          time_to_wait = 5 - end_time
+          if (time_to_wait>0){
+            Sys.sleep(time_to_wait)
+          }
+          session$reload()
+          
+        }
+      } else {
+        insertUI(selector = "#new_name_millesime",where = "beforeBegin",session = session,immediate = T,
+                 ui=tags$div(id="forbidden_name",tags$p(style="color:#f00;",tags$b('Merci de choisir un autre nom, les mots clefs "en vigueur" et "justification" sont réservés.'))))
+      }
+      
+      
+      
+      
+      
+      
+      
+    }
+    
+  })
   
   
   output$nb_modif_unsaved = renderText({

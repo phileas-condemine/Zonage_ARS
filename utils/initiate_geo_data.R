@@ -1,12 +1,5 @@
 source("global.R")
 # my_reg = regions$reg[1]
-my_reg = 28
-my_reg = 84 # ARA
-my_reg = 11 
-my_reg = 4 #La Réunion
-todo = c(11,84,93)#PLM
-todo = setdiff(regions_reac()$reg,6)#no mayotte
-todo = 11
 drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
 
@@ -15,6 +8,18 @@ TVS = get_TVS(dropbox_folder,params[file=="tvs"]$name)
 dep = unique(TVS[,c("dep","reg","libdep")])
 regions = get_regions_seuils(dropbox_folder,params[file=="seuils_arretes"]$name,TVS)
 BVCV = get_BVCV(dropbox_folder,params[file=="bvcv"]$name)
+
+
+my_reg = 28
+my_reg = 84 # ARA
+my_reg = 11 
+my_reg = 4 #La Réunion
+todo = c(11,84,93)#PLM
+todo = setdiff(regions$reg,6)#no mayotte
+todo = 11
+drop_auth(rdstoken = "droptoken.rds")
+params = fread("params.csv",sep=":")
+
 
   
 for (my_reg in todo){
@@ -27,24 +32,10 @@ for (my_reg in todo){
                              dep = dep,
                              dropbox_folder = dropbox_folder,
                              TVS = TVS,
-                             BVCV = BVCV)
+                             BVCV = BVCV,params = params)
 }
 
 
-my_reg = 6
-reg_name=regions_reac()[reg==my_reg]$libreg
-my_deps=dep_reac()[reg==my_reg]$dep
-source("utils/handle_geo_data.R",local = T,encoding = "UTF-8")
-# prep_geo_data_from_scratch(my_reg,mailles_geo=c("TVS"))
-print(my_reg)
-prep_geo_data_from_scratch(my_reg = my_reg,
-                           regions = regions_reac(),
-                           dep = dep_reac(),
-                           dropbox_folder = dropbox_folder(),
-                           TVS = TVS(),
-                           BVCV = BVCV(),
-                           mailles_geo=c("TVS"),params=params
-                           )
 
 
 

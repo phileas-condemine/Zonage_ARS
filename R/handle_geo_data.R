@@ -321,7 +321,7 @@ create_and_upload_reg_majo_per_agr = function(regions=regions_reac(),dep=dep_rea
   #### TVS        
   message("func : create_and_upload_reg_majo_per_agr")
   
-  all_com_tvs = rbindlist(use.names = T,lapply(regions$reg,function(my_reg){
+  all_com_tvs = rbindlist(use.names = T,fill = T,lapply(regions$reg,function(my_reg){
     print(my_reg)
     file = paste0(my_reg,"_preprocessed_TVS.RData")
     if(!file%in%list.files("data/")){

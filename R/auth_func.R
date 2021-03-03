@@ -1,6 +1,12 @@
 
 
-on_login_actions = function(input,output,session,log_is_admin_reac,has_logged_in_reac,enable_dl_zonage_en_vigueur_reac,auth){
+on_login_actions = function(input,
+                            output,
+                            session,
+                            log_is_admin_reac,
+                            has_logged_in_reac,
+                            enable_dl_zonage_en_vigueur_reac,
+                            auth,IP,info_region) {
   message("func : on_login_actions")
   
   req(input$my_auth)
@@ -29,9 +35,16 @@ on_login_actions = function(input,output,session,log_is_admin_reac,has_logged_in
         slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
         slackr_bot(message)
       })
-      send_mail_user_login(my_reg = reg,my_ps = ps)
+      
+      send_mail_user_login(
+        my_reg = reg,
+        my_ps = ps,
+        session = session,
+        IP = IP,
+        info_region = info_region,
+        key = key
+      )
     }
-    
     has_logged_in_reac(T)
     enable_dl_zonage_en_vigueur_reac(T)
     outputOptions(output, "auth", suspendWhenHidden=FALSE)

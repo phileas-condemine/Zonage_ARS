@@ -27,16 +27,35 @@ drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/
   rdrop2::drop_upload(file = local_name,path = drop_path,autorename = F,mode="overwrite")
 }
 
-send_mail_user_login = function(my_reg=input$choix_reg,my_ps=input$choix_ps,session=session,IP=IP(),info_region = regions_reac()){
+send_mail_user_login = function(my_reg=input$choix_reg,my_ps=input$choix_ps,session,IP,info_region,key){
   message("func : send_mail_user_login")
-  
   email <- gm_mime() %>%
     gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
     gm_subject("Envoi de mail via R") %>%
     gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
-                             sprintf("Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",as.character(Sys.time()),key,session$clientData$url_hostname,session$clientData$url_pathname),
-                             sprintf("L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",info_region[reg==my_reg]$libreg,names(list_PS)[list_PS==my_ps]),
-                             ifelse(is.null(IP),"",sprintf("D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",IP$city,IP$region,IP$country,IP$org)),
+                             sprintf(
+                               "Une connexion a été réalisée à %s avec la %s sur l'app %s%s<br>",
+                               as.character(Sys.time()),
+                               key,
+                               session$clientData$url_hostname,
+                               session$clientData$url_pathname
+                             ),
+                             sprintf(
+                               "L'utilisateur s'est connecté pour la région %s avec la profession %s.<br>",
+                               info_region[reg == my_reg]$libreg,
+                               names(list_PS)[list_PS == my_ps]
+                             ),
+                             ifelse(
+                               is.null(IP),
+                               "",
+                               sprintf(
+                                 "D'après les infos collectées, l'IP est dans la ville de %s, en %s (%s), organisation : %s.<br>",
+                                 IP$city,
+                                 IP$region,
+                                 IP$country,
+                                 IP$org
+                               )
+                             ),
                              "A bientôt<br>",
                              "Philéas</p>"))
   gm_send_message(email)
@@ -44,7 +63,7 @@ send_mail_user_login = function(my_reg=input$choix_reg,my_ps=input$choix_ps,sess
 }
 
 
-send_mail_user_validate_zonage = function(my_reg=input$choix_reg,my_ps=input$choix_ps,info_region = regions_reac()){
+send_mail_user_validate_zonage = function(my_reg,my_ps,info_region){
   message("func : send_mail_user_validate_zonage")
   
   

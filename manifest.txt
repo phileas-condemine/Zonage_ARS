@@ -20,11 +20,15 @@ www/FAQ_mg.pdf
 www/slackr_config.txt
 www/slackr_config_log.txt
 www/get_ip.js
+www/bootstrap-tour-standalone.min.css
+www/bootstrap-tour-standalone.min.js
+www/integration_bootstrap_tour.js
 data/geojson/init_geojson.txt
 utils/create_arrete_inf.Rmd
 utils/create_arrete_mg.Rmd
 utils/create_arrete_sf.Rmd
 utils/modele_word_arrete.docx
+utils/ARS.png
 R/misc.R
 R/load_files.R
 R/plots_func.R

@@ -179,7 +179,7 @@ save_upload_en_vigueur = function(input,
         slackr_bot(message)
       })
       
-      send_mail_user_validate_zonage()
+      send_mail_user_validate_zonage(my_reg=input$choix_reg,my_ps=input$choix_ps,info_region = regions_reac())
       
     }
     

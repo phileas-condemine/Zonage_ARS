@@ -78,7 +78,7 @@ tagList(
                      # ,tags$img(src="Logo_Drees.jpg")
     ),
     dashboardBody(
-      includeCSS("www/bootstrap-tour-standalone.min.css")
+          includeCSS("www/bootstrap-tour-standalone.min.css")
       ,includeScript("www/bootstrap-tour-standalone.min.js")
       ,includeScript("www/integration_bootstrap_tour.js")
       ,tabItems(
@@ -191,8 +191,9 @@ tagList(
         tabItem(tabName = "zonage",
                 conditionalPanel(condition="output.auth=='KO'",
                                  fluidRow(box(width=12,title="Connexion nécessaire",
-                                              "<p>Merci de retourner sur l'onglet \"Choix de la profession\" pour vous identifier.</p>",
-                                              "<p>Si le chargement du zonage est en cours (notification en bas à droite de la page) vous pouvez ignorer ce message, le tableau apparaîtra bientôt sur l'écran.</p>"))),
+                                              p("Merci de retourner sur l'onglet \"Choix de la profession\" pour vous identifier."),
+                                              p("Si le chargement du zonage est en cours (notification en bas à droite de la page) vous pouvez ignorer ce message, le tableau apparaîtra bientôt sur l'écran."),
+                                              tags$div(id="loading")))),
                 conditionalPanel(condition="output.auth=='OK'",
                                  fluidRow(
                                    # uiOutput("box_tableau"),
