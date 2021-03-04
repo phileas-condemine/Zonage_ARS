@@ -777,7 +777,7 @@ function(input, output,session) {
       log_is_admin,
       has_logged_in,
       enable_dl_zonage_en_vigueur,
-      get_auth(),
+      get_auth(dropbox_folder()),
       IP=IP(),info_region = regions_reac()
     ) 
     
@@ -792,7 +792,7 @@ function(input, output,session) {
       session,
       log_is_admin,
       enable_dl_zonage_en_vigueur,
-      get_auth()
+      get_auth(dropbox_folder())
     ) 
     
     
@@ -923,7 +923,7 @@ function(input, output,session) {
   
   observeEvent(input$validate_rename_millesime,{
     req(input$validate_rename_millesime)
-    auth = get_auth()
+    auth = get_auth(dropbox_folder())
     auth = auth[key==input$key_to_validate_rename_millesime & reg == input$choix_reg]
     
     if(nrow(auth)==0){
