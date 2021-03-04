@@ -18,7 +18,6 @@ droptoken.rds
 *.pptx
 data_prep/
 googlesheets_token.rds
-*.gif
 data/SF/
 data/Shape_files_qppv/
 Leaflet.glify-2.1.0/
