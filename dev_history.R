@@ -7,5 +7,5 @@ pkgs = c("shiny","data.table","DT","leaflet","ggplot2","ggrepel","sp","sf","shin
          ,"dplyr","readxl","flexdashboard","jsonlite","curl","colourvalues","bsplus","rdrop2"
          ,"rgdal","rgeos","htmlwidgets","lubridate","openxlsx","knitr","kableExtra","flextable"
          ,"ggsn","shinydashboard","shinyWidgets","plotly","slackr","shinyjs","gmailr","purrr"
-         ,"assertthat")
+         ,"assertthat","shinytest","testthat")
 pkgs %>% map(usethis::use_package) %>% invisible()

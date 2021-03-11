@@ -47,4 +47,6 @@ Imports:
     shinyjs,
     gmailr,
     purrr,
-    assertthat
+    assertthat,
+    shinytest,
+    testthat
