@@ -16,9 +16,9 @@ testing:
     only:
         - master
     script:
-#      - sudo apt-get update -y 
-#      - sudo apt-get install -y libudunits2-dev
-#      - Rscript R/install_deps.R
+     - sudo apt-get update -y
+     - sudo apt-get install -y libudunits2-dev
+     - Rscript R/install_deps.R
       - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
 
     artifacts:

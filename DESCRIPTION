@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "phileas.condemine@sante.gouv.fr",
            comment = c(ORCID = "0000-0003-4078-7269"))
-Description: L'application n'est pas tout à fait un package mais on utilise certaines notions comme les tests unitaires ou le fichier DESCRIPTION pour déclarer les dépendances (avec usethis)
+Description: L application n est pas tout a fait un package mais on utilise certaines notions comme les tests unitaires ou le fichier DESCRIPTION pour declarer les dependances (avec usethis)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
