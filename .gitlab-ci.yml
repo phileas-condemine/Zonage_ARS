@@ -18,9 +18,7 @@ testing:
     script:
       - sudo apt-get update -y 
       - sudo apt-get install -y libudunits2-dev
-      - R -e "source('https://docs.rstudio.com/rspm/admin/check-user-agent.R')"
-      - R -e "options(HTTPUserAgent = sprintf('R/%s R (%s)', getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))"
-      - R -e "remotes::install_deps(dependencies = TRUE,repos='https://packagemanager.rstudio.com/all/latest')"
+      - Rscript install_deps.R
       - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
 
     artifacts:
