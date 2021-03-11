@@ -1,0 +1,3 @@
+^\.gitlab-ci\.yml$
+^LICENSE\.md$
+dev_history.R

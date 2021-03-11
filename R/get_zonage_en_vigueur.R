@@ -12,7 +12,12 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg,maj){
     my_files = my_files[grepl(paste0("^en_vigueur_",ps),name)]
     my_files = my_files[!grepl(paste0("^en_vigueur_qpv",ps),name)]
     if (length(my_files$name)>0){
-      files = lapply(my_files$name,function(en_vigueur){
+      files = lapply(1:nrow(my_files),function(i){
+        # browser()
+        en_vigueur = my_files$name[i]
+        date_modif = my_files$client_modified[i]
+        date_modif = as.Date(date_modif)
+        date_modif = format(date_modif,format="%d/%m/%Y")
         print(en_vigueur)
         drop_path = paste0(path,en_vigueur)
         local_path = paste0("data/",en_vigueur)
@@ -22,7 +27,7 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg,maj){
         
         ps = strsplit(infos,split = "_")[[1]][1]
         reg = strsplit(infos,split = "_")[[1]][2]
-        cbind(fread(local_path,colClasses = c("agr"="character")),reg=reg)
+        cbind(fread(local_path,colClasses = c("agr"="character")),reg=reg,date_modif = date_modif)
       })
       zonages_en_vigueur = rbindlist(files)
       print("fichier de zonages en vigueur");print(head(zonages_en_vigueur))
@@ -31,13 +36,13 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg,maj){
         zonages_en_vigueur[,reg:=as.numeric(reg)]
         setnames(zonages_en_vigueur,"picked_zonage","en_vigueur_autre_reg")
       } else {
-        zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric())
+        zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric(),date_modif = character())
       }
     } else {
-      zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric())
+      zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric(),date_modif = character())
     }
   } else {
-    zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric())
+    zonages_en_vigueur = data.table(agr=character(), en_vigueur_autre_reg=character(), reg=numeric(),date_modif = character())
   }
   # rm(files)
   # message("il faudrait vérifier la région majoritaire pour bien choisir celle \"en vigueur\" à sélectionner, pour l'instant on prend arbitrairement la 1ère du fichier.")
@@ -92,8 +97,9 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps,maj,TVS,BVCV=NULL)
       setnames(en_vigueur,"libreg","region_libelle")
       setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
       setnames(en_vigueur,"majoritaire","region_majoritaire")
+      setnames(en_vigueur,"date_modif","date_enregistrement")
 
-      en_vigueur <- en_vigueur[, c("region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
+      en_vigueur <- en_vigueur[, c("date_enregistrement","region", "region_libelle", "TVS", "TVS_libelle", "region_majoritaire", "zonage_regional")]
       
     } else if (ps %in% c("sf","inf")){
       en_vigueur <- en_vigueur %>% mutate(en_vigueur_autre_reg=case_when(
@@ -115,7 +121,9 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps,maj,TVS,BVCV=NULL)
       setnames(en_vigueur,"libreg","region_libelle")
       setnames(en_vigueur,"en_vigueur_autre_reg","zonage_regional")
       setnames(en_vigueur,"majoritaire","region_majoritaire")
-      en_vigueur <- en_vigueur[, c("region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
+      setnames(en_vigueur,"date_modif","date_enregistrement")
+      
+      en_vigueur <- en_vigueur[, c("date_enregistrement","region", "region_libelle", "BVCV", "BVCV_libelle", "region_majoritaire", "zonage_regional")]
       en_vigueur$BVCV = gsub(x=en_vigueur$BVCV,pattern="_",replacement="")
     }
 
