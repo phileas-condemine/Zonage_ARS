@@ -1,8 +1,9 @@
 image: rocker/tidyverse
 
 stages:
-  - test
-  - deploy
+  - setup
+  - test_manual_dl
+  - test_interaction_tableau
 
 
 # To have the coverage percentage appear as a gitlab badge follow these
@@ -11,30 +12,30 @@ stages:
 # The coverage parsing string is
 # Coverage: \d+\.\d+
 
-testing:
-    stage: test
+setting_env:
+  stage: setup
+  only:
+      - master
+  script:
+      - sudo apt-get update -y
+      - sudo apt-get install -y libudunits2-dev
+      - Rscript R/install_deps.R
+      
+testing1:
+    stage: test_manual_dl
+    dependencies:
+      - setup
     only:
-        - master
+      - master
     script:
-     - sudo apt-get update -y
-     - sudo apt-get install -y libudunits2-dev
-     - Rscript R/install_deps.R
       - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
 
-    artifacts:
-        paths:
-            - public
-
-
-onshinyapps:
-    stage: deploy
+testing2:
+    stage: test_interaction_tableau
     dependencies:
-        - testing
+      - setup        
+      - test_manual_dl
     script:
-        - ls
-    artifacts:
-        paths:
-            - public
-        expire_in: 30 days
+      - R -e "testthat::test_file('tests/shinytest/interaction_w_tableau_zonage.R')"
     only:
-        - master
+      - master
