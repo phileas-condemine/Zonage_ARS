@@ -23,19 +23,10 @@ setting_env:
       
 testing1:
     stage: test_manual_dl
-    dependencies:
-      - setup
-    only:
-      - master
     script:
       - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
 
 testing2:
     stage: test_interaction_tableau
-    dependencies:
-      - setup        
-      - test_manual_dl
     script:
       - R -e "testthat::test_file('tests/shinytest/interaction_w_tableau_zonage.R')"
-    only:
-      - master
