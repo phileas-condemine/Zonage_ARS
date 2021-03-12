@@ -10,8 +10,8 @@ drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
 print("Init the Shiny Driver...")
 app <- ShinyDriver$new(path_to_app)
 print("...Done !")
-source("R/load_files.R",encoding = "UTF-8")
-get_auth("zonage_dev/")
+source(paste0(path_to_app,"R/load_files.R"),encoding = "UTF-8")
+get_auth("zonage_dev/",paste0(path_to_app,"data"))
 
 auth <- fread(paste0(path_to_app,"data/auth.txt"))
 key <- auth[grepl("phileas",name)]$key[1]
