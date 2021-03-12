@@ -12,7 +12,7 @@ stages:
 # The coverage parsing string is
 # Coverage: \d+\.\d+
 
-setting_env:
+install_test:
   stage: setup
   only:
       - master
@@ -20,13 +20,5 @@ setting_env:
       - sudo apt-get update -y
       - sudo apt-get install -y libudunits2-dev
       - Rscript R/install_deps.R
-      
-testing1:
-    stage: test_manual_dl
-    script:
       - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
-
-testing2:
-    stage: test_interaction_tableau
-    script:
       - R -e "testthat::test_file('tests/shinytest/interaction_w_tableau_zonage.R')"
