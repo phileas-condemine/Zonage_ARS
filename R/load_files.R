@@ -1,12 +1,13 @@
 
-get_auth = function(dropbox_folder,local_dir="data"){
+get_auth = function(dropbox_folder="zonage_dev/",local_dir="data"){
   message("func : get_auth")
   #created in utils/keygen.R
   filename = "auth.txt"
   if(!filename%in%list.files(local_dir)){
+    print("download auth.txt from dropbox")
     rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = local_dir)
   }
-  auth = fread(paste0(local_dir,"/auth.txt"))
+  auth = fread(paste0(local_dir,"/",filename))
   
   auth
 }
