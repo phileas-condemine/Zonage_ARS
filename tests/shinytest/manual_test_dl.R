@@ -6,6 +6,11 @@ library(data.table)
 # path_to_app="./"
 path_to_app = "../../"
 drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
+
+print("Init the Shiny Driver...")
+app <- ShinyDriver$new(path_to_app)
+print("...Done !")
+
 auth <- fread(paste0(path_to_app,"data/auth.txt"))
 key <- auth[grepl("phileas",name)]$key[1]
 files = drop_dir(path = "zonage_dev",recursive = T)
@@ -38,9 +43,7 @@ test_dl_ps=function(ps){
                            label = "the dlButton should trigger an error")
   }
 }
-print("Init the Shiny Driver...")
-app <- ShinyDriver$new(path_to_app)
-print("...Done !")
+
 
 
 
