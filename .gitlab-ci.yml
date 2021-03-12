@@ -23,6 +23,9 @@ install_test:
       - sudo apt-get install -y libproj-dev
       - Rscript install_deps.R
       - R -e "webshot::install_phantomjs()"
-      - base64 $DROPTOKEN -d > $CI_PROJECT_DIR/droptoken.rds
+      - base64 $DROPTOKEN -d > droptoken.rds
+      - sudo cp $gm_credentials > credentials.json
+      - mkdir .secrets
+      - base64 $GMSECRET -d > .secrets/fbc5fe5f1b9501fb39a3686784bf63a1_drees.zonage.ars@gmail
       - Rscript run_tests.R
 
