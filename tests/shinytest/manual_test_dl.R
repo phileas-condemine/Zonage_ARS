@@ -52,14 +52,17 @@ test_dl_ps=function(ps){
 test_that("DL en_vigueur is blocked",{
   app$setInputs(sidebarItemExpanded = "Documents")
   expect_error(app$snapshotDownload("dl_zonage_en_vigueur_inf"),"Unable request data from server")
+  print("dl zonage en vigueur check")
 })
 
 
 test_that("DL en_vigueur can be unlocked w. password",{
   expect_true(dir.exists(paste0(path_to_app,"tests/shinytest/snapshot-current/")),
               label = "the folder snapshot-current should have been created manually")
+  print("dir exists check")
   app$setInputs(send_pwd2 = "click")
   expect_equal(app$getAllValues()$input$my_auth2,"",label = "The key should be empty for now")
+  print("empty key check")
   app$setInputs(my_auth2 = key)
   app$setInputs(send_pwd2 = "click")
   
@@ -68,8 +71,11 @@ test_that("DL en_vigueur can be unlocked w. password",{
   unlink(files)
 
   test_dl_ps("inf")
+  print("inf check")
   test_dl_ps("sf")
+  print("sf check")
   test_dl_ps("mg")
+  print("mg check")
 })
 test_that("reg_maj_tvs can be downloaded",{
   nm = "reg_maj_tvs.xlsx"
@@ -78,8 +84,9 @@ test_that("reg_maj_tvs can be downloaded",{
   dt = readxl::read_excel(paste0(path_to_app,"tests/shinytest/snapshot-current/",nm))
   print("done !")
   expect_true(inherits(dt,"tbl"),label="reg_maj_tvs should be read as a tbl by readxl")
+  print("is tbl check")
   expect_gt(nrow(dt),0,label = "reg_maj_tvs should be a non-empty df")
-  
+  print("non empty check")
 })
 
 app$stop()

@@ -28,5 +28,6 @@ install_test:
       - mkdir .secrets
       - base64 $GMSECRET -d > .secrets/$PATHGMSECRET
       - mkdir data
+      - mkdir tests/shinytest/snapshot-current
       - Rscript run_tests.R
 
