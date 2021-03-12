@@ -1,9 +1,7 @@
 
 
 # shinytest::testApp(testnames = "mytest")
-testthat::test_file('tests/shinytest/manual_test_dl.R')
-testthat::test_file('tests/shinytest/interaction_w_tableau_zonage.R')#remember the ps/reg/agr are picked randomly thus it could be useful to run this several times !
-testthat::test_file('tests/shinytest/download_map_zonage_arrete.R')
+
 # TODO add test for import_file from custom zonage already prepared in csv/xlsx
 
 # TODO test QPV

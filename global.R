@@ -18,41 +18,45 @@ try({
   
 })
 
-library(shiny)
-library(data.table)
-library(DT)
-library(leaflet)
-library(ggplot2)
-library(ggrepel)
-library(sp)
-library(sf)
-library(shinyalert)
-library(dplyr)
-library(readxl)
-library(flexdashboard)
-library(jsonlite)
-library(curl)
-library(colourvalues)
-library(bsplus)
-library(rdrop2)
-library(rgdal)
-library(rgeos)
-library(htmlwidgets)
-library(lubridate)
-library(openxlsx)
-library(knitr)
-library(kableExtra)
-library(flextable)
-library(ggsn)
-library(shinydashboard)
-library(shinyWidgets)
-library(plotly)
-# devtools::install_github("mrkaye97/slackr")
-library(slackr)
-library(shinyjs)
-library(gmailr,exclude = "message")
-library(purrr)
-library(assertthat)
+suppressMessages({
+  library(shiny)
+  library(data.table)
+  library(DT)
+  library(leaflet)
+  library(ggplot2)
+  library(ggrepel)
+  library(sp)
+  library(sf)
+  library(shinyalert)
+  library(dplyr)
+  library(readxl)
+  library(flexdashboard)
+  library(jsonlite)
+  library(curl)
+  library(colourvalues)
+  library(bsplus)
+  library(rdrop2)
+  library(rgdal)
+  library(rgeos)
+  library(htmlwidgets)
+  library(lubridate)
+  library(openxlsx)
+  library(knitr)
+  library(kableExtra)
+  library(flextable)
+  library(ggsn)
+  library(shinydashboard)
+  library(shinyWidgets)
+  library(plotly)
+  # devtools::install_github("mrkaye97/slackr")
+  library(slackr)
+  library(shinyjs)
+  library(gmailr,exclude = "message")
+  library(purrr)
+  library(assertthat)
+})
+
+print("package loading done !")
 gm_auth_configure(path = "credentials.json")
 gm_auth(email = "drees.zonage.ars@gmail.com",cache = ".secrets/") # ça marche ! il fallait suivre les instructions de récup des credentials pour Python "quickstart.py"
 
@@ -79,6 +83,8 @@ source("R/jauges_func.R",encoding = "UTF-8")
 source("R/qpv_func.R",encoding = "UTF-8")
 source("R/justification_func.R",encoding = "UTF-8")
 source("R/auth_func.R",encoding = "UTF-8")
+
+print("func sourcing done !")
 
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                   "Liste des départements"="departements",
@@ -176,7 +182,7 @@ correspondants_dev_drees = c(
 
 
 
-
+print("global.R fully run - OK !")
 
 
 

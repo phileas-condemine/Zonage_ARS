@@ -2,7 +2,6 @@ function(input, output,session) {
   drop_auth(rdstoken = "droptoken.rds")
   params = fread("params.csv",sep=":")
   
-  
   # bvcv_reg_majoritaire
   # tvs_reg_majoritaire
   ##### DEFINE REACTIVES ######

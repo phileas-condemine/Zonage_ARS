@@ -19,6 +19,6 @@ install_test:
   script:
       - sudo apt-get update -y
       - sudo apt-get install -y libudunits2-dev
-      - Rscript R/install_deps.R
-      - R -e "testthat::test_file('tests/shinytest/manual_test_dl.R')"
-      - R -e "testthat::test_file('tests/shinytest/interaction_w_tableau_zonage.R')"
+      - Rscript install_deps.R
+      - Rscript run_tests.R
+
