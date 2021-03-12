@@ -9,3 +9,5 @@ pkgs = c("shiny","data.table","DT","leaflet","ggplot2","ggrepel","sp","sf","shin
          ,"ggsn","shinydashboard","shinyWidgets","plotly","slackr","shinyjs","gmailr","purrr"
          ,"assertthat","shinytest","testthat")
 pkgs %>% map(usethis::use_package) %>% invisible()
+
+usethis::use_package("webshot")

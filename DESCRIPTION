@@ -49,4 +49,5 @@ Imports:
     purrr,
     assertthat,
     shinytest,
-    testthat
+    testthat,
+    webshot
