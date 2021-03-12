@@ -24,8 +24,8 @@ install_test:
       - Rscript install_deps.R
       - R -e "webshot::install_phantomjs()"
       - base64 $DROPTOKEN -d > droptoken.rds
-      - sudo cp $gm_credentials > credentials.json
+      - cp $gm_credentials credentials.json
       - mkdir .secrets
-      - base64 $GMSECRET -d > .secrets/fbc5fe5f1b9501fb39a3686784bf63a1_drees.zonage.ars@gmail
+      - base64 $GMSECRET -d > .secrets/$PATHGMSECRET
       - Rscript run_tests.R
 
