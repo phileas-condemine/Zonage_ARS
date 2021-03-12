@@ -1,9 +1,7 @@
 image: rocker/tidyverse
 
 stages:
-  - setup
-  - test_manual_dl
-  - test_interaction_tableau
+  - setup_and_test
 
 
 # To have the coverage percentage appear as a gitlab badge follow these
@@ -13,12 +11,13 @@ stages:
 # Coverage: \d+\.\d+
 
 install_test:
-  stage: setup
+  stage: setup_and_test
   only:
       - master
   script:
       - sudo apt-get update -y
       - sudo apt-get install -y libudunits2-dev
       - Rscript install_deps.R
+      - echo $DROPTOKEN | base64 -d > $CI_PROJECT_DIR/droptoken.rds
       - Rscript run_tests.R
 

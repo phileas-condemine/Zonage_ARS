@@ -1,5 +1,5 @@
 function(input, output,session) {
-  drop_auth(rdstoken = "droptoken.rds")
+  drop_auth(rdstoken = "droptoken.rds")#add to gitlab var_env with cat droptoken.rds | base64
   params = fread("params.csv",sep=":")
   
   # bvcv_reg_majoritaire
