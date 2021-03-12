@@ -1,12 +1,12 @@
 
-get_auth = function(dropbox_folder,local_path="data"){
+get_auth = function(dropbox_folder,local_dir="data"){
   message("func : get_auth")
   #created in utils/keygen.R
   filename = "auth.txt"
-  if(!filename%in%list.files("data")){
-    rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = local_path)
+  if(!filename%in%list.files(local_dir)){
+    rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = local_dir)
   }
-  auth = fread("data/auth.txt")
+  auth = fread(paste0(local_dir,"/auth.txt"))
   
   auth
 }
