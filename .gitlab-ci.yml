@@ -27,5 +27,6 @@ install_test:
       - cp $gm_credentials credentials.json
       - mkdir .secrets
       - base64 $GMSECRET -d > .secrets/$PATHGMSECRET
+      - mkdir data
       - Rscript run_tests.R
 
