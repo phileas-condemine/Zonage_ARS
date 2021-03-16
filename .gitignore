@@ -36,7 +36,7 @@ utils/test_arrete*
 quickstart.py
 .secrets/
 token.pickle
-tests/shinytest/snapshot-current/*.xlsx
+tests/shinytest/snapshot-current/
 app.R
 server_old.R
 utils/old/

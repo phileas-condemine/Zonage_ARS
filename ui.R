@@ -193,7 +193,7 @@ tagList(
                                  fluidRow(box(width=12,title="Connexion nécessaire",
                                               p("Merci de retourner sur l'onglet \"Choix de la profession\" pour vous identifier."),
                                               p("Si le chargement du zonage est en cours (notification en bas à droite de la page) vous pouvez ignorer ce message, le tableau apparaîtra bientôt sur l'écran."),
-                                              tags$div(id="loading")))),
+                                              tags$div(id="loading",class="loading_spinner")))),
                 conditionalPanel(condition="output.auth=='OK'",
                                  fluidRow(
                                    # uiOutput("box_tableau"),
@@ -225,8 +225,9 @@ tagList(
                                            tags$br(),
                                            fluidRow(column(12,
                                              column(2,actionButton("force_save","Sauvegarder",icon=shiny::icon("save"))),
-                                             column(6,textOutput("nb_modif_unsaved")),
-                                             column(4,tags$div(id="loading")))),
+                                             column(6,textOutput("nb_modif_unsaved"))
+                                             ,column(4,tags$div(id="loading",class="loading_spinner"))
+                                             )),
                                            fluidRow(column(12,
                                              actionBttn(
                                              inputId = "save_envigueur",

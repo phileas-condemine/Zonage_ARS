@@ -9,6 +9,7 @@ stages:
 # https://docs.gitlab.com/ee/user/project/pipelines/settings.html#test-coverage-parsing
 # The coverage parsing string is
 # Coverage: \d+\.\d+
+# sudo git clone https://github.com/phileas-condemine/Zonage_ARS.git
 
 install_test:
   stage: setup_and_test

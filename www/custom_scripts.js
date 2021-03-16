@@ -47,10 +47,10 @@ $(document).on('click','.leaflet-top .legend i',function(){
 function checkifrunning() {
       var is_running = $("html").attr("class").includes("shiny-busy");
       if (is_running){
-        $("#loading").show()
+        $(".loading_spinner").show()
         $("#save_envigueur").hide()
       } else {
-        $("#loading").hide()
+        $(".loading_spinner").hide()
         $("#save_envigueur").show()
 
       }

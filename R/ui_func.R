@@ -189,7 +189,7 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
   
   my_data = importFile_reac()
   req(my_data)
-  insertUI(session=session,selector = "#parse_file",where = "beforeBegin",immediate = T,ui = tags$div(id="loading"))
+  insertUI(session=session,selector = "#parse_file",where = "beforeBegin",immediate = T,ui = tags$div(id="loading",class="loading_spinner"))
   removeUI(session = session,selector = "#parse_file",immediate = T)
   removeUI(session = session,selector = "#shiny-modal button.btn",immediate = T)
   

@@ -514,7 +514,7 @@ form_generate_arrete = function(input,session,my_TAs){
                                                    dateInput("DATE_CONF_SANTE_AUTO","Date avis de la conférence régionale de la santé et de l’autonomie ",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                                    dateInput("DATE_UNION_REG_PS","Date avis de l’union régionale des professionnels de santé",startview = "decade", language = "fr",value = Sys.Date(),format = "dd-mm-yyyy"),
                                                    selectInput("VILLE_TRIBUNAL_ADMINISTRATIF","Ville du Tribunal Administratif de région",choices=my_TAs,selected=my_TAs[1]),
-                                                   # column(6,tags$div(id="loading")),
+                                                   # column(6,tags$div(id="loading",class="loading_spinner")),
                                                    # column(6,
                                                    checkboxGroupInput("add_annexes",label = "Annexes à inclure",
                                                                       choices = c("Tableaux","Cartes"),selected = c("Tableaux","Cartes")),
@@ -543,7 +543,7 @@ gen_buttons_sidebar_dl = function(input){
         downloadButton("dl_pop_tvs","Population jauges", style = "width:230px;color:#000"),br(),
         downloadButton("dl_reg_maj_tvs","Rég. maj TVS", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br()
-        ,tags$div(id="loading")
+        ,tags$div(id="loading",class="loading_spinner")
       )
     } else if(input$choix_ps=="sf"){
       
@@ -554,7 +554,7 @@ gen_buttons_sidebar_dl = function(input){
         downloadButton("dl_pop_bvcv_femmes","Population jauges (femmes)", style = "width:230px;color:#000"),br(),
         downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br()
-        ,tags$div(id="loading")
+        ,tags$div(id="loading",class="loading_spinner")
         
       )
     } else  if(input$choix_ps=="inf"){
@@ -565,7 +565,7 @@ gen_buttons_sidebar_dl = function(input){
         downloadButton("dl_pop_bvcv_all","Population jauges", style = "width:230px;color:#000"),br(),
         downloadButton("dl_reg_maj_bvcv","Rég. maj BVCV", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
-        ,tags$div(id="loading")
+        ,tags$div(id="loading",class="loading_spinner")
         
         
       )
@@ -576,7 +576,7 @@ gen_buttons_sidebar_dl = function(input){
         downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
         downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
-        ,tags$div(id="loading")
+        ,tags$div(id="loading",class="loading_spinner")
       )
     }
     
@@ -587,7 +587,7 @@ gen_buttons_sidebar_dl = function(input){
       downloadButton("dl_zonage_en_vigueur_mg","Zonages MG", style = "width:230px;color:#000"),br(),
       downloadButton("dl_zonage_en_vigueur_sf","Zonages SF", style = "width:230px;color:#000"),br(),
       downloadButton("dl_zonage_en_vigueur_inf","Zonages IDE", style = "width:230px;color:#000"),br()
-      ,tags$div(id="loading")
+      ,tags$div(id="loading",class="loading_spinner")
     )
   }
   

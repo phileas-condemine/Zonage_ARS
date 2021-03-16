@@ -95,7 +95,7 @@ save_upload_en_vigueur = function(input,
   
   req(input$choix_reg)
   req(input$save_envigueur_confirm)
-  insertUI(session = session,selector = "#save_envigueur_confirm",where = "beforeBegin",immediate = T,ui = tags$div(id="loading"))
+  insertUI(session = session,selector = "#save_envigueur_confirm",where = "beforeBegin",immediate = T,ui = tags$div(id="loading",class="loading_spinner"))
   removeUI(session = session,selector = "#save_envigueur_confirm",immediate = T)
   removeUI(session = session,selector = "#shiny-modal button.btn",immediate = T)
   print("Persistance : save_envigueur_confirm")
