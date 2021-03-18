@@ -18,7 +18,6 @@ prep_zonage_hors_mg <- function(
   zonages_en_vigueur){
   message("func : prep_zonage_hors_mg")
   
-  
   if(my_ps=="sf"){
     filename = params[file=="zonage_sf"]$name
   } else if (my_ps =="inf"){
@@ -87,6 +86,21 @@ prep_zonage_hors_mg <- function(
   
   bvcv=merge(bvcv,cadre_national,
              by.x=c("agr"),by.y=c("bvcv"),all.x=T)    
+  
+  not_merged = bvcv[is.na(CN)]
+  if(nrow(not_merged)==1){
+    showNotification(
+      sprintf("Attention, le BVCV de %s, n° %s n'a pas été trouvé dans le fichier cadre national, aucune valeur par défaut n'a été attribuée ! Merci de veillez à attribuer un zonage à ce BVCV.",
+              not_merged$libagr,not_merged$agr),
+      duration = NULL,type = "error",session = session)
+  } else if (nrow(not_merged)>1){
+    
+    showNotification(
+      sprintf("Attention, les BVCV de %s n'ont pas été trouvés dans le fichier cadre national, aucune valeur par défaut n'a été attribuée ! Merci de veillez à attribuer un zonage à ces BVCV.",
+              paste(paste0(not_merged$libagr," (",not_merged$agr,")"),collapse=", ")),
+      duration = NULL,type = "error",session = session)
+    
+  }
   
   radio_buttons=expand.grid(agr=bvcv$agr,
                             statut=c("VUD","UD","Int","VD","OD"),stringsAsFactors = F)%>%data.table
@@ -217,7 +231,7 @@ prep_zonage_hors_mg <- function(
   radio_buttons[,extra:=paste0(
     ifelse(!is_majoritaire," disabled='disabled'",""),
     ifelse(is.na(value_provisoire_mino),"",ifelse(value_provisoire_mino&statut=="Int"," title='FaQ: Intermédiaire si ARS majoritaire doit encore saisir son zonage'","")),
-    ifelse((ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
+    ifelse(is.na(CN)|(ZE_OD==1&statut%in%ps_ZE_OD)|(ZE_UD==1&statut%in%ps_ZE_UD),""," disabled='disabled'")
   )]
   
   
@@ -229,10 +243,10 @@ prep_zonage_hors_mg <- function(
     ifelse(checked>0," checked='checked'",""),
     extra)]
   
-  none_check = radio_buttons[,.(checked=sum(checked)),by="agr"][checked==0]
-  if(nrow(none_check)>0){
-    showNotification(session=session,sprintf("Aucune case n'est cochée pour les BVCV suivants : %s. Merci de veiller à renseigner le zonage pour ces zones.",paste(none_check$agr,collapse=", ")),duration = NULL,type = "error",closeButton = T)
-  }
+  # none_check = radio_buttons[,.(checked=sum(checked)),by="agr"][checked==0]
+  # if(nrow(none_check)>0){
+  #   showNotification(session=session,sprintf("Aucune case n'est cochée pour les BVCV suivants : %s. Merci de veiller à renseigner le zonage pour ces zones.",paste(none_check$agr,collapse=", ")),duration = NULL,type = "error",closeButton = T)
+  # }
   
   # radio_buttons[,html:=sprintf(
   #   "<input type='radio' name='%s' value='%s' %sclass='zonage_radio_button%s%s%s%s'%s/>",

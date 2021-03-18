@@ -3,7 +3,8 @@ source("global.R")
 drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
 
-dropbox_folder =  "zonage/" # "zonage_dev/"
+dropbox_folder =  "zonage/"
+# dropbox_folder =  "zonage_dev/" 
 TVS = get_TVS(dropbox_folder,params[file=="tvs"]$name)
 dep = unique(TVS[,c("dep","reg","libdep")])
 regions = get_regions_seuils(dropbox_folder,params[file=="seuils_arretes"]$name,TVS)
@@ -20,7 +21,7 @@ todo = 11
 drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
 
-
+# todo = todo[todo>44]
   
 for (my_reg in todo){
   print(my_reg)

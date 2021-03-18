@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  rstudio:
+    environment:
+      - USER=rstudio
+      - PASSWORD=azerty
+    build: .
+    ports:
+      - 8787:8787

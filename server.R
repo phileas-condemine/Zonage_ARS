@@ -412,32 +412,43 @@ function(input, output,session) {
     },
     function(file) {
       
-      if(input$choix_ps=="mg"){
-        infos = prep_table_to_download(
-          input,
-          session,
-          vals_reac,
-          tableau_reg(),
-          hist_qpv = hist_qpv(),
-          zonage_qpv = zonage_qpv(),
-          communes_TVS = communes_TVS
-        )
-      } else if(input$choix_ps=="sf"){
-        infos = prep_table_to_download(input,
-                                       session, 
-                                       vals_reac, 
-                                       tableau_reg(), 
-                                       pop_femmes = pop_femmes(),
-                                       communes_BVCV = communes_BVCV)
-      } else {
-        infos = prep_table_to_download(input,
-                                       session,
-                                       vals_reac,
-                                       tableau_reg(),
-                                       communes_BVCV = communes_BVCV)
-      }
+      zonage = vals_reac()
+      tableau = tableau_reg()
+      sans_zonage = anti_join(tableau,zonage,by="agr")
       
-      write.xlsx(infos,file)
+      if(nrow(sans_zonage)>0){
+        showNotification(sprintf("Attention, avant de récupérer le tableau, vous devez assigner un zonage à toutes les zones géographiques. Merci d'indiquer le zonage pour %s",
+                                 paste(paste0(sans_zonage$libagr," (",sans_zonage$agr,")"),collapse=", ")),
+                         type = "error",duration = NULL)
+      } else {
+        
+        if(input$choix_ps=="mg"){
+          infos = prep_table_to_download(
+            input,
+            session,
+            vals_reac,
+            tableau_reg(),
+            hist_qpv = hist_qpv(),
+            zonage_qpv = zonage_qpv(),
+            communes_TVS = communes_TVS
+          )
+        } else if(input$choix_ps=="sf"){
+          infos = prep_table_to_download(input,
+                                         session, 
+                                         vals_reac, 
+                                         tableau_reg(), 
+                                         pop_femmes = pop_femmes(),
+                                         communes_BVCV = communes_BVCV)
+        } else {
+          infos = prep_table_to_download(input,
+                                         session,
+                                         vals_reac,
+                                         tableau_reg(),
+                                         communes_BVCV = communes_BVCV)
+        }
+        
+        write.xlsx(infos,file)
+      }
       
     }
   )
@@ -460,8 +471,24 @@ function(input, output,session) {
   
   observeEvent(input$generate_arrete,{
     
-    my_TAs=TA()[reg%in%input$choix_reg]$TA
-    form_generate_arrete(input,session,my_TAs)
+    zonage = vals_reac()
+    tableau = tableau_reg()
+    sans_zonage = anti_join(tableau,zonage,by="agr")
+    
+    if(nrow(sans_zonage)>0){
+      showNotification(sprintf("Attention, avant de générer le modèle d'arrêté, vous devez assigner un zonage à toutes les zones géographiques. Merci d'indiquer le zonage pour %s",
+                               paste(paste0(sans_zonage$libagr," (",sans_zonage$agr,")"),collapse=", ")),
+                       type = "error",duration = NULL)
+    } else {
+      
+      my_TAs=TA()[reg%in%input$choix_reg]$TA
+      form_generate_arrete(input,session,my_TAs)
+      
+    }
+    
+    
+    
+    
   })
   output$download_arrete <- downloadHandler(
     function() {
@@ -555,7 +582,18 @@ function(input, output,session) {
   
   observeEvent(input$save_envigueur,{
     req(!is.null(input$save_envigueur))
-    confirm_save_envigueur(session)
+    
+    zonage = vals_reac()
+    tableau = tableau_reg()
+    sans_zonage = anti_join(tableau,zonage,by="agr")
+    
+    if(nrow(sans_zonage)>0){
+      showNotification(sprintf("Attention, avant de valider vous devez assigner un zonage à toutes les zones géographiques. Merci d'indiquer le zonage pour %s",
+                               paste(paste0(sans_zonage$libagr," (",sans_zonage$agr,")"),collapse=", ")),
+                       type = "error",duration = NULL)
+    } else {
+      confirm_save_envigueur(session)
+    }
   })
   
   observeEvent(c(autorefresh(),input$force_save),{
@@ -980,10 +1018,10 @@ function(input, output,session) {
           nm = input$new_name_millesime
           new_mil = paste0(input$choix_ps,'_',input$choix_reg,'_',nm)
           
-
           
           
-
+          
+          
           to_rename = dropbox_files[grepl(sprintf("(%s$)|(%s.csv$)",old_mil,old_mil),name)]$name
           start_warning = Sys.time()
           insertUI(selector = ".modal-body",where = "beforeEnd",session = session,immediate = T,
