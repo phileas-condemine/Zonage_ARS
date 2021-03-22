@@ -100,6 +100,7 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   app$setInputs(send_pwd = "click",wait_ = F,values_ = F)
   
   print("wait for the \"force save button\" to appear...")
+  Sys.sleep(1)
   force_save_value = app$waitForValue("force_save", ignore = NULL,timeout = 20*1E+3)
   print("... done !")
   

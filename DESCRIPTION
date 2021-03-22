@@ -50,4 +50,6 @@ Imports:
     assertthat,
     shinytest,
     testthat,
-    webshot
+    webshot,
+    docxtractr,
+    textreadr

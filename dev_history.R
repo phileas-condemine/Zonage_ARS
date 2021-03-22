@@ -11,3 +11,5 @@ pkgs = c("shiny","data.table","DT","leaflet","ggplot2","ggrepel","sp","sf","shin
 pkgs %>% map(usethis::use_package) %>% invisible()
 
 usethis::use_package("webshot")
+usethis::use_package("docxtractr")#for download_map_zonage_arrete.R
+usethis::use_package("textreadr")#for download_map_zonage_arrete.R
