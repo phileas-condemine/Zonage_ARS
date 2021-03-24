@@ -1,5 +1,5 @@
 FROM rocker/rstudio:latest
-RUN add-apt-repository -y ppa:cran/poppler && apt-get update -qq && apt-get -y --no-install-recommends install \
+RUN apt-get update -qq && apt-get -y --no-install-recommends install \
 libudunits2-dev \
 libgdal-dev \
 gdal-bin \
