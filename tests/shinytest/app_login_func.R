@@ -101,7 +101,12 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   
   print("wait for the \"force save button\" to appear...")
   Sys.sleep(1)
-  force_save_value = app$waitForValue("force_save", ignore = NULL,timeout = 20*1E+3)
+  iter = 0
+  force_save_value = app$getValue("force_save")
+  while(!"force_save_value" %in% ls() && iter <10){
+    force_save_value = app$waitForValue("force_save", ignore = NULL,timeout = 5*1E+3)
+    iter = iter +1
+  }
   print("... done !")
   
   inputs = app$getAllValues(output = F,export = F)$input
