@@ -11,8 +11,18 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   print("move to params")
   # app$getAllValues()$input$choix_reg
   app$setInputs(go_params = "click")
-  app$waitForValue("choix_ps",ignore = list())
-  app$waitForValue("choix_reg",ignore = list())
+  curr_choix_ps = app$getValue("choix_ps")
+  if(!"curr_choix_ps"%in%ls()){
+    curr_choix_ps = app$waitForValue("choix_ps",ignore = list())
+  }
+  print(sprintf("Valeur choix_ps actuelle : %s",curr_choix_ps))
+  
+  curr_choix_reg = app$getValue("choix_reg")
+  if(!"curr_choix_reg"%in%ls()){
+    curr_choix_reg = app$waitForValue("choix_reg",ignore = list())
+  }
+  print(sprintf("Valeur choix_reg actuelle : %s",curr_choix_reg))
+  
   inputs = app$getAllValues()$input
   print("choix_ps & choix_reg inputs should exist")
   expect_true(all(c("choix_ps","choix_reg")%in%names(inputs)),"choix_ps & choix_reg should exist as input (but NULL, see next test)")
@@ -103,6 +113,9 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   Sys.sleep(1)
   iter = 0
   force_save_value = app$getValue("force_save")
+  if (!"force_save_value"%in%ls()){
+    print("getValue didn't work => waitForValue")
+  }
   while(!"force_save_value" %in% ls() && iter <10){
     force_save_value = app$waitForValue("force_save", ignore = NULL,timeout = 5*1E+3)
     iter = iter +1

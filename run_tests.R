@@ -1,3 +1,4 @@
+# options(error=recover) 
 test_res = testthat::test_file('tests/shinytest/manual_test_dl.R')
 test_res = invisible(print(test_res))
 has_error = sum(test_res$error)>0
