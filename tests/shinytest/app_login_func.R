@@ -4,7 +4,7 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   
   #### Start the app ####
   print("Init the Shiny Driver...")
-  app <- ShinyDriver$new(path_to_app)
+  app <- ShinyDriver$new(path_to_app,loadTimeout = 20E+3,phantomTimeout = 20E+3)
   print("...Done !")
   
   
@@ -99,8 +99,13 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
   expect_true("go_zonage" %in% names(app$getAllValues()$input),
               label = "go_zonage button should exist !")
   app$setInputs(go_zonage = "click")
+  # app$setInputs(go_zonage = "click",wait_ = F,values_ = F)
   print("Clicked on go_zonage button - expecting the password modal to appear")
-  
+  # app$getValue("sidebarmenu")
+  # app$getValue("go_zonage")
+  # app$getValue("my_auth")
+  # app$waitForValue("my_auth")
+  # app$findElement("#my_auth")
   empty_pwd_field = app$waitForValue("my_auth", ignore = NULL,timeout = 20*1E+3)
   expect_true("my_auth" %in% names(app$getAllValues()$input),
               label = "There should be a field to enter the password")
@@ -121,6 +126,22 @@ login_app = function(path_to_app,my_reg,my_ps,auth){
     iter = iter +1
   }
   print("... done !")
+  
+  # source_code = app$getSource()
+  # page = read_html(source_code)
+  # page = page %>% html_nodes("#shiny-tab-zonage")
+  # page %>% html_text() %>% gsub(pattern = "\n",replacement = "")
+  # page %>% html_node("table")
+  # page %>% html_table()
+  
+  # e = app$findElement('a[href*="#shiny-tab-my_params"]')
+  # e$getText()
+  # e$getName()
+  # e$click()
+  # app$getValue("sidebarmenu")
+  
+  
+  
   
   inputs = app$getAllValues(output = F,export = F)$input
   expect_true("force_save"%in%names(inputs))

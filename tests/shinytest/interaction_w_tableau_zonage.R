@@ -3,6 +3,8 @@ library(testthat)
 library(rdrop2)
 library(data.table)
 library(magrittr)
+library(rvest)
+
 # path_to_app="./"
 # path_to_tests = "tests/shinytest/"
 path_to_app = "../../"

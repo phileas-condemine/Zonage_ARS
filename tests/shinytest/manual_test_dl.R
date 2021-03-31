@@ -8,7 +8,7 @@ path_to_app = "../../"
 drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
 
 print("Init the Shiny Driver...")
-app <- ShinyDriver$new(path_to_app)
+app <- ShinyDriver$new(path_to_app,loadTimeout = 20E+3,phantomTimeout = 20E+3)
 print("...Done !")
 source(paste0(path_to_app,"R/load_files.R"),encoding = "UTF-8")
 get_auth("zonage_dev/",paste0(path_to_app,"data"))
