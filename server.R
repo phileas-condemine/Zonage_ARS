@@ -138,6 +138,20 @@ function(input, output,session) {
     
   })
   
+  observeEvent(input$choix_ps,{
+    req(input$choix_ps)
+    if(input$choix_ps == "mg"){
+      removeNotification(id = "mg_is_wip",session=session)
+      
+      showNotification(ui = "Attention pour le zonage des médecins généralistes, l'application est en chantier et ne se substitue pas aux fichiers de remontée de la DGOS.",type = "warning",id="mg_is_wip",session=session)
+    } else {
+      removeNotification(id = "mg_is_wip",session=session)
+    }
+    
+  })
+  
+  
+  
   ##### CHOIX REG  ##### 
   
   

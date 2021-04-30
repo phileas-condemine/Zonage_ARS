@@ -110,7 +110,8 @@ send_mail_and_slack_user_feedback = function(input,session){
       try({
         email <- gm_mime() %>%
           gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
-          gm_subject("Commentaire d'un utilisateur") %>%
+          gm_cc("drees-zonage-ars@sante.gouv.fr")%>%
+          gm_subject("App Zonage-ARS : Commentaire d'un utilisateur") %>%
           gm_text_body(paste0(text_to_send,"\n",name_sender,"\n",adresse_mail))
         gm_send_message(email)
       })
