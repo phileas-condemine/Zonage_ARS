@@ -176,7 +176,8 @@ correspondants_DGOS = c(
 
 correspondants_dev_drees = c(
   "phileas.condemine@sante.gouv.fr",
-  "blandine.legendre@sante.gouv.fr"
+  "blandine.legendre@sante.gouv.fr",
+  "drees-zonage-ars@sante.gouv.fr"
 )
 
 

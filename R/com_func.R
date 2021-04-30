@@ -31,6 +31,7 @@ send_mail_user_login = function(my_reg=input$choix_reg,my_ps=input$choix_ps,sess
   message("func : send_mail_user_login")
   email <- gm_mime() %>%
     gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+    gm_cc("drees-zonage-ars@sante.gouv.fr")%>%
     gm_subject("Envoi de mail via R") %>%
     gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
                              sprintf(
