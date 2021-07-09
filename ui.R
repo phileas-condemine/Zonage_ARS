@@ -110,7 +110,7 @@ tagList(
                 fluidRow(
                   actionBttn(
                     "tuto_params",
-                    "Lancer la viste guidée",
+                    "Lancer la visite guidée",
                     style = "pill",
                     color = "default",
                     size = "md",
@@ -204,7 +204,7 @@ tagList(
                                            column(7,uiOutput("rappel_ps")),
                                            column(5,br(),actionBttn(
                                              "tuto_zonage",
-                                             "Lancer la viste guidée",
+                                             "Lancer la visite guidée",
                                              style = "pill",
                                              color = "default",
                                              size = "md",

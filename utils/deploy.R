@@ -1,6 +1,5 @@
 
 
-# shinytest::testApp(testnames = "mytest")
 
 # TODO add test for import_file from custom zonage already prepared in csv/xlsx
 

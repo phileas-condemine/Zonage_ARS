@@ -97,11 +97,6 @@ tableau_reg_func = function(input,
   zonages_en_vigueur = dl_zonage_en_vigueur_agr(input$choix_ps,dropbox_ps_folder,input$choix_reg,maj=maj)
   
   
-  # if(input$choix_ps=='mg'){
-  #   source("utils/prep_zonage_mg.R",local=T,encoding = "UTF-8")
-  # }else{
-  #   source("utils/prep_zonage_hors_mg.R",local=T,encoding = "UTF-8")
-  # }
   
   
   if (shiny_running()){

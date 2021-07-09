@@ -156,10 +156,10 @@ input[type="radio"].temp_minoritaire:checked:after {
       animation: spin 1s ease-in-out infinite;
     }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 
 @keyframes pulse {
