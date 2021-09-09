@@ -54,6 +54,8 @@ suppressMessages({
   library(gmailr,exclude = "message")
   library(purrr)
   library(assertthat)
+  library(sas7bdat)
+  library(haven)
 })
 
 print("package loading done !")
