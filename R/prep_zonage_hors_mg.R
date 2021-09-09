@@ -213,7 +213,6 @@ prep_zonage_hors_mg <- function(
     ps_ZE_UD = c("VUD","UD")
     ps_ZE_OD = c("OD","VD")
   }
-  
   radio_buttons[,class:=paste0(
     ifelse(check_historique|(CN==statut)," historical_choice",""),
     ifelse(value_set," saved_choice",""),

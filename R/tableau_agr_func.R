@@ -26,7 +26,7 @@ tableau_reg_func = function(input,
                             session,
                             dropbox_folder,
                             dropbox_ps_folder,
-                            dropbox_files
+                            list_dropbox_files
                             ,regions=NULL#regions_reac()
                             ,dep = NULL#dep_reac()
                             ,TVS_reac = NULL#TVS
@@ -125,7 +125,7 @@ tableau_reg_func = function(input,
       my_ps=input$choix_ps,
       dropbox_folder=dropbox_folder,
       dropbox_ps_folder=dropbox_ps_folder,
-      my_dropbox_files=dropbox_files,
+      my_dropbox_files=list_dropbox_files,
       choix_mil = my_mil,
       params=params,
       VZN_reac,communes_AGR=communes_TVS,
@@ -138,7 +138,7 @@ tableau_reg_func = function(input,
       my_ps=input$choix_ps,
       dropbox_folder=dropbox_folder,
       dropbox_ps_folder=dropbox_ps_folder,
-      my_dropbox_files=dropbox_files,
+      my_dropbox_files=list_dropbox_files,
       choix_mil = my_mil,
       params=params,
       VZN_reac,pop_femmes=pop_femmes,

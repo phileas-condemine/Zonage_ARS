@@ -19,6 +19,12 @@ try({
 })
 
 suppressMessages({
+  
+
+  
+  
+  
+  
   library(shiny)
   library(data.table)
   library(DT)
@@ -55,7 +61,12 @@ suppressMessages({
   library(purrr)
   library(assertthat)
   library(sas7bdat)
-  library(haven)
+  library(haven)  
+  # library(shinytest)
+  # library(testthat)
+  # library(webshot)
+  # library(docxtractr)
+  # library(textreadr)
 })
 
 print("package loading done !")

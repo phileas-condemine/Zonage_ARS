@@ -252,6 +252,9 @@ function(input, output,session) {
                                      importFile_reac = importFile,
                                      dropbox_ps_folder=dropbox_ps_folder(),
                                      millesimes_reac = millesimes)
+    
+    dropbox_files(get_dropbox_files(input,dropbox_ps_folder = dropbox_ps_folder()))
+    
   })
   
   ##### LOAD TABLEAU AGR ######
@@ -266,7 +269,7 @@ function(input, output,session) {
       tableau_reg_func(input = input,output=output,session = session,
                        dropbox_folder = dropbox_folder(),
                        dropbox_ps_folder = dropbox_ps_folder(),
-                       dropbox_files = dropbox_files(),
+                       list_dropbox_files = dropbox_files(),
                        regions=regions_reac(),
                        dep = dep_reac(),
                        fond_de_carte_reac = fond_de_carte,
@@ -1007,10 +1010,8 @@ function(input, output,session) {
       old_mil = input$choix_millesime
       mil_list = millesimes()
       old_mil_name = names(mil_list[mil_list==old_mil])
-      dropbox_files = drop_dir(dropbox_ps_folder())
-      dropbox_files = data.table(dropbox_files)
       reg_ps = paste0("^",input$choix_ps,"_",input$choix_reg,"_")
-      proj_in_reg_ps = dropbox_files[grep(reg_ps,name)]$name
+      proj_in_reg_ps = dropbox_files()[grep(reg_ps,name)]$name
       proj_in_reg_ps = gsub(reg_ps,"",proj_in_reg_ps)
       
       if (sum(grepl("(vigueur)|(justification)",input$new_name_millesime))==0){
@@ -1036,7 +1037,7 @@ function(input, output,session) {
           
           
           
-          to_rename = dropbox_files[grepl(sprintf("(%s$)|(%s.csv$)",old_mil,old_mil),name)]$name
+          to_rename = dropbox_files()[grepl(sprintf("(%s$)|(%s.csv$)",old_mil,old_mil),name)]$name
           start_warning = Sys.time()
           insertUI(selector = ".modal-body",where = "beforeEnd",session = session,immediate = T,
                    ui=tags$div(id="rename_and_reload",

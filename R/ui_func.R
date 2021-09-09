@@ -202,6 +202,7 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
       my_data[picked_zonage%in%input$mod_zv]$picked_zonage <- "ZV"
       my_data[picked_zonage%in%input$mod_hv]$picked_zonage <- "HV"
     } else if (input$choix_ps %in% c("sf","inf")){
+      
       my_data[picked_zonage%in%input$mod_tsd]$picked_zonage <- "VUD"
       my_data[picked_zonage%in%input$mod_sod]$picked_zonage <- "UD"
       my_data[picked_zonage%in%input$mod_int]$picked_zonage <- "Int"
@@ -237,6 +238,8 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
                        choices=c(millesimes_reac(),setNames(filename,filenm_no_extension)),
                        selected=filename)
   importFile_reac(my_data)
+  
+  
   shinyjs::runjs("$('#file_import_box button.btn-box-tool').trigger('click');")
   shinyjs::runjs("$('button#go_zonage').addClass('pulse');")
   removeModal(session = session)
