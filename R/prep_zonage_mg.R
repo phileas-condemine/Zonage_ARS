@@ -30,8 +30,7 @@ prep_zonage_mg <- function(
   zonage_historique=data.table(zonage_historique)
   names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars")
   table(zonage_historique$zonage_ars)
-  zonage_historique[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
-  zonage_historique[zonage_ars=="Hors vivier",zonage_ars:="HV"]
+  # zonage_historique[zonage_ars=="Hors zonage",zonage_ars:="HZ"]
   zonage_historique=zonage_historique%>%
     mutate_if(is.factor,as.character)%>%
     select(reg,tvs,zonage_ars,zonage_nat)%>% 
@@ -79,7 +78,7 @@ prep_zonage_mg <- function(
             by.x=c("agr"),by.y=c("tvs"),all.x=T)    
   
   radio_buttons=expand.grid(agr=tvs$agr,
-                            statut=c("ZIP","ZAC","ZV","HV"),stringsAsFactors = F)%>%data.table
+                            statut=c("ZIP","ZAC","HZ"),stringsAsFactors = F)%>%data.table
   radio_buttons=merge(radio_buttons,
                       tvs[,c("agr","is_majoritaire","CN")],
                       by="agr")
@@ -100,7 +99,7 @@ prep_zonage_mg <- function(
              ifelse(statut=="ZIP",ifelse(my_reg%in%regions_derogatoires," checked='checked'",
                                          " checked='checked' disabled='disabled'"),
                     ifelse(my_reg%in%regions_derogatoires,""," disabled='disabled'")),""),
-      ifelse(CN=="ZZ_Hors vivier"&statut=="HV"&!check_historique," checked='checked'","")
+      ifelse(CN=="ZZ_Hors zonage"&statut=="HZ"&!check_historique," checked='checked'","")
     )]
     vals=data.table(vals_zonage_historique[,c("tvs","zonage_ars")])
     setnames(vals,c("tvs","zonage_ars"),c("agr","picked_zonage"))
@@ -164,7 +163,7 @@ prep_zonage_mg <- function(
                     ifelse(my_reg%in%regions_derogatoires," checked='checked'"," checked='checked' disabled='disabled'"),
                     ifelse(my_reg%in%regions_derogatoires,""," disabled='disabled'")),
              ""),
-      ifelse(CN=="ZZ_Hors vivier"&statut=="HV"&!value_set&!check_historique," checked='checked'","")
+      ifelse(CN=="ZZ_Hors zonage"&statut=="HZ"&!value_set&!check_historique," checked='checked'","")
     )]
   }
   

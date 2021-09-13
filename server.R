@@ -238,7 +238,7 @@ function(input, output,session) {
   observeEvent(c(input$var_zonage,
                  input$import_data_model,
                  input$choix_ps,
-                 input$mod_zip,input$mod_zac,input$mod_zv,input$mod_hv,
+                 input$mod_zip,input$mod_zac,input$mod_hz,
                  input$mod_tsd,input$mod_sod,input$mod_int,input$mod_td,input$mod_sud),{
                    
                    file_import_form_dynamic_update(input,session,importFile)

@@ -59,7 +59,7 @@ gen_edit_qpv_options = function(input,vals_reac,regions_reac,hist_qpv,zonage_qpv
       tags$p(paste0("Cadre national : ", info_curr$CN)),
       selectizeInput("zonage_one_qpv","Choix du zonage du QPV",
                      selected=zonage_qpv[cod%in%input$edit_one_qpv]$picked_zonage,
-                     choices=c("ZIP"="ZIP","ZAC"="ZAC","Zone de vigilance"="ZV","Hors-Vivier"="HV")),
+                     choices=c("ZIP"="ZIP","ZAC"="ZAC","Hors zonage"="HZ")),
       actionButton("save_zonage_qpv","Enregistrer ce zonage pour ce QPV",icon=icon("save"))
     )
   } else NULL

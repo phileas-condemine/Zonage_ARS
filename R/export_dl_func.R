@@ -40,9 +40,8 @@ prep_table_to_download = function(input,session,vals_reac,tableau_reg,communes_T
     print(table(infos$picked_zonage))
     infos <- infos %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -93,9 +92,8 @@ prep_table_to_download = function(input,session,vals_reac,tableau_reg,communes_T
     
     infos_zonage_qpv <- infos_zonage_qpv %>% mutate(picked_zonage_qpv=case_when(
       picked_zonage_qpv=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage_qpv=="HV"~"Hors-vivier",
+      picked_zonage_qpv=="HZ"~"Hors zonage",
       picked_zonage_qpv=="Non-spécifié"~"Non-spécifié",
-      picked_zonage_qpv=="ZV"~"Zone de vigilance",
       picked_zonage_qpv=="ZAC"~"Zone d'action complémentaire",
       picked_zonage_qpv=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -104,9 +102,8 @@ prep_table_to_download = function(input,session,vals_reac,tableau_reg,communes_T
     
     infos_zonage_qpv <- infos_zonage_qpv %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -146,9 +143,8 @@ prep_map_to_download = function(input,session,vals_reac,regions_reac,tableau_reg
     print(table(infos$picked_zonage))
     infos <- infos %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -158,8 +154,8 @@ prep_map_to_download = function(input,session,vals_reac,regions_reac,tableau_reg
                      by.y="agr",all.x=T)
   contours_reg <- contours_reg %>% arrange(-population)
   if(input$choix_ps=="mg"){
-    # lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
-    lev = c("Erreur TVS-COM","Hors-vivier","Non-spécifié","Zone de vigilance","Zone d'action complémentaire","Zone d'intervention prioritaire")
+    # lev = c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
+    lev = c("Erreur TVS-COM","Hors zonage","Non-spécifié","Zone d'action complémentaire","Zone d'intervention prioritaire")
   }else{
     lev = c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")
   }
@@ -173,15 +169,15 @@ prep_map_to_download = function(input,session,vals_reac,regions_reac,tableau_reg
   
   contours_reg = merge(contours_reg,nb_per_zonage[,c("picked_zonage","zonage_nb")],by="picked_zonage")
   
-  # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+  # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
   # }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
   # contours_reg$picked_zonage,alpha=.3)
   if(input$choix_ps=='mg'){
-    my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+    my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
   } else if (input$choix_ps %in% c("sf","inf")){
     my_colors <- c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
   }
-  # names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+  # names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
   # }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
   names(my_colors) <- nb_per_zonage$zonage_nb
   # https://stackoverflow.com/questions/61286108/error-in-cpl-transformx-crs-aoi-pipeline-reverse-ogrcreatecoordinatetrans
@@ -274,9 +270,8 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
     print(table(infos$picked_zonage))
     my_table <- my_table %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -312,9 +307,8 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
     
     my_table2 <- my_table2 %>% mutate(picked_zonage_qpv=case_when(
       picked_zonage_qpv=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage_qpv=="HV"~"Hors-vivier",
+      picked_zonage_qpv=="HZ"~"Hors zonage",
       picked_zonage_qpv=="Non-spécifié"~"Non-spécifié",
-      picked_zonage_qpv=="ZV"~"Zone de vigilance",
       picked_zonage_qpv=="ZAC"~"Zone d'action complémentaire",
       picked_zonage_qpv=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -323,9 +317,8 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
     
     my_table2 <- my_table2 %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -386,9 +379,8 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
     print(table(infos$picked_zonage))
     infos <- infos %>% mutate(picked_zonage=case_when(
       picked_zonage=="Erreur TVS-COM"~"Erreur TVS-COM",
-      picked_zonage=="HV"~"Hors-vivier",
+      picked_zonage=="HZ"~"Hors zonage",
       picked_zonage=="Non-spécifié"~"Non-spécifié",
-      picked_zonage=="ZV"~"Zone de vigilance",
       picked_zonage=="ZAC"~"Zone d'action complémentaire",
       picked_zonage=="ZIP"~"Zone d'intervention prioritaire"
     ))
@@ -400,8 +392,8 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
                      by.y="agr",all.x=T)
   contours_reg <- contours_reg %>% arrange(-population)
   if(input$choix_ps=="mg"){
-    # lev = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
-    lev = c("Erreur TVS-COM","Hors-vivier","Non-spécifié","Zone de vigilance","Zone d'action complémentaire","Zone d'intervention prioritaire")
+    # lev = c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
+    lev = c("Erreur TVS-COM","Hors zonage","Non-spécifié","Zone d'action complémentaire","Zone d'intervention prioritaire")
     
   }else{
     lev = c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")
@@ -416,15 +408,15 @@ prep_arrete_to_download = function(input,session,vals_reac,regions_reac,tableau_
   
   contours_reg = merge(contours_reg,nb_per_zonage[,c("picked_zonage","zonage_nb")],by="picked_zonage")
   
-  # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+  # factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
   # }else{c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
   # contours_reg$picked_zonage,alpha=.3)
   if(input$choix_ps=='mg'){
-    my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+    my_colors <- c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
   } else if (input$choix_ps %in% c("sf","inf")){
     my_colors <- c('#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
   }
-  # names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+  # names(my_colors) <- if(input$choix_ps=='mg'){c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
   # }else{c("Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}
   names(my_colors) <- nb_per_zonage$zonage_nb
   # st_crs(contours_reg) <- 4326
@@ -524,7 +516,7 @@ form_generate_arrete = function(input,session,my_TAs){
                                                    # )
                                             ))))
   } else {
-    showNotification(session=session,duration = NULL,type = "warning",ui = HTML("<b>Attention</b> la génération de l'arrêté n'est pas encore disponible pour cette profession, n'hésitez pas à nous solliciter (Blandine Legendre, Clémence Lamoril et Philéas Condemine) pour en savoir plus sur l'avancement du projet."))
+    showNotification(session=session,duration = NULL,type = "warning",ui = HTML("<b>Attention</b> la génération de l'arrêté n'est pas encore disponible pour cette profession, n'hésitez pas à nous solliciter (Blandine Legendre, Clémence Lamoril, Philéas Condemine et Julie Kamionka) pour en savoir plus sur l'avancement du projet."))
   }
 }
 

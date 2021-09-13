@@ -30,7 +30,7 @@ drop_clean_upload = function(filename, local_path = "data/",drop_path = "zonage/
 send_mail_user_login = function(my_reg=input$choix_reg,my_ps=input$choix_ps,session,IP,info_region,key){
   message("func : send_mail_user_login")
   email <- gm_mime() %>%
-    gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+    gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr","julie.kamionka@externes.sante.gouv.fr")) %>%
     gm_cc("drees-zonage-ars@sante.gouv.fr")%>%
     gm_subject("Envoi de mail via R") %>%
     gm_html_body(body = HTML("<p><b>Bonjour</b>,<br>",
@@ -75,7 +75,7 @@ send_mail_user_validate_zonage = function(my_reg,my_ps,info_region){
     gm_html_body(body = HTML("<p>Bonjour à tous,<br>",
                              sprintf("L'ARS de la région %s vient de valider son zonage sur l'<a href=\"https://drees.shinyapps.io/Zonage_ARS/\">application DREES</a> avec la profession %s.<br>",info_region[reg==my_reg]$libreg,names(list_PS)[list_PS==my_ps]),
                              "Bien cordialement,<br>",
-                             "Blandine et Philéas<br>",
+                             "Blandine, Philéas et Julie<br>",
                              "PS : Merci de ne pas répondre, il s'agit d'un mail automatique.</p>"))
   gm_send_message(email)
   
@@ -110,7 +110,7 @@ send_mail_and_slack_user_feedback = function(input,session){
       
       try({
         email <- gm_mime() %>%
-          gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr")) %>%
+          gm_to(c("blandine.legendre@sante.gouv.fr","phileas.condemine@sante.gouv.fr","julie.kamionka@externes.sante.gouv.fr")) %>%
           gm_cc("drees-zonage-ars@sante.gouv.fr")%>%
           gm_subject("App Zonage-ARS : Commentaire d'un utilisateur") %>%
           gm_text_body(paste0(text_to_send,"\n",name_sender,"\n",adresse_mail))

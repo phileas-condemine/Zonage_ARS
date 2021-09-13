@@ -48,13 +48,13 @@ plot_communes = function(input,tableau_reg,default_vals,fond_de_carte){
   }
   
   contours_reg$picked_zonage=factor(contours_reg$picked_zonage,
-                                    levels = if(input$choix_ps=="mg"){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+                                    levels = if(input$choix_ps=="mg"){c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
                                     }else{c("Choix de l'ARS majoritaire","Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}) 
   print("leaflet picked zonage levels")
   print(levels(contours_reg$picked_zonage))
   
   
-  factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+  factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
   } else{c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
   contours_reg$picked_zonage,alpha=.3)
   
@@ -89,8 +89,7 @@ add_qpv = function(input,session,coords){
   
   cols = c("ZIP"="red",
            "ZAC"="lightred",
-           "ZV"="green",
-           "HV"="blue")
+           "HZ"="blue")
   icons <- awesomeIcons(
     icon = 'ios-close',
     iconColor = 'black',
@@ -120,8 +119,7 @@ update_qpv = function(input,session,coords,latest_modif){
   
   cols = c("ZIP"="red",
            "ZAC"="lightred",
-           "ZV"="green",
-           "HV"="blue")
+           "HZ"="blue")
   icons <- awesomeIcons(
     icon = 'ios-close',
     iconColor = 'black',
@@ -184,11 +182,11 @@ update_table2map = function(input,session,vals_reac,current_mapped_data_reac,tab
     }
     
     contours_reg$picked_zonage=factor(contours_reg$picked_zonage,
-                                      levels = if(input$choix_ps=="mg"){c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+                                      levels = if(input$choix_ps=="mg"){c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
                                         # }else{c("Choix de l'ARS majoritaire","VUD","UD","Int","VD","OD")}) 
                                       }else{c("Choix de l'ARS majoritaire","Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")}) 
     
-    factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')
+    factpal <- colorFactor(if(input$choix_ps=="mg"){c('#A6CEE3','#1F78B4','#B2DF8a','#FB9A99','#E31A1C')
     } else{c('#A6CEE3','#1F78B4','#B2DF8a','#33A02C','#FB9A99','#E31A1C')},
     contours_reg$picked_zonage,alpha=.3)
     
@@ -217,7 +215,7 @@ update_table2map = function(input,session,vals_reac,current_mapped_data_reac,tab
     }
     
     if(input$choix_ps=="mg"){
-      levels_picked_zonage = c("Erreur TVS-COM","HV","Non-spécifié","ZV","ZAC","ZIP")
+      levels_picked_zonage = c("Erreur TVS-COM","HZ","Non-spécifié","ZAC","ZIP")
     }else{
       levels_picked_zonage = c("Choix de l'ARS majoritaire","Très sous-doté","Sous-doté","Intermédiaire","Très doté","Sur-doté")
     }

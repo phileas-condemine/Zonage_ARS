@@ -232,7 +232,7 @@ zonage_dt_func = function(input,tableau_reg){
   )%>% formatStyle(
     ifelse(input$choix_ps=="mg","CN","libCN"),
     target = 'row',
-    backgroundColor = if(input$choix_ps=="mg"){styleEqual(c("ZZ_Hors vivier", 
+    backgroundColor = if(input$choix_ps=="mg"){styleEqual(c("ZZ_Hors zonage", 
                                                             "02_Vivier",
                                                             "01_Sélection nationale"), 
                                                           c('rgba(31,120,180,0.2)', #1F78B4
@@ -285,7 +285,7 @@ warning_zonage_clicked = function(input,
         shinyalert("Attention!", ifelse(input$choix_ps=="mg",
                                         ifelse(my_row$CN=="01_Sélection nationale",
                                                "Ce Territoire de Vie-Santé fait partie de la sélection nationale.",
-                                               "Ce Territoire de Vie-Santé est hors-vivier."
+                                               "Ce Territoire de Vie-Santé est hors zonage."
                                         ),"Ce Bassin de Vie - Canton-Ville n'est pas en zone d'échange."),
                    cancelButtonText = "Annuler",
                    confirmButtonText = "Forcer l'édition",

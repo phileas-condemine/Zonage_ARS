@@ -24,7 +24,6 @@ suppressMessages({
   library(DT)
   library(leaflet)
   library(ggplot2)
-  library(ggrepel)
   library(sp)
   library(sf)
   library(shinyalert)
@@ -91,8 +90,7 @@ print("func sourcing done !")
 vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                   "Liste des départements"="departements",
                                   "Liste communes"="communes",
-                                  "Hors Vivier (HV)"="HV",
-                                  "Zone de Vigilance (ZV)"="ZV","ZAC","ZIP",
+                                  "Hors zonage (HZ)"="HZ","ZAC","ZIP",
                                   "Population (communes de la région)"="population",
                                   # "APL 2017"="apl",
                                   "Ma région est majoritaire"="is_majoritaire",
@@ -118,7 +116,7 @@ vars_to_choose_from = list(mg = c("Code TVS"="agr","Nom TVS"="libagr",
                                    "Zone d'échange intermédiaire/sous-dotée"="ZE_UD",
                                    "Zone d'échange très/sur-dotée"="ZE_OD","Cadre National (CN)"="libCN",
                                    "Zone d'échange"="degre_liberte","Code région majoritaire"="reg_majoritaire"))
-vars_to_show_list = list(mg = c("agr","libagr","communes","HV","ZV","ZAC","ZIP","CN","population"),
+vars_to_show_list = list(mg = c("agr","libagr","communes","HZ","ZAC","ZIP","CN","population"),
                          sf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"),
                          inf = c("agr","libagr","communes","VUD","UD","Int","VD","OD","libCN","population","apl","reg_majoritaire"))
 
@@ -153,10 +151,9 @@ list_PS = c("Médecins"="mg","Sages-femmes"="sf",
 
 vswitch_zonage_mg = function(v){
   sapply(v,function(x)switch(x,
-                             ZIP = 4,
-                             ZAC = 3,
-                             ZV = 2,
-                             HV = 1))
+                             ZIP = 3,
+                             ZAC = 2,
+                             HZ = 1))
 }
 
 
@@ -179,6 +176,7 @@ correspondants_DGOS = c(
 correspondants_dev_drees = c(
   "phileas.condemine@sante.gouv.fr",
   "blandine.legendre@sante.gouv.fr",
+  "julie.kamionka@externes.sante.gouv.fr",
   "drees-zonage-ars@sante.gouv.fr"
 )
 

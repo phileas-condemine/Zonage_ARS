@@ -77,8 +77,7 @@ get_hist_qpv = function(dropbox_folder,filename){
   hist_qpv <- readxl::read_excel(paste0("data/",filename),sheet = "Zonage_QPV")[,c(1,3,5,6,10,12)]
   hist_qpv = data.table(hist_qpv)
   names(hist_qpv) <- c("reg","agr","cod","libqpv","zonage_ars","pop")
-  hist_qpv[zonage_ars=="Zone de vigilance",zonage_ars:="ZV"]
-  hist_qpv[zonage_ars=="Hors vivier",zonage_ars:="HV"]
+  hist_qpv[zonage_ars=="Hors zonage",zonage_ars:="HZ"]
   hist_qpv=hist_qpv%>%mutate_if(is.factor,as.character)%>%data.table%>%unique
   hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
   hist_qpv
@@ -90,7 +89,6 @@ get_regions_seuils = function(dropbox_folder,seuils_filename,TVS){
   if(!seuils_filename%in%list.files("data"))
     drop_download(paste0(dropbox_folder,seuils_filename),local_path = "data/",overwrite = T)
   
-  # browser()
   seuils_reg_mg=read_xlsx(paste0("data/",seuils_filename),sheet="mg")
   seuils_reg_sf=read_xlsx(paste0("data/",seuils_filename),sheet="sf")%>%rename(check_sf=check)
   seuils_reg_inf=read_xlsx(paste0("data/",seuils_filename),sheet="inf")%>%rename(check_inf=check)

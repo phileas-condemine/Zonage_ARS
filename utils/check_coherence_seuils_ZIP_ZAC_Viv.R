@@ -8,7 +8,7 @@ zonage_historique=readxl::read_xlsx("data/Zonage_medecin_20191231.xlsx",
                                     sheet="Zonage_TVS")[,c(2,5,7,8,11)]
 names(zonage_historique) <- c("reg","tvs","zonage_nat","zonage_ars","population")
 zonage_historique$zonage_ars=factor(zonage_historique$zonage_ars)
-levels(zonage_historique$zonage_ars) <- c("HV","ZAC","ZIP","ZV")
+levels(zonage_historique$zonage_ars) <- c("HZ","ZAC","ZIP")
 # zonage_historique$zonage_ars=relevel(zonage_historique$zonage_ars,ref = "ZIP")
 zonage_historique=zonage_historique%>%
   mutate_if(is.factor,as.character)%>%

@@ -13,7 +13,6 @@ dl_zonage_en_vigueur_agr = function(ps,path,curr_reg,maj){
     my_files = my_files[!grepl(paste0("^en_vigueur_qpv",ps),name)]
     if (length(my_files$name)>0){
       files = lapply(1:nrow(my_files),function(i){
-        # browser()
         en_vigueur = my_files$name[i]
         date_modif = my_files$client_modified[i]
         date_modif = as.Date(date_modif)
@@ -82,9 +81,8 @@ prepare_zonage_en_vigueur_for_export = function(en_vigueur,ps,maj,TVS,BVCV=NULL)
       en_vigueur <- en_vigueur %>% 
         mutate(en_vigueur_autre_reg=case_when(
           en_vigueur_autre_reg=="Erreur TVS-COM"~"Erreur TVS-COM",
-          en_vigueur_autre_reg=="HV"~"4 - Hors-vivier",
+          en_vigueur_autre_reg=="HZ"~"3 - Hors zonage",
           en_vigueur_autre_reg=="Non-spécifié"~"Non-spécifié",
-          en_vigueur_autre_reg=="ZV"~"3 - Zone de vigilance",
           en_vigueur_autre_reg=="ZAC"~"2- Zone d'action complémentaire",
           en_vigueur_autre_reg=="ZIP"~"1 -Zone d'intervention prioritaire"))%>%
           # mutate(reg=as.character(reg))%>%

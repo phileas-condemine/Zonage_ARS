@@ -82,10 +82,10 @@ jauge_threshold_MD= function(input,zonage_pop_reac_md,regions_reac){
   min_val=0
   max_val=5
   req(max_val)
-  val = round(100*(ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors vivier"]$pop)!=0,
-                          zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors vivier"]$pop,0)+
-                     ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors vivier"]$pop)!=0,
-                            zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors vivier"]$pop,0)),1)
+  val = round(100*(ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors zonage"]$pop)!=0,
+                          zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors zonage"]$pop,0)+
+                     ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors zonage"]$pop)!=0,
+                            zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors zonage"]$pop,0)),1)
   if (length(val)==0)val<-0
   print(val)
   if (val > max_val&!input$remove_alerte_jauge)
@@ -163,7 +163,6 @@ jauge_threshold_ZIP = function(input,zonage_pop_reac,regions_reac){
 
 zonage_pop_md_func = function(input,session,vals_reac,tableau_reg){
   message("func : zonage_pop_md_func")
-  
   print("zonage_pop_reac_md")
   infos_md=dplyr::left_join(tableau_reg[,c("agr","population","CN")],
                             vals_reac(),by="agr")

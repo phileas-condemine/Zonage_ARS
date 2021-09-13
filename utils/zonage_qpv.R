@@ -33,8 +33,8 @@ save(qppv,file="zonage_qppv.RData")
 
 library(leaflet)
 
-pal <- colorFactor(c('red','orange','yellow','yellow'),
-                   domain=c('ZIP','ZAC','Hors vivier','Zone de vigilance'),
+pal <- colorFactor(c('red','orange','yellow'),
+                   domain=c('ZIP','ZAC','Hors zonage'),
                    ordered=TRUE)
 
 leaflet(qppv) %>% addTiles() %>% 

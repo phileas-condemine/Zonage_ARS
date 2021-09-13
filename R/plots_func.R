@@ -24,20 +24,17 @@ pie_plot_distr_pop = function(input,vals_reac,tableau_reg){
   
   if(input$choix_ps=="mg"){
     zonage_pop[,zonage_majoritaire:=factor(zonage_majoritaire,levels=c("NA - majoritaire","NA - minoritaire",
-                                                                       "HV - majoritaire","HV - minoritaire",
-                                                                       "ZV - majoritaire", "ZV - minoritaire",
+                                                                       "HZ - majoritaire","HZ - minoritaire",
                                                                        "ZAC - majoritaire","ZAC - minoritaire",
                                                                        "ZIP - majoritaire","ZIP - minoritaire"
     ))]
     my_colors = data.table(zonage_majoritaire = c("NA - majoritaire","NA - minoritaire",
-                                                  "HV - majoritaire","HV - minoritaire",
-                                                  "ZV - majoritaire", "ZV - minoritaire",
+                                                  "HZ - majoritaire","HZ - minoritaire",
                                                   "ZAC - majoritaire","ZAC - minoritaire",
                                                   "ZIP - majoritaire","ZIP - minoritaire"
     ),
     color = c('#A6CEE3','#95BDD2',
               '#1F78B4','#0E67A3',
-              '#33A02C','#228F1B',
               '#FB9A99','#EA8988',
               '#E31A1C','#D2090B'))
   } else if (input$choix_ps%in%c("sf","inf")){

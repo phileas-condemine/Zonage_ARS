@@ -113,8 +113,7 @@ file_import_modal_ui = function(input,output,session,importFile_reac){
         selectInput("var_agr",label = "Variable de TVS/BVCV",choices = names(import_table)),
         selectInput("var_zip",label = "Variable ZIP",choices = names(import_table)),
         selectInput("var_zac",label = "Variable ZAC",choices = names(import_table)),
-        selectInput("var_zv" ,label = "Variable Zone de vigilance",choices = names(import_table)),
-        selectInput("var_hv" ,label = "Variable Hors-Vivier",choices = names(import_table))
+        selectInput("var_hZ" ,label = "Variable Hors zonage",choices = names(import_table))
       )
     } else if(input$choix_ps %in% c("sf","inf")) {
       inputs = tagList(
@@ -135,8 +134,7 @@ file_import_modal_ui = function(input,output,session,importFile_reac){
         selectInput("var_zonage", label = "Variable de zonage",choices = names(import_table),selected=names(import_table)[2]),
         selectInput("mod_zip"   , label = "Modalité zone d'intervention prioritaire",multiple=T,choices = ""),
         selectInput("mod_zac"   , label = "Modalité zone d'accompagnement complémentaire",multiple=T,choices = ""),
-        selectInput("mod_zv"    , label = "Modalité zone de vigilance",multiple=T,choices = ""),
-        selectInput("mod_hv"    , label = "Modalité hors-vivier",multiple=T,choices = ""))
+        selectInput("mod_hz"    , label = "Modalité hors zonage",multiple=T,choices = ""))
     } else if(input$choix_ps %in% c("sf","inf")) {
       inputs = tagList(
         selectInput("var_agr"   , label = "Variable de TVS/BVCV",choices = names(import_table),selected=names(import_table)[1]),
@@ -168,10 +166,9 @@ file_import_form_dynamic_update = function(input,session,importFile_reac){
     mods_choices = unique(importFile_reac()[[input$var_zonage]])
     if(input$choix_ps == "mg"){
       
-      updateSelectInput(session,"mod_zip",selected = input$mod_zip,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_hv)))
-      updateSelectInput(session,"mod_zac",selected = input$mod_zac,choices = setdiff(mods_choices,c(input$mod_zip,input$mod_zv,input$mod_hv)))
-      updateSelectInput(session,"mod_zv" ,selected = input$mod_zv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zip,input$mod_hv)))
-      updateSelectInput(session,"mod_hv" ,selected = input$mod_hv,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zv,input$mod_zip)))
+      updateSelectInput(session,"mod_zip",selected = input$mod_zip,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_hz)))
+      updateSelectInput(session,"mod_zac",selected = input$mod_zac,choices = setdiff(mods_choices,c(input$mod_zip,input$mod_hz)))
+      updateSelectInput(session,"mod_hz" ,selected = input$mod_hz,choices = setdiff(mods_choices,c(input$mod_zac,input$mod_zip)))
       
     } else if(input$choix_ps %in% c("sf","inf")){
       updateSelectInput(session,"mod_tsd",selected = input$mod_tsd,choices = setdiff(mods_choices,c(input$mod_sod,input$mod_int,input$mod_td,input$mod_sud)))
@@ -199,8 +196,7 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
     if (input$choix_ps=="mg"){
       my_data[picked_zonage%in%input$mod_zip]$picked_zonage <- "ZIP"
       my_data[picked_zonage%in%input$mod_zac]$picked_zonage <- "ZAC"
-      my_data[picked_zonage%in%input$mod_zv]$picked_zonage <- "ZV"
-      my_data[picked_zonage%in%input$mod_hv]$picked_zonage <- "HV"
+      my_data[picked_zonage%in%input$mod_hz]$picked_zonage <- "HZ"
     } else if (input$choix_ps %in% c("sf","inf")){
       my_data[picked_zonage%in%input$mod_tsd]$picked_zonage <- "VUD"
       my_data[picked_zonage%in%input$mod_sod]$picked_zonage <- "UD"
@@ -210,8 +206,8 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
     }
   } else if (input$import_data_model=="cast"){
     if(input$choix_ps == "mg"){
-      setnames(my_data,c(input$var_agr, input$var_zip, input$var_zac, input$var_zv, input$var_hv),
-               c("agr","ZIP","ZAC","ZV","HV"))
+      setnames(my_data,c(input$var_agr, input$var_zip, input$var_zac, input$var_hz),
+               c("agr","ZIP","ZAC","HZ"))
       my_data = melt(my_data,id.vars="agr",variable.factor=F,variable.name="picked_zonage")
       my_data = my_data[value==1]
       my_data[,value:=NULL]
