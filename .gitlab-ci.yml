@@ -15,6 +15,7 @@ install_test:
   stage: setup_and_test
   only:
       - master
+      - nv_methodo_MG
   script:
       - sudo apt-get update -y
       - sudo apt-get install -y libudunits2-dev
