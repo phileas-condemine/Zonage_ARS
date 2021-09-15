@@ -52,4 +52,6 @@ Imports:
     testthat,
     webshot,
     docxtractr,
-    textreadr
+    textreadr,
+    sas7bdat,
+    haven
