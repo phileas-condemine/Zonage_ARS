@@ -18,7 +18,7 @@ get_TVS = function(dropbox_folder,filename){
   message("func : get_TVS")
   # drop_upload(file = paste0("data/",filename),path = "zonage/",mode = "overwrite",autorename = F)
   if(!filename%in%list.files("data")){
-    rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = "data")
+    rdrop2::drop_download(path = paste0(dropbox_folder,filename),overwrite = T,local_path = "data",verbose = T)
   }
   TVS = fread(paste0("data/",filename))
   TVS=data.table(TVS)

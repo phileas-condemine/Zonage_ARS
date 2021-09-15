@@ -50,3 +50,4 @@ R/justification_func.R
 R/auth_func.R
 .secrets/fbc5fe5f1b9501fb39a3686784bf63a1_drees.zonage.ars@gmail.com
 credentials.json
+data/init_data.txt
