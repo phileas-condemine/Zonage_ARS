@@ -93,12 +93,12 @@ prep_zonage_mg <- function(
       "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s'%s%s/>",
       agr,
       statut,
-      ifelse(is_majoritaire,""," disabled='disabled'"),
+      ifelse(is_majoritaire,"",""),
       ifelse(check_historique," historical_choice' checked='checked",""),
       ifelse(CN=="01_Sélection nationale"&!check_historique,
              ifelse(statut=="ZIP",ifelse(my_reg%in%regions_derogatoires," checked='checked'",
-                                         " checked='checked' disabled='disabled'"),
-                    ifelse(my_reg%in%regions_derogatoires,""," disabled='disabled'")),""),
+                                         " checked='checked'"),
+                    ifelse(my_reg%in%regions_derogatoires,"","")),""),
       ifelse(CN=="ZZ_Hors zonage"&statut=="HZ"&!check_historique," checked='checked'","")
     )]
     vals=data.table(vals_zonage_historique[,c("tvs","zonage_ars")])
@@ -154,14 +154,14 @@ prep_zonage_mg <- function(
       "<input type='radio' name='%s' value='%s' %s class='zonage_radio_button%s%s'%s%s/>",
       agr,
       statut,
-      ifelse(is_majoritaire,""," disabled='disabled'"),
+      ifelse(is_majoritaire,"",""),
       ifelse(check_historique,ifelse(value_is_set," historical_choice",
                                      " historical_choice' checked='checked"),""),
       ifelse(value_set," saved_choice' checked='checked",""),
       ifelse(CN=="01_Sélection nationale"&!value_set&!check_historique,
              ifelse(statut=="ZIP",
-                    ifelse(my_reg%in%regions_derogatoires," checked='checked'"," checked='checked' disabled='disabled'"),
-                    ifelse(my_reg%in%regions_derogatoires,""," disabled='disabled'")),
+                    ifelse(my_reg%in%regions_derogatoires," checked='checked'"," checked='checked'"),
+                    ifelse(my_reg%in%regions_derogatoires,"","")),
              ""),
       ifelse(CN=="ZZ_Hors zonage"&statut=="HZ"&!value_set&!check_historique," checked='checked'","")
     )]

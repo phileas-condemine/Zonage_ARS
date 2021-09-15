@@ -268,8 +268,8 @@ warning_zonage_clicked = function(input,
       # print(input$zonage_dt_cell_clicked)
       # print(my_row$is_majoritaire)
       new_modifs_reac(new_modifs_reac()+1)
-      if(!my_row$is_majoritaire){
-        shinyalert("Attention!", paste("Vous avez sélectionné un",ifelse(input$choix_ps=="mg","Territoire de Vie-Santé","Bassin de Vie - Canton-Ville"),"minoritaire en termes de population dans votre région."),
+      if(!my_row$is_majoritaire & input$choix_ps!="mg"){
+        shinyalert("Attention!", paste("Vous avez sélectionné un Bassin de Vie - Canton-Ville minoritaire en termes de population dans votre région."),
                    cancelButtonText = "Annuler",
                    confirmButtonText = "Forcer l'édition",
                    type = "error",showCancelButton = T,
@@ -281,12 +281,8 @@ warning_zonage_clicked = function(input,
                      }
                    }",my_row$agr))
       }
-      if (!is.na(my_row$CN)&(my_row$CN=="01_Sélection nationale"|(input$choix_ps!="mg"&my_row$degre_liberte==0))){
-        shinyalert("Attention!", ifelse(input$choix_ps=="mg",
-                                        ifelse(my_row$CN=="01_Sélection nationale",
-                                               "Ce Territoire de Vie-Santé fait partie de la sélection nationale.",
-                                               "Ce Territoire de Vie-Santé est hors zonage."
-                                        ),"Ce Bassin de Vie - Canton-Ville n'est pas en zone d'échange."),
+      if (!is.na(my_row$CN)&((input$choix_ps!="mg"&my_row$CN=="01_Sélection nationale")|(input$choix_ps!="mg"&my_row$degre_liberte==0))){
+        shinyalert("Attention! Ce Bassin de Vie - Canton-Ville n'est pas en zone d'échange.",
                    cancelButtonText = "Annuler",
                    confirmButtonText = "Forcer l'édition",
                    type = "error",showCancelButton = T,
