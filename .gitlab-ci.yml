@@ -26,10 +26,10 @@ install_test:
       - sudo apt-get install -y libpoppler-cpp-dev
       - Rscript install_deps.R
       - R -e "webshot::install_phantomjs()"
-      - base64 $DROPTOKEN -d > droptoken.rds
+      - base64 '$DROPTOKEN' -d > droptoken.rds
       - echo "$gm_credentials" > credentials.json
       - mkdir .secrets
-      - base64 $GMSECRET -d > '.secrets/$PATHGMSECRET'
+      - base64 '$GMSECRET' -d > '.secrets/$PATHGMSECRET'
       - mkdir data
       - mkdir tests/shinytest/snapshot-current
       - Rscript run_tests.R
