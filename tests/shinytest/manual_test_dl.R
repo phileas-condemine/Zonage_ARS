@@ -4,7 +4,13 @@ library(rdrop2)
 library(data.table)
 # path_to_app = ifelse(interactive(),"./","../../")
 # path_to_app="./"
+print("CURRENT DIR")
+print(getwd())
+print("TEST DIR")
+print(list.files())
 path_to_app = "../../"
+print("PATH TO APP")
+print(list.files(path_to_app))
 drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
 
 print("Init the Shiny Driver...")
