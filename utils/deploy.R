@@ -7,6 +7,14 @@
 # TODO test prep_geo_data_from_scratch for each specific case : 4, 11, and one standard one
 # TODO add selenium basic test to see if the app is running in prod. There could be issue with the manifest.txt for example !
 
+#check manifest consistency
+manifest = readLines("manifest.txt")
+files = list.files(".",full.names = T,recursive = T)
+files = gsub("^./","",files)
+manifest = gsub("( )*$","",manifest)
+manifest[!manifest %in% files]
+
+
 rsconnect::deployApp(appFileManifest = "manifest.txt",
                      appName = "Zonage_ARS_dev",
                      launch.browser = T,
