@@ -1,0 +1,4 @@
+docker images
+docker rmi phileasc/rocker-zonage_ars:1.0
+docker build -t phileasc/rocker-zonage_ars:1.0 .
+docker push phileasc/rocker-zonage_ars
