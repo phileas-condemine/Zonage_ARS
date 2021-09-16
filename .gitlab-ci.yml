@@ -1,4 +1,4 @@
-image: rocker/tidyverse
+image: phileasc/rocker-zonage_ars
 
 stages:
   - setup_and_test
@@ -17,15 +17,6 @@ install_test:
       - master
       - nv_methodo_MG
   script:
-      - sudo apt-get update -y
-      - sudo apt-get install -y libudunits2-dev
-      - sudo apt-get install -y libgdal-dev
-      - sudo apt-get install -y gdal-bin
-      - sudo apt-get install -y libgeos-dev
-      - sudo apt-get install -y libproj-dev
-      - sudo apt-get install -y libpoppler-cpp-dev
-      - Rscript install_deps.R
-      - R -e "webshot::install_phantomjs()"
       - base64 '$DROPTOKEN' -d > droptoken.rds
       - echo "$gm_credentials" > credentials.json
       - mkdir .secrets
