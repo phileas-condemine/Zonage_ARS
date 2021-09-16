@@ -29,7 +29,7 @@ install_test:
       - base64 $DROPTOKEN -d > droptoken.rds
       - echo "$gm_credentials" > credentials.json
       - mkdir .secrets
-      - base64 $GMSECRET -d > .secrets/$PATHGMSECRET
+      - base64 $GMSECRET -d > '.secrets/$PATHGMSECRET'
       - mkdir data
       - mkdir tests/shinytest/snapshot-current
       - Rscript run_tests.R
