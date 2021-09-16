@@ -17,12 +17,10 @@ install_test:
       - master
       - nv_methodo_MG
   script:
-      - cat $DROPTOKEN > droptoken.base64
-      - base64 droptoken.base64 -d > droptoken.rds
+      - base64 $DROPTOKEN -d > droptoken.rds
       - echo "$gm_credentials" > credentials.json
       - mkdir .secrets
-      - cat $GMSECRET > gmsecret.base64
-      - base64 gmsecret.base64 -d > '.secrets/$PATHGMSECRET'
+      - base64 $GMSECRET -d > .secrets/$PATHGMSECRET
       - mkdir tests/shinytest/snapshot-current
       - Rscript run_tests.R
 

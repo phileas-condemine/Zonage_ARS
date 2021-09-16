@@ -5,8 +5,6 @@ library(data.table)
 # path_to_app = ifelse(interactive(),"./","../../")
 # path_to_app="./"
 path_to_app = "../../"
-print(readLines(file.path(path_to_app,"droptoken.rds"),n = 3,skipNul = T))
-print(readLines(file.path(path_to_app,"droptoken.base64"),n = 3))
 drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
 
 print("Init the Shiny Driver...")
