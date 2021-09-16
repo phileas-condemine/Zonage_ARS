@@ -15,3 +15,4 @@ usethis::use_package("docxtractr")#for download_map_zonage_arrete.R
 usethis::use_package("textreadr")#for download_map_zonage_arrete.R
 usethis::use_package("sas7bdat")
 usethis::use_package("haven")
+usethis::use_package("ggspatial")
