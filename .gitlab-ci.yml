@@ -1,4 +1,4 @@
-image: phileasc/rocker-zonage_ars
+image: phileasc/rocker-zonage_ars:1.0.0
 
 stages:
   - setup_and_test
