@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 image: phileasc/rocker-zonage_ars:1.0
+=======
+image: phileasc/rocker-zonage_ars:1.0.0
+>>>>>>> 0d436ed8379791233efda275d1210a342a3ac965
 
 stages:
   - setup_and_test
