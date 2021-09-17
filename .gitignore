@@ -40,3 +40,4 @@ tests/shinytest/snapshot-current/
 app.R
 server_old.R
 utils/old/
+droptoken.base64

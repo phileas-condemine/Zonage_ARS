@@ -4,13 +4,7 @@ library(rdrop2)
 library(data.table)
 # path_to_app = ifelse(interactive(),"./","../../")
 # path_to_app="./"
-print("CURRENT DIR")
-print(getwd())
-print("TEST DIR")
-print(list.files())
 path_to_app = "../../"
-print("PATH TO APP")
-print(list.files(path_to_app))
 drop_auth(rdstoken = paste0(path_to_app,"droptoken.rds"))
 
 print("Init the Shiny Driver...")
@@ -47,8 +41,8 @@ test_dl_ps=function(ps){
     print("nothing to DL")
     expect_error(
       app$snapshotDownload(paste0("dl_zonage_en_vigueur_",ps)),
-                           regexp = "Unable request data from server",
-                           label = "the dlButton should trigger an error")
+      regexp = "Unable request data from server",
+      label = "the dlButton should trigger an error")
   }
 }
 
@@ -75,7 +69,7 @@ test_that("DL en_vigueur can be unlocked w. password",{
   files = list.files(paste0(path_to_app,"tests/shinytest/snapshot-current/"),full.names = T)
   print("remove existing snapshots")
   unlink(files)
-
+  
   test_dl_ps("inf")
   print("inf check")
   test_dl_ps("sf")
