@@ -80,6 +80,7 @@ get_hist_qpv = function(dropbox_folder,filename){
   hist_qpv[zonage_ars=="Hors zonage",zonage_ars:="HZ"]
   hist_qpv=hist_qpv%>%mutate_if(is.factor,as.character)%>%data.table%>%unique
   hist_qpv$agr = stringi::stri_pad_right(hist_qpv$agr,5,"_")
+  hist_qpv[,agr := paste0(reg,"x",agr)]
   hist_qpv
 }
 
