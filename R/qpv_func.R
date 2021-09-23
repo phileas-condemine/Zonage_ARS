@@ -133,7 +133,7 @@ warning_qpv_in_tvs = function(input,session,vals_reac,last_zonage_tvs_reac,hist_
     if(!is.null(last_zonage_tvs_reac())){
       latest = vals_reac()
       old = last_zonage_tvs_reac()
-      modified = data.table(merge(latest,old,by="agr",suffixes=c(".new",".old")))[picked_zonage.new!=picked_zonage.old]
+      modified = data.table(merge(latest,old,by="agr",all=T,suffixes=c(".new",".old")))[picked_zonage.new!=picked_zonage.old]
       tvs_has_qpv = modified$agr%in%hist_qpv$agr
       if(tvs_has_qpv){
         showNotification(sprintf("Attention, ce TVS (%s) contient des QPV, merci de vérifier la cohérence du zonage de ces QPV.",
