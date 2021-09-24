@@ -667,13 +667,6 @@ function(input, output,session) {
     
   })
   
-  
-  output$threshold_MD=flexdashboard::renderGauge({ #changer pour que ça soit en % du vivier, pas de la pop régionale
-    
-    jauge_threshold_MD(input,zonage_pop_reac_md,regions_reac)
-    
-  })
-  
   output$threshold_UD=flexdashboard::renderGauge({ #spécifier les zones d'échange
     
     jauge_threshold_UD(input,zonage_pop_reac,regions_reac)
