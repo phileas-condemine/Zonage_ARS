@@ -47,7 +47,7 @@ suppressMessages({
   library(shinydashboard)
   library(shinyWidgets)
   library(plotly)
-  # devtools::install_github("mrkaye97/slackr")
+  # remotes::install_github("mrkaye97/slackr@v2.1.1",force = T,dependencies = F)
   library(slackr)
   library(shinyjs)
   library(gmailr,exclude = "message")

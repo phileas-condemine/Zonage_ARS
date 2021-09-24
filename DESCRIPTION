@@ -54,4 +54,5 @@ Imports:
     docxtractr,
     textreadr,
     sas7bdat,
-    haven
+    haven,
+    ggspatial
