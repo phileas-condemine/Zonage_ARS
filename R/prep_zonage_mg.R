@@ -42,11 +42,12 @@ prep_zonage_mg <- function(
   }
   
   zonage_historique_reg=zonage_historique[reg==my_reg,c("tvs","zonage_ars","zonage_nat")]
+  zonage_historique_reg$tvs <- paste0(my_reg,"x",zonage_historique_reg$tvs)
   setnames(zonage_historique_reg,"zonage_nat","CN")
   zonage_historique_reg=unique(zonage_historique_reg)
   # zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
   if (my_reg!="4"){
-    zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,5,"_")
+    zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,8,"_")
   }
   
   
@@ -135,7 +136,7 @@ prep_zonage_mg <- function(
     zonage_saved = zonage_saved%>%
       mutate_all(as.character)%>%
       # mutate(agr=stringi::stri_pad_left(agr,5,"0"))
-      mutate(agr=stringi::stri_pad_right(agr,5,"_"))
+      mutate(agr=stringi::stri_pad_right(agr,8,"_"))
     
     # assign("vals",zonage_saved,env)
     vals <- zonage_saved

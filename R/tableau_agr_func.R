@@ -164,7 +164,8 @@ tableau_reg_func = function(input,
   current_mapped_data(vals)
   
   if(input$choix_ps=="mg"){
-    tvs = merge(tvs,zonages_en_vigueur[,.(agr,en_vigueur_autre_reg)],by="agr",all.x=T)
+    zonages_en_vigueur[,reg_agr := paste0(my_reg,"x",agr)]
+    tvs = merge(tvs,zonages_en_vigueur[,.(reg_agr,en_vigueur_autre_reg)],by.x="agr",by.y="reg_agr",all.x=T)
     tvs[,degre_liberte := (CN=="02_Vivier")*is_majoritaire]
     
     tvs = rbind(tvs[degre_liberte==1],tvs[degre_liberte==0],tvs[is.na(degre_liberte)])

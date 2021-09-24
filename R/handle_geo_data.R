@@ -70,14 +70,17 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
   if(my_reg == 11){
     communes <- rbind(communes,
                       arr[["paris"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+    communes <- communes[communes$depcom!="75056",]
   }
   if(my_reg == 84){
     communes <- rbind(communes,
                       arr[["lyon"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+    communes <- communes[communes$depcom!="69123",]
   }
   if(my_reg == 93){
     communes <- rbind(communes,
                       arr[["marseille"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
+    communes <- communes[communes$depcom!="13055",]
   }
   
   
@@ -156,7 +159,6 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
     }
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
-    
     if(my_reg == 4 & a =="TVS"){
       
       filename = params[file=="polygones_grands_quartiers_reunion"]$name
@@ -217,7 +219,9 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
       
     }
     
-    
+    if(a == "TVS"){
+      communes$agr <- paste0(my_reg,"x",communes$agr)
+    }
     
     
     # Nettoyage des polygones pour éviter les erreurs
