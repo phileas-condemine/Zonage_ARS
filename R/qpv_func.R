@@ -47,12 +47,12 @@ gen_edit_qpv_options = function(input,vals_reac,regions_reac,hist_qpv,zonage_qpv
   
   if(!is.null(input$edit_one_qpv)&length(input$edit_one_qpv)>0){
     info_qpv = hist_qpv[cod %in% input$edit_one_qpv]
-    info_tvs = TVS[agr == info_qpv$agr][1]#une ligne par commune
+    info_tvs = TVS[paste0(reg,"x",agr) == info_qpv$agr][1]#une ligne par commune
     info_curr = tableau_reg[agr==info_qpv$agr]
     
     tagList(
       tags$p(paste0("Région : ",regions_reac()[reg==info_qpv$reg]$libreg)),
-      tags$p(paste0("TVS : ", info_tvs$libagr," (",info_tvs$agr, ")")),
+      tags$p(paste0("TVS : ", info_tvs$libagr," (",paste0(info_tvs$reg,"x",info_tvs$agr), ")")),
       tags$p(paste0("Nom QPV : ", info_qpv$libqpv)),
       tags$p(paste0("Population : ",info_qpv$pop)),
       tags$p(paste0("Zonage TVS : ",vals_reac()[vals_reac()$agr==info_qpv$agr,]$picked_zonage)),
