@@ -107,7 +107,7 @@ jauge_threshold_ZIP = function(input,zonage_pop_reac,regions_reac){
   
   req(input$choix_reg)
   info_reg=regions_reac()[reg%in%input$choix_reg]
-  min_val=info_reg$SN
+  min_val=0
   max_val=info_reg$maxZIP
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="ZIP"]$pop,1)
