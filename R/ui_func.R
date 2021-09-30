@@ -194,6 +194,7 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
     setnames(my_data,c(input$var_agr,input$var_zonage),c("agr","picked_zonage"))
     my_data = my_data[,c("agr","picked_zonage")]
     if (input$choix_ps=="mg"){
+      my_data$agr = paste0(input$choix_reg,"x",my_data$agr)
       my_data[picked_zonage%in%input$mod_zip]$picked_zonage <- "ZIP"
       my_data[picked_zonage%in%input$mod_zac]$picked_zonage <- "ZAC"
       my_data[picked_zonage%in%input$mod_hz]$picked_zonage <- "HZ"
@@ -225,6 +226,8 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
   filenm_no_extension = gsub('(.xls$)|(.xlsx$)|(.csv$)','',input$from_file$name)
   filename = paste0(input$choix_ps,"_",input$choix_reg,"_",filenm_no_extension,".csv")
   local_filenm = paste0("data/",filename)
+  
+  
   fwrite(unique(my_data),local_filenm)
   
   drop_clean_upload(filename = filename,drop_path = dropbox_ps_folder)
@@ -233,6 +236,7 @@ file_import_validate_join_update = function(input,output,session,importFile_reac
                        choices=c(millesimes_reac(),setNames(filename,filenm_no_extension)),
                        selected=filename)
   importFile_reac(my_data)
+  
   shinyjs::runjs("$('#file_import_box button.btn-box-tool').trigger('click');")
   shinyjs::runjs("$('button#go_zonage').addClass('pulse');")
   removeModal(session = session)
