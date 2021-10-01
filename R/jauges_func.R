@@ -5,8 +5,7 @@ gen_ui_jauges = function(input){
   if(input$choix_ps == "mg"){
     tagList(fluidRow(
       column(12,flexdashboard::gaugeOutput("threshold_ZIP",height = "auto")),
-      column(12,flexdashboard::gaugeOutput("threshold_ZAC",height = "auto")),
-      column(12,flexdashboard::gaugeOutput("threshold_MD",height = "auto"))))
+      column(12,flexdashboard::gaugeOutput("threshold_ZAC",height = "auto"))))
   } else if (input$choix_ps =="sf"){
     tagList(fluidRow(
       column(12,flexdashboard::gaugeOutput("threshold_UD",height = "auto")),
@@ -73,35 +72,6 @@ jauge_threshold_UD = function(input,zonage_pop_reac,regions_reac){
 }
 
 
-
-jauge_threshold_MD= function(input,zonage_pop_reac_md,regions_reac){
-  message("func : jauge_threshold_MD")
-  
-  req(input$choix_reg)
-  info_reg=regions_reac()[reg%in%input$choix_reg]
-  min_val=0
-  max_val=5
-  req(max_val)
-  val = round(100*(ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors zonage"]$pop)!=0,
-                          zonage_pop_reac_md()[picked_zonage=="ZIP"&CN=="ZZ_Hors zonage"]$pop,0)+
-                     ifelse(length(zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors zonage"]$pop)!=0,
-                            zonage_pop_reac_md()[picked_zonage=="ZAC"&CN=="ZZ_Hors zonage"]$pop,0)),1)
-  if (length(val)==0)val<-0
-  print(val)
-  if (val > max_val&!input$remove_alerte_jauge)
-    shinyalert(title = "Dépassement de la population en marge dérogatoire (jauges en bas à droite)",
-               text="Ces alertes peuvent être désactivées dans le menu \"Paramétrage\" situé dans le bandeau de gauche.",
-               closeOnClickOutside = T)
-  flexdashboard::gauge(label = "Marge dérogatoire",symbol = '%',
-                       value = val,
-                       min = min_val,
-                       max = max_val,
-                       sectors=flexdashboard::gaugeSectors(
-                         success=c(min_val,min_val+.5*(max_val-min_val)),
-                         warning=c(min_val+.5*(max_val-min_val),min_val+.95*(max_val-min_val)),
-                         danger=c(min_val+.95*(max_val-min_val),max_val)))
-}
-
 jauge_threshold_ZAC = function(input,zonage_pop_reac,regions_reac){
   message("func : jauge_threshold_ZAC")
   
@@ -137,7 +107,7 @@ jauge_threshold_ZIP = function(input,zonage_pop_reac,regions_reac){
   
   req(input$choix_reg)
   info_reg=regions_reac()[reg%in%input$choix_reg]
-  min_val=info_reg$SN
+  min_val=0
   max_val=info_reg$maxZIP
   req(max_val)
   val = round(100*zonage_pop_reac()[picked_zonage=="ZIP"]$pop,1)

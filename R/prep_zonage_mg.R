@@ -46,10 +46,13 @@ prep_zonage_mg <- function(
   setnames(zonage_historique_reg,"zonage_nat","CN")
   zonage_historique_reg=unique(zonage_historique_reg)
   # zonage_historique_reg$tvs = stringi::stri_pad_left(zonage_historique_reg$tvs,5,"0")
-  if (my_reg!="4"){
+  if (!(my_reg %in% c("4","1","2","3","6"))){
     zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,8,"_")
   }
   
+  if (my_reg %in% c("1","2","3","6")){
+    zonage_historique_reg$tvs = stringi::stri_pad_right(zonage_historique_reg$tvs,7,"_")
+  }
   
   cadre_national = zonage_historique_reg[,c("tvs","CN")]%>%unique
   vals_zonage_historique = zonage_historique_reg[,c("tvs","zonage_ars")]

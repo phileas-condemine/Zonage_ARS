@@ -147,7 +147,7 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
   
   for(a in mailles_geo){
     AGR <- get(a)#()
-    
+
     if(sum(!communes2$depcom %in% AGR$depcom)>0){
       print("oups une commune est passée à la trappe !")
       not_found = communes2[!communes2$depcom %in% AGR$depcom,]$depcom
@@ -157,6 +157,18 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
       slackr_bot(message)
       
     }
+    AGR_my_reg = AGR[reg %in% my_reg]
+    
+    if(sum(!AGR_my_reg$depcom %in% communes2$depcom)>0){
+      print("oups une commune est passée à la trappe !")
+      not_found = AGR_my_reg[!depcom %in% communes2$depcom]$depcom
+      # showNotification(sprintf("Attention certaines communes n'ont pas été retrouvées dans le fichier de correspondance COM-%s : %s",a,paste(not_found,collapse=", ")))
+      slackr_setup(config_file = "www/slackr_config_log.txt",echo = F)
+      message = sprintf("App:ZonageARS\nEvent: Attention certaines communes de la table de correspondance %s n'ont pas été retrouvées dans les fonds géographiques de l'api.geo : %s",a,paste(not_found,collapse=", "))
+      slackr_bot(message)
+      
+    }
+    
     communes=merge(communes2,AGR %>% select(-libcom),by="depcom")
     
     if(my_reg == 4 & a =="TVS"){
