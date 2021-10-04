@@ -395,27 +395,6 @@ function(input, output,session) {
   
   
   
-  observeEvent(input$update_contours,{
-    if(!is.null(input$update_contours)&!is.null(input$choix_reg)){
-      if(input$update_contours){
-        my_reg=input$choix_reg
-        showNotification("Une fois les données mises à jour, l'application va redémarrer et vous devrez vous reconnecter.",type = "message",duration = NULL)
-        mailles_geo = ifelse(input$choix_ps == "mg","TVS","BVCV")
-        prep_geo_data_from_scratch(my_reg = my_reg,
-                                   regions = regions_reac(),
-                                   dep = dep_reac(),
-                                   dropbox_folder = dropbox_folder(),
-                                   TVS = TVS(),
-                                   BVCV = BVCV(),
-                                   refresh_geojson=T,
-                                   mailles_geo=mailles_geo,
-                                   params=params)
-        session$reload()
-        
-      }
-    }
-  })
-  
   
   ####### EXPORT TABLE######
   output$download_table = downloadHandler(

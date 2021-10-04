@@ -14,27 +14,24 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
                                        refresh_geojson = F,mailles_geo = c("TVS","BVCV")
                                        ,TVS = NULL#TVS()
                                        ,BVCV= NULL#BVCV()
-                                       ,params
+                                       ,params,
+                                       fonds_geo_communes = NULL
                                        ){
   message("func : prep_geo_data_from_scratch")
   reg_name=regions[reg==my_reg]$libreg
   my_deps=dep[reg==my_reg]$dep
   nb_deps=length(my_deps)
-  communes=lapply(my_deps,function(my_dep){
-    if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
-      download.file(paste0("https://geo.api.gouv.fr/departements/",my_dep,"/communes?fields=nom,code,population,contour&format=geojson&geometry=contour"),
-                    destfile = paste0("data/geojson/",my_dep,".json"))
-      
+  
+  if(is.null(fonds_geo_communes)){
+    if(!file.exists("data/FRANCE_FULL_WGS84.RDS")){
+      drop_download(path=paste0(dropbox_folder,"FRANCE_FULL_WGS84.RDS"),local_path = "data",overwrite = F)
     }
-    info_com_sf=geojsonsf::geojson_sf(paste0("data/geojson/",my_dep,".json"))
-    info_com_sf$nom=iconv(info_com_sf$nom,"UTF-8","latin1")
-    info_com_sf$nom=iconv(info_com_sf$nom,"latin1","UTF-8")
-    info_com_sf
-  })
-  communes=do.call("rbind",communes)
-  communes=unique(communes)
+    fonds_geo_communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
+  }
   
   
+  communes = fonds_geo_communes[fonds_geo_communes$dep%in%my_deps,]
+  communes$dep=NULL
   names(communes)[which(names(communes)=="nom")]<-"libcom"
   names(communes)[which(names(communes)=="code")]<-"depcom"
   
@@ -107,24 +104,8 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
   if (length(other_deps)>0){
     nb_deps=length(other_deps)
     
-    other_communes=lapply(other_deps,function(my_dep){
-      # info_com=jsonlite::fromJSON(sprintf("https://geo.api.gouv.fr/communes?codeDepartement=%s&fields=nom,code,population&format=json&geometry=centre",my_dep))
-      if (refresh_geojson | !paste0(my_dep,".json")%in%list.files("data/geojson/")){
-        download.file(sprintf(
-          "https://geo.api.gouv.fr/departements/%s/communes?fields=nom,code,population,contour&format=geojson&geometry=contour"
-          ,my_dep),paste0("data/geojson/",my_dep,".json"))            
-      } 
-      
-      info_com_sf=geojsonsf::geojson_sf(paste0("data/geojson/",my_dep,".json"))
-      # leaflet(info_com_sf)%>%addTiles()%>%addPolygons()
-      info_com_sf$nom=iconv(info_com_sf$nom,"UTF-8","latin1")
-      info_com_sf$nom=iconv(info_com_sf$nom,"latin1","UTF-8")
-      info_com_sf
-      
-    })
-    
-    
-    other_communes=do.call("rbind",other_communes)
+    other_communes = fonds_geo_communes[fonds_geo_communes$dep%in%other_deps,]
+    other_communes$dep=NULL
     communes_pertinentes_TVS = ""#init
     communes_pertinentes_BVCV = ""#init
     for(a in mailles_geo){
@@ -144,6 +125,9 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
     communes=rbind(communes,other_communes)
   }
   communes2 <- communes
+  
+  
+  
   
   for(a in mailles_geo){
     AGR <- get(a)#()
@@ -375,6 +359,10 @@ create_and_upload_reg_majo_per_agr = function(regions=regions_reac(),dep=dep_rea
   
   #### BVCV
   
+  if(!file.exists("data/FRANCE_FULL_WGS84.RDS")){
+    drop_download(path=paste0(dropbox_folder,"FRANCE_FULL_WGS84.RDS"),local_path = "data",overwrite = F)
+  }
+  fonds_geo_communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
   
   message("load BVCV")
   all_com_bvcv = rbindlist(use.names = T,fill = T,lapply(setdiff(regions$reg,"6"),function(my_reg){
@@ -393,7 +381,7 @@ create_and_upload_reg_majo_per_agr = function(regions=regions_reac(),dep=dep_rea
                                    dep = dep,
                                    dropbox_folder = dropbox_folder,
                                    TVS = TVS,
-                                   BVCV = BVCV,params=params)
+                                   BVCV = BVCV,params=params,fonds_geo_communes=fonds_geo_communes)
       }
     }
     load(paste0("data/",file))

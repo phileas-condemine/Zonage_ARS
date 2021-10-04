@@ -64,14 +64,14 @@ rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autore
 # on a juste besoin de 3 variables pour reproduire ce qu'on récupérait avec l'API GEO: 
   # code , population & nom
 pop_fra[,code:=paste0(substr(CODDEP,1,2),CODCOM)]
-pop_fra = pop_fra[,.(code,population=PTOT,nom=COM)]
+pop_fra = pop_fra[,.(code,population=PTOT,nom=COM,dep=CODDEP)]
 communes=aggregate(x = FRANCE,
                    by = list("code"=FRANCE$INSEE_COM),
                    FUN = function(x)x[1])
 communes$INSEE_COM=NULL
 communes = merge(communes,pop_fra,by="code",all.x=T)
 
-saveRDS(communes,"data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS")
+saveRDS(communes,"data/FRANCE_FULL_WGS84.RDS")
 path = "zonage_dev/"
-rdrop2::drop_upload(file="data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
+rdrop2::drop_upload(file="data/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
 

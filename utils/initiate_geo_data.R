@@ -3,8 +3,8 @@ source("global.R")
 drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
 
-dropbox_folder =  "zonage/"
-# dropbox_folder =  "zonage_dev/" 
+# dropbox_folder =  "zonage/"
+dropbox_folder =  "zonage_dev/"
 TVS = get_TVS(dropbox_folder,params[file=="tvs"]$name)
 dep = unique(TVS[,c("dep","reg","libdep")])
 regions = get_regions_seuils(dropbox_folder,params[file=="seuils_arretes"]$name,TVS)
@@ -22,7 +22,11 @@ drop_auth(rdstoken = "droptoken.rds")
 params = fread("params.csv",sep=":")
 
 # todo = todo[todo>44]
-  
+if(!file.exists("data/FRANCE_FULL_WGS84.RDS")){
+  drop_download(path=paste0(dropbox_folder,"FRANCE_FULL_WGS84.RDS"),local_path = "data",overwrite = F)
+}
+fonds_geo_communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
+
 for (my_reg in todo){
   print(my_reg)
   reg_name=regions[reg==my_reg]$libreg
@@ -33,7 +37,8 @@ for (my_reg in todo){
                              dep = dep,
                              dropbox_folder = dropbox_folder,
                              TVS = TVS,
-                             BVCV = BVCV,params = params)
+                             BVCV = BVCV,params = params,
+                             fonds_geo_communes = fonds_geo_communes)
 }
 
 
