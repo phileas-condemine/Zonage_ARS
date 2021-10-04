@@ -50,33 +50,6 @@ MYT = MYT %>% st_as_sf(coords=c("coordxet","coordyet"),crs=4471) %>% st_transfor
 leaflet(MYT)%>%addTiles()%>%addPolygons()
 
 FRANCE = rbind(FRA, GLP, MTQ, GUF, REU, MYT)
-length(unique(FRA$INSEE_COM))
-length(unique(FRANCE$INSEE_COM))
-communes=aggregate(x = FRANCE,
-                             by = list("code_agr"=FRANCE$INSEE_COM),
-                             FUN = function(x)x[1])
-
-
-
-print(system.time(communes_dissolved$geometry <-communes_dissolved$geometry %>%
-                    st_transform(2154) %>%
-                    as('Spatial')%>%
-                    # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
-                    rgeos::gSimplify(topologyPreserve = T,tol=200) %>%
-                    # rmapshaper::ms_simplify()%>%
-                    rgeos::gBuffer(byid=TRUE, width=0)%>%
-                    # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
-                    # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
-                    st_as_sf()%>%
-                    st_transform(4326) %>%
-                    .$geometry))
-
-
-
-
-saveRDS(FRANCE,"data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS")
-path = "zonage_dev/"
-rdrop2::drop_upload(file="data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
 
 ##### POPULATION #####
 # https://www.insee.fr/fr/statistiques/4989724?sommaire=4989761 
@@ -88,4 +61,17 @@ pop_fra = fread("data/pop_insee_legales2018_noMYT.csv",encoding = "UTF-8",colCla
 path = "zonage_dev/"
 rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autorename = F)
 
+# on a juste besoin de 3 variables pour reproduire ce qu'on récupérait avec l'API GEO: 
+  # code , population & nom
+pop_fra[,code:=paste0(substr(CODDEP,1,2),CODCOM)]
+pop_fra = pop_fra[,.(code,population=PTOT,nom=COM)]
+communes=aggregate(x = FRANCE,
+                   by = list("code"=FRANCE$INSEE_COM),
+                   FUN = function(x)x[1])
+communes$INSEE_COM=NULL
+communes = merge(communes,pop_fra,by="code",all.x=T)
+
+saveRDS(communes,"data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS")
+path = "zonage_dev/"
+rdrop2::drop_upload(file="data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
 
