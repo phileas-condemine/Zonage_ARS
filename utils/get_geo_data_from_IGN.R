@@ -50,25 +50,31 @@ MYT = MYT %>% st_as_sf(coords=c("coordxet","coordyet"),crs=4471) %>% st_transfor
 leaflet(MYT)%>%addTiles()%>%addPolygons()
 
 FRANCE = rbind(FRA, GLP, MTQ, GUF, REU, MYT)
-
-##### POPULATION #####
-# https://www.insee.fr/fr/statistiques/4989724?sommaire=4989761 
-# télécharger le format csv, 
-# c'est un fichier compressé (zip) contenant un CSV 
-# récupérer le fichier Communes.csv et le mettre dans data/
-# Pour 2021 on utilise la population légale 2018 et on renomme le fichier pop_insee_legales2018_noMYT.csv parce qu'il n'y a pas Mayotte
-# path = "zonage_dev/"
-# rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autorename = F)
-
-# on a juste besoin de 3 variables pour reproduire ce qu'on récupérait avec l'API GEO: 
-  # code , population & nom
-pop_fra = fread("data/pop_insee_legales2018_noMYT.csv",encoding = "UTF-8",colClasses = "character")
-pop_fra[,code:=paste0(substr(CODDEP,1,2),CODCOM)]
-pop_fra = pop_fra[,.(code,population=PTOT,nom=COM,dep=CODDEP)]
 communes=aggregate(x = FRANCE,
                    by = list("code"=FRANCE$INSEE_COM),
                    FUN = function(x)x[1])
 communes$INSEE_COM=NULL
+##### POPULATION #####
+# PAS A JOUR https://www.insee.fr/fr/statistiques/4989724?sommaire=4989761 
+# https://www.insee.fr/fr/statistiques/5395878?sommaire=5395927 en naviguant sur le site https://www.insee.fr/fr/accueil > stats & études -> niveaux géo = toutes les communes > 
+# démographie : évolution et structure de la population > Population en 2018 > pop1A 
+# télécharger le format csv, 
+# c'est un fichier compressé (zip) contenant un CSV 
+# récupérer le fichier BTT_TD_POP1A_2018.CSV et le mettre dans data/
+
+
+# path = "zonage_dev/"
+# rdrop2::drop_upload(file="data/BTT_TD_POP1A_2018.CSV",path=path,autorename = F)
+
+# on a juste besoin de 3 variables pour reproduire ce qu'on récupérait avec l'API GEO: 
+  # code , population & nom
+pop_fra = fread("data/BTT_TD_POP1A_2018.CSV",encoding = "UTF-8",colClasses = "character")
+pop_fra[,NB:=as.numeric(NB)]
+pop_fra = pop_fra[,.(population = round(sum(NB))),by=.(code=CODGEO,nom=LIBGEO)]
+pop_fra[,dep:=substr(code,1,2)]
+pop_fra[dep=="97",dep:=substr(code,1,3)]
+# communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
+communes = communes[,"code"]
 communes = merge(communes,pop_fra,by="code",all.x=T)
 
 saveRDS(communes,"data/FRANCE_FULL_WGS84.RDS")
@@ -79,5 +85,5 @@ rdrop2::drop_upload(file="data/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
 communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
 table(is.na(communes$population))
 communes$code[is.na(communes$population)]
-
-pop_fra[code%in%c("27058")]
+communes[communes$dep=="75",]
+# pop_fra[code%in%c("27058")]

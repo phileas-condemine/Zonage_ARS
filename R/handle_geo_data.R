@@ -35,52 +35,6 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
   names(communes)[which(names(communes)=="nom")]<-"libcom"
   names(communes)[which(names(communes)=="code")]<-"depcom"
   
-  if(my_reg %in% c(11,84,93)){
-    filename = params[file=="polygones_arrondissements_PLM"]$name
-    if(!filename%in%list.files("data/")){
-      drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
-    }
-    load(paste0("data/",filename))
-    
-    filename = params[file=="pop_plm"]$name
-    if(!filename%in%list.files("data/")){
-      drop_download(paste0(dropbox_folder,filename),local_path = "data/",overwrite = T)
-    }
-    load(paste0("data/",filename))
-    z_pop <- pop_plm
-    print(head(z_pop))
-    arr = lapply(arr,function(x){
-      x@data$depcom = as.character(x@data$depcom)
-      tmp = x@data
-      tmp$ordre = 1:nrow(tmp)
-      tmp = merge(tmp,z_pop,by="depcom")
-      setorder(tmp,"ordre")
-      tmp$ordre=NULL
-      x@data = tmp
-      x
-    })
-    print(head(arr))
-    
-  }
-  
-  
-  if(my_reg == 11){
-    communes <- rbind(communes,
-                      arr[["paris"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
-    communes <- communes[communes$depcom!="75056",]
-  }
-  if(my_reg == 84){
-    communes <- rbind(communes,
-                      arr[["lyon"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
-    communes <- communes[communes$depcom!="69123",]
-  }
-  if(my_reg == 93){
-    communes <- rbind(communes,
-                      arr[["marseille"]] %>% sf::st_as_sf()%>%select(libcom,depcom,population)) 
-    communes <- communes[communes$depcom!="13055",]
-  }
-  
-  
   
   communes$my_reg_TVS=T
   communes$my_reg_BVCV=T
@@ -222,17 +176,17 @@ prep_geo_data_from_scratch <- function(my_reg,regions = regions_reac(),dep = dep
     
     # Nettoyage des polygones pour éviter les erreurs
     print("Fusion des polygones (regroupement des communes en AGR). Ca peut prendre 1 minute la première fois.")
-    print(system.time(communes$geometry <-
-                        communes$geometry %>% 
-                        st_transform(2154) %>%
-                        as('Spatial')%>%
-                        # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
-                        rgeos::gBuffer(byid=TRUE, width=0)%>%
-                        # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
-                        # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
-                        st_as_sf()%>%
-                        st_transform(4326) %>%
-                        .$geometry))
+    # print(system.time(communes$geometry <-
+    #                     communes$geometry %>% 
+    #                     st_transform(2154) %>%
+    #                     as('Spatial')%>%
+    #                     # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
+    #                     rgeos::gBuffer(byid=TRUE, width=0)%>%
+    #                     # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
+    #                     # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
+    #                     st_as_sf()%>%
+    #                     st_transform(4326) %>%
+    #                     .$geometry))
     
     
     
