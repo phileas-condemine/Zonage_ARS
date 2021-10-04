@@ -57,12 +57,12 @@ FRANCE = rbind(FRA, GLP, MTQ, GUF, REU, MYT)
 # c'est un fichier compressé (zip) contenant un CSV 
 # récupérer le fichier Communes.csv et le mettre dans data/
 # Pour 2021 on utilise la population légale 2018 et on renomme le fichier pop_insee_legales2018_noMYT.csv parce qu'il n'y a pas Mayotte
-pop_fra = fread("data/pop_insee_legales2018_noMYT.csv",encoding = "UTF-8",colClasses = "character")
-path = "zonage_dev/"
-rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autorename = F)
+# path = "zonage_dev/"
+# rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autorename = F)
 
 # on a juste besoin de 3 variables pour reproduire ce qu'on récupérait avec l'API GEO: 
   # code , population & nom
+pop_fra = fread("data/pop_insee_legales2018_noMYT.csv",encoding = "UTF-8",colClasses = "character")
 pop_fra[,code:=paste0(substr(CODDEP,1,2),CODCOM)]
 pop_fra = pop_fra[,.(code,population=PTOT,nom=COM,dep=CODDEP)]
 communes=aggregate(x = FRANCE,
@@ -73,5 +73,11 @@ communes = merge(communes,pop_fra,by="code",all.x=T)
 
 saveRDS(communes,"data/FRANCE_FULL_WGS84.RDS")
 path = "zonage_dev/"
-rdrop2::drop_upload(file="data/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
+# path =  "zonage/"
 
+rdrop2::drop_upload(file="data/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
+communes = readRDS("data/FRANCE_FULL_WGS84.RDS")
+table(is.na(communes$population))
+communes$code[is.na(communes$population)]
+
+pop_fra[code%in%c("27058")]
