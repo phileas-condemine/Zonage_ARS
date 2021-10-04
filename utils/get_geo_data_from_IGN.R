@@ -10,6 +10,9 @@ library(sf)
 library(tidyr)
 library(magrittr)
 library(leaflet)
+
+##### RECUP DES FONDS DE CARTE #####
+
 # https://professionnels.ign.fr/contoursiris
 ftp2file = "ftp://Contours_IRIS_ext:ao6Phu5ohJ4jaeji@ftp3.ign.fr/CONTOURS-IRIS_2-1__SHP__FRA_2021-01-01.7z"
 # téléchargement depuis le site en passant par IE (le proxy ministère bloque download.file)
@@ -46,10 +49,43 @@ MYT@data = data.frame(INSEE_COM = MYT@data$INSEE_COM)
 MYT = MYT %>% st_as_sf(coords=c("coordxet","coordyet"),crs=4471) %>% st_transform(4326)
 leaflet(MYT)%>%addTiles()%>%addPolygons()
 
-
 FRANCE = rbind(FRA, GLP, MTQ, GUF, REU, MYT)
+length(unique(FRA$INSEE_COM))
+length(unique(FRANCE$INSEE_COM))
+communes=aggregate(x = FRANCE,
+                             by = list("code_agr"=FRANCE$INSEE_COM),
+                             FUN = function(x)x[1])
+
+
+
+print(system.time(communes_dissolved$geometry <-communes_dissolved$geometry %>%
+                    st_transform(2154) %>%
+                    as('Spatial')%>%
+                    # sp::spTransform( CRS( "+init=epsg:2154" ) ) %>%
+                    rgeos::gSimplify(topologyPreserve = T,tol=200) %>%
+                    # rmapshaper::ms_simplify()%>%
+                    rgeos::gBuffer(byid=TRUE, width=0)%>%
+                    # sp::spTransform( CRS( "+init=epsg:4326" ) ) %>%
+                    # sp::spTransform( CRS( "+no_defs +datum=WGS84 +proj=longlat" ) ) %>%
+                    st_as_sf()%>%
+                    st_transform(4326) %>%
+                    .$geometry))
+
+
+
 
 saveRDS(FRANCE,"data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS")
 path = "zonage_dev/"
 rdrop2::drop_upload(file="data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
+
+##### POPULATION #####
+# https://www.insee.fr/fr/statistiques/4989724?sommaire=4989761 
+# télécharger le format csv, 
+# c'est un fichier compressé (zip) contenant un CSV 
+# récupérer le fichier Communes.csv et le mettre dans data/
+# Pour 2021 on utilise la population légale 2018 et on renomme le fichier pop_insee_legales2018_noMYT.csv parce qu'il n'y a pas Mayotte
+pop_fra = fread("data/pop_insee_legales2018_noMYT.csv",encoding = "UTF-8",colClasses = "character")
+path = "zonage_dev/"
+rdrop2::drop_upload(file="data/pop_insee_legales2018_noMYT.csv",path=path,autorename = F)
+
 
