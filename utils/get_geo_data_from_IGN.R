@@ -1,3 +1,7 @@
+source("global.R")
+# my_reg = regions$reg[1]
+drop_auth(rdstoken = "droptoken.rds")
+
 # remotes::install_github("InseeFrLab/inseeLocalData")
 # library(inseeLocalData)
 # library(curl)
@@ -46,5 +50,6 @@ leaflet(MYT)%>%addTiles()%>%addPolygons()
 FRANCE = rbind(FRA, GLP, MTQ, GUF, REU, MYT)
 
 saveRDS(FRANCE,"data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS")
-
+path = "zonage_dev/"
+rdrop2::drop_upload(file="data/IGN_CONTOURS_IRIS/FRANCE_FULL_WGS84.RDS",path=path,autorename = F)
 
